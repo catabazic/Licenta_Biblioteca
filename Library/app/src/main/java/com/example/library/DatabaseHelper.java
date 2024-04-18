@@ -1,10 +1,14 @@
 package com.example.library;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
+
+import java.sql.PreparedStatement;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -155,6 +159,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(" + COLUMN_USER_PREFERENCES_AUTHOR_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COLUMN_USER_ID + "), " +
                 "FOREIGN KEY(" + COLUMN_USER_PREFERENCES_AUTHOR_AUTHOR_ID + ") REFERENCES " + TABLE_AUTHOR + "(" + COLUMN_AUTHOR_ID + "))";
         db.execSQL(createUserPreferencesAuthorTableQuery);
+        db.close();
     }
 
 
@@ -172,4 +177,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER_PREFERENCES_AUTHOR);
         onCreate(db);
     }
+
+    public boolean authenticateUser(String userMail, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_USER +
+                " WHERE " + COLUMN_USER_EMAIL + " = ?" +
+                " AND " + COLUMN_USER_PASSWORD + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{userMail, password});
+        boolean isValid = cursor.getCount() > 0;
+        cursor.close();
+        return isValid;
+    }
+
+    public boolean uniqueEmailRegister(String email){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_USER +
+                " WHERE " + COLUMN_USER_EMAIL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{email});
+        boolean isValid=cursor.getCount()==0;
+        cursor.close();
+        return isValid;
+    }
+
+    public void addNewUser(String name, String number, String email, String password){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_NAME, name);
+        values.put(COLUMN_USER_PHONE, number);
+        values.put(COLUMN_USER_EMAIL,email);
+        values.put(COLUMN_USER_PASSWORD,password);
+        db.insert(TABLE_USER, null, values);
+        db.close();
+    }
+
+
 }

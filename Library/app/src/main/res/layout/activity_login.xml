@@ -2,9 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#D8CBD2">
+    android:background="#D8CBD2"
+    tools:context=".LoginActivity">
 
     <TextView
         android:id="@+id/LoginTxt"
@@ -49,9 +51,9 @@
         android:drawableLeft="@android:drawable/ic_lock_idle_lock"
         android:drawablePadding="10dp"
         android:ems="10"
-        android:minHeight="48dp"
         android:hint="Password"
         android:inputType="textPassword"
+        android:minHeight="48dp"
         android:paddingLeft="20dp"
         android:paddingTop="10dp"
         android:paddingRight="10dp"
@@ -62,7 +64,7 @@
         app:layout_constraintTop_toBottomOf="@+id/EmailLoginTxt" />
 
     <Button
-        android:id="@+id/Login"
+        android:id="@+id/LoginBtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
@@ -72,14 +74,15 @@
         app:layout_constraintStart_toStartOf="@+id/PasswordLoginTxt"
         app:layout_constraintTop_toBottomOf="@+id/PasswordLoginTxt" />
 
-    <TextView
-        android:id="@+id/textView3"
+    <Button
+        android:id="@+id/LoginChoiceBtn"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_height="48dp"
+        android:backgroundTint="#D7CAD1"
         android:text="Don't have an account?"
-        app:layout_constraintEnd_toEndOf="@+id/Login"
-        app:layout_constraintStart_toStartOf="@+id/Login"
-        app:layout_constraintTop_toBottomOf="@+id/Login" />
+        android:textColor="#000000"
+        app:layout_constraintEnd_toEndOf="@+id/LoginBtn"
+        app:layout_constraintStart_toStartOf="@+id/LoginBtn"
+        app:layout_constraintTop_toBottomOf="@+id/LoginBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
