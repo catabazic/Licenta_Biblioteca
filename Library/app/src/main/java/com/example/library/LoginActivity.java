@@ -1,6 +1,7 @@
 package com.example.library;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -35,6 +36,10 @@ public class LoginActivity extends AppCompatActivity {
 
                 // Check credentials (e.g., against local database or server)
                 if (isValidCredentials(username, password)) {
+                    SharedPreferences.Editor editor = MainActivity.sharedPreferences.edit();
+
+                    editor.putBoolean("isLoggedIn",true);
+                    editor.apply();
                     // Navigate to home screen
                     startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                     finish();

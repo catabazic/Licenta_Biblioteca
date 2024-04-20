@@ -38,6 +38,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
+                    android:contentDescription="home"
                     app:srcCompat="@android:drawable/ic_menu_gallery" />
             </LinearLayout>
 
@@ -55,6 +56,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.2"
                     android:clickable="true"
+                    android:contentDescription="Search"
                     app:srcCompat="@android:drawable/ic_menu_search" />
             </LinearLayout>
 
@@ -72,6 +74,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:clickable="true"
+                    android:contentDescription="books"
                     app:srcCompat="?attr/actionModeSelectAllDrawable" />
             </LinearLayout>
 
@@ -89,6 +92,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:clickable="true"
+                    android:contentDescription="messages"
                     app:srcCompat="@android:drawable/stat_notify_chat" />
             </LinearLayout>
 
@@ -106,6 +110,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:clickable="true"
+                    android:contentDescription="user"
                     app:srcCompat="@android:drawable/ic_menu_myplaces" />
             </LinearLayout>
 

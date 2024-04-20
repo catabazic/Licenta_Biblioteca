@@ -9,16 +9,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MyBooksActivity extends AppCompatActivity {
-    FloatingActionButton homeActionButton = findViewById(R.id.homeActionButton);
-    FloatingActionButton searchActionButton = findViewById(R.id.searchActionButton);
-    FloatingActionButton booksActionButton = findViewById(R.id.booksActionButton);
-    FloatingActionButton messagesActionButton = findViewById(R.id.messagesActionButton);
-    FloatingActionButton userActionButton = findViewById(R.id.userActionButton);
+    FloatingActionButton homeActionButton;
+    FloatingActionButton searchActionButton;
+    FloatingActionButton booksActionButton;
+    FloatingActionButton messagesActionButton;
+    FloatingActionButton userActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_books);
+
+        homeActionButton = findViewById(R.id.homeActionButton);
+        searchActionButton = findViewById(R.id.searchActionButton);
+        booksActionButton = findViewById(R.id.booksActionButton);
+        messagesActionButton = findViewById(R.id.messagesActionButton);
+        userActionButton = findViewById(R.id.userActionButton);
 
         homeActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -32,12 +38,15 @@ public class MyBooksActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MyBooksActivity.this, SearchActivity.class));
-                finish();            }
+                finish();
+            }
         });
 
         booksActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // If you're already in MyBooksActivity, you might not want to restart it
+                // You can handle this case differently if needed
                 startActivity(new Intent(MyBooksActivity.this, MyBooksActivity.class));
                 finish();
             }

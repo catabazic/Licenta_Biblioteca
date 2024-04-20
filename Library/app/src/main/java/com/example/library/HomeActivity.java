@@ -9,16 +9,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class HomeActivity extends AppCompatActivity {
-    FloatingActionButton homeActionButton = findViewById(R.id.homeActionButton);
-    FloatingActionButton searchActionButton = findViewById(R.id.searchActionButton);
-    FloatingActionButton booksActionButton = findViewById(R.id.booksActionButton);
-    FloatingActionButton messagesActionButton = findViewById(R.id.messagesActionButton);
-    FloatingActionButton userActionButton = findViewById(R.id.userActionButton);
+    FloatingActionButton homeActionButton;
+    FloatingActionButton searchActionButton;
+    FloatingActionButton booksActionButton;
+    FloatingActionButton messagesActionButton;
+    FloatingActionButton userActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        homeActionButton = findViewById(R.id.homeActionButton);
+        searchActionButton = findViewById(R.id.searchActionButton);
+        booksActionButton = findViewById(R.id.booksActionButton);
+        messagesActionButton = findViewById(R.id.messagesActionButton);
+        userActionButton = findViewById(R.id.userActionButton);
 
         homeActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
