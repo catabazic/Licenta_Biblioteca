@@ -133,7 +133,7 @@
         app:layout_constraintTop_toBottomOf="@+id/Password2Register" />
 
     <TextView
-        android:id="@+id/questionRegister"
+        android:id="@+id/registerOtherChoise"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"

@@ -7,7 +7,7 @@
     android:background="#D8CBD2">
 
     <TextView
-        android:id="@+id/bookstxt_bolt"
+        android:id="@+id/booksIntroTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -18,6 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
+        android:id="@+id/BooksMyBooks"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
@@ -25,9 +26,10 @@
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bookstxt_bolt">
+        app:layout_constraintTop_toBottomOf="@+id/booksIntroTxt">
 
         <LinearLayout
+            android:id="@+id/BooksBook1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#5BFFFFFF"
@@ -40,13 +42,14 @@
             android:paddingBottom="10dp">
 
             <ImageView
-                android:id="@+id/imageView3"
+                android:id="@+id/booksBookImg"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_weight="0"
                 app:srcCompat="@drawable/_057249787_0_240" />
 
             <LinearLayout
+                android:id="@+id/BooksBookDescription"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="clip_vertical"
@@ -54,21 +57,21 @@
                 android:paddingLeft="10dp">
 
                 <TextView
-                    android:id="@+id/textView13"
+                    android:id="@+id/BooksBookName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Litera stacojie"
                     android:textSize="16sp" />
 
                 <TextView
-                    android:id="@+id/textView14"
+                    android:id="@+id/BooksBookAuthor"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingLeft="10dp"
                     android:text="NATHANIEL HAWTHORNE" />
 
                 <TextView
-                    android:id="@+id/textView15"
+                    android:id="@+id/BooksBookState"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="10dp"
@@ -257,6 +260,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
+                    android:contentDescription="home"
                     app:srcCompat="@android:drawable/ic_menu_gallery" />
             </LinearLayout>
 
@@ -274,6 +278,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.2"
                     android:clickable="true"
+                    android:contentDescription="Search"
                     app:srcCompat="@android:drawable/ic_menu_search" />
             </LinearLayout>
 
@@ -291,6 +296,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:clickable="true"
+                    android:contentDescription="books"
                     app:srcCompat="?attr/actionModeSelectAllDrawable" />
             </LinearLayout>
 
@@ -308,6 +314,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:clickable="true"
+                    android:contentDescription="messages"
                     app:srcCompat="@android:drawable/stat_notify_chat" />
             </LinearLayout>
 
@@ -325,6 +332,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:clickable="true"
+                    android:contentDescription="user"
                     app:srcCompat="@android:drawable/ic_menu_myplaces" />
             </LinearLayout>
 

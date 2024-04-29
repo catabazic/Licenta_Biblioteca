@@ -118,7 +118,7 @@
 
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+        android:id="@+id/profilePhoto"
         android:layout_width="110dp"
         android:layout_height="110dp"
         android:layout_marginTop="16dp"
@@ -128,7 +128,7 @@
         app:cardCornerRadius="150dp">
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/profilePhotoImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitCenter"
@@ -136,7 +136,7 @@
     </androidx.cardview.widget.CardView>
 
     <TextView
-        android:id="@+id/Name_view"
+        android:id="@+id/profileNameTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -144,8 +144,87 @@
         android:text="Name"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/cardView"
-        app:layout_constraintStart_toStartOf="@+id/cardView"
-        app:layout_constraintTop_toBottomOf="@+id/cardView" />
+        app:layout_constraintEnd_toEndOf="@+id/profilePhoto"
+        app:layout_constraintStart_toStartOf="@+id/profilePhoto"
+        app:layout_constraintTop_toBottomOf="@+id/profilePhoto" />
+
+    <Button
+        android:id="@+id/profileEditBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="10dp"
+        android:backgroundTint="#1E6750A3"
+        android:text="Edit my profile"
+        android:textAlignment="textStart"
+        android:textColor="#6750A3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profileNameTxt" />
+
+    <Button
+        android:id="@+id/profileHistoryBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#BEAEC6"
+        android:text="History"
+        android:textAlignment="textStart"
+        android:textColor="#6750A3"
+        app:layout_constraintEnd_toEndOf="@+id/profileEditBtn"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/profileEditBtn"
+        app:layout_constraintTop_toBottomOf="@+id/profileEditBtn" />
+
+    <Button
+        android:id="@+id/profileMyBooksBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="My books"
+        android:textAlignment="textStart"
+        android:backgroundTint="#BEAEC6"
+        android:textColor="#6750A3"
+        app:layout_constraintEnd_toEndOf="@+id/profileHistoryBtn"
+        app:layout_constraintStart_toStartOf="@+id/profileHistoryBtn"
+        app:layout_constraintTop_toBottomOf="@+id/profileHistoryBtn" />
+
+    <Button
+        android:id="@+id/profileMyRewiewsBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="My rewiews"
+        android:textAlignment="textStart"
+        android:backgroundTint="#BEAEC6"
+        android:textColor="#6750A3"
+        app:layout_constraintEnd_toEndOf="@+id/profileMyBooksBtn"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/profileMyBooksBtn"
+        app:layout_constraintTop_toBottomOf="@+id/profileMyBooksBtn" />
+
+    <Button
+        android:id="@+id/profileParolaBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Schimba parola"
+        android:textAlignment="textStart"
+        android:backgroundTint="#BEAEC6"
+        android:textColor="#6750A3"
+        app:layout_constraintEnd_toEndOf="@+id/profileMyRewiewsBtn"
+        app:layout_constraintStart_toStartOf="@+id/profileMyRewiewsBtn"
+        app:layout_constraintTop_toBottomOf="@+id/profileMyRewiewsBtn" />
+
+    <Button
+        android:id="@+id/profileLogoutBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Logout"
+        android:textAlignment="textStart"
+        android:backgroundTint="#BEAEC6"
+        android:textColor="#6750A3"
+        app:layout_constraintEnd_toEndOf="@+id/profileParolaBtn"
+        app:layout_constraintStart_toStartOf="@+id/profileParolaBtn"
+        app:layout_constraintTop_toBottomOf="@+id/profileParolaBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

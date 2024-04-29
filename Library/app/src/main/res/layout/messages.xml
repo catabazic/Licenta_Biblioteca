@@ -7,12 +7,16 @@
     android:background="#D8CBD2">
 
     <ImageButton
-        android:id="@+id/imageButton2"
+        android:id="@+id/MessagesAddBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
         android:background="#D7CAD1"
+        android:contentDescription="addBtn"
+        android:cropToPadding="true"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/baseline_add_circle_outline_24" />
@@ -47,6 +51,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
+                    android:contentDescription="home"
                     app:srcCompat="@android:drawable/ic_menu_gallery" />
             </LinearLayout>
 
@@ -64,6 +69,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.2"
                     android:clickable="true"
+                    android:contentDescription="Search"
                     app:srcCompat="@android:drawable/ic_menu_search" />
             </LinearLayout>
 
@@ -81,6 +87,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:clickable="true"
+                    android:contentDescription="books"
                     app:srcCompat="?attr/actionModeSelectAllDrawable" />
             </LinearLayout>
 
@@ -98,6 +105,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:clickable="true"
+                    android:contentDescription="messages"
                     app:srcCompat="@android:drawable/stat_notify_chat" />
             </LinearLayout>
 
@@ -115,6 +123,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:clickable="true"
+                    android:contentDescription="user"
                     app:srcCompat="@android:drawable/ic_menu_myplaces" />
             </LinearLayout>
 
@@ -123,7 +132,7 @@
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/messagesIntroTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -135,6 +144,7 @@
 
 
     <LinearLayout
+        android:id="@+id/MessagesChats"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
@@ -145,9 +155,10 @@
         app:layout_constraintBottom_toTopOf="@+id/Coordination"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView">
+        app:layout_constraintTop_toBottomOf="@+id/messagesIntroTxt">
 
         <LinearLayout
+            android:id="@+id/MessagesChat1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#5BFFFFFF"
@@ -161,12 +172,13 @@
 
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/MessagesPhoto1"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 app:cardCornerRadius="150dp">
 
                 <ImageView
-                    android:id="@+id/user_img3"
+                    android:id="@+id/MessagesPhotoImg1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     tools:srcCompat="@tools:sample/avatars" />
@@ -174,6 +186,7 @@
 
 
             <LinearLayout
+                android:id="@+id/MessagesMessage1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.2"
@@ -181,7 +194,7 @@
                 android:paddingLeft="10dp">
 
                 <TextView
-                    android:id="@+id/sender_text_view6"
+                    android:id="@+id/MessagesNameTxt1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Luna Evergreen"
@@ -189,7 +202,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/message_text_view4"
+                    android:id="@+id/MessagesMessageTxt1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.2"
@@ -200,7 +213,7 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/MessagesHourMessage1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"

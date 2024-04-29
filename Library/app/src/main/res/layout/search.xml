@@ -36,6 +36,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
+                    android:contentDescription="home"
                     app:srcCompat="@android:drawable/ic_menu_gallery" />
             </LinearLayout>
 
@@ -53,6 +54,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.2"
                     android:clickable="true"
+                    android:contentDescription="Search"
                     app:srcCompat="@android:drawable/ic_menu_search" />
             </LinearLayout>
 
@@ -70,6 +72,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:clickable="true"
+                    android:contentDescription="books"
                     app:srcCompat="?attr/actionModeSelectAllDrawable" />
             </LinearLayout>
 
@@ -87,6 +90,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:clickable="true"
+                    android:contentDescription="messages"
                     app:srcCompat="@android:drawable/stat_notify_chat" />
             </LinearLayout>
 
@@ -104,6 +108,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:clickable="true"
+                    android:contentDescription="user"
                     app:srcCompat="@android:drawable/ic_menu_myplaces" />
             </LinearLayout>
 
@@ -112,7 +117,7 @@
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 
     <EditText
-        android:id="@+id/searchBar"
+        android:id="@+id/SearchSearchBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -134,6 +139,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/SearchResults"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -141,6 +147,6 @@
         android:layout_marginEnd="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchBar" />
+        app:layout_constraintTop_toBottomOf="@+id/SearchSearchBar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
