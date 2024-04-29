@@ -2,15 +2,17 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/messages"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#D8CBD2">
+    android:background="#D8CBD2"
+    tools:context=".MessagesActivity">
 
     <ImageButton
         android:id="@+id/MessagesAddBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+	android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
         android:background="#D7CAD1"
         android:contentDescription="addBtn"
@@ -19,6 +21,7 @@
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="addButton"
         app:srcCompat="@drawable/baseline_add_circle_outline_24" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -181,7 +184,7 @@
                     android:id="@+id/MessagesPhotoImg1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    tools:srcCompat="@tools:sample/avatars" />
+                    tools:srcCompat="@tools:sample/avatars"/>
             </androidx.cardview.widget.CardView>
 
 

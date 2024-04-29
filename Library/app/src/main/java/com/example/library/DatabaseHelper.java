@@ -1,10 +1,14 @@
 package com.example.library;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
+
+import java.sql.PreparedStatement;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -155,6 +159,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(" + COLUMN_USER_PREFERENCES_AUTHOR_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COLUMN_USER_ID + "), " +
                 "FOREIGN KEY(" + COLUMN_USER_PREFERENCES_AUTHOR_AUTHOR_ID + ") REFERENCES " + TABLE_AUTHOR + "(" + COLUMN_AUTHOR_ID + "))";
         db.execSQL(createUserPreferencesAuthorTableQuery);
+        db.close();
     }
 
 
@@ -172,4 +177,109 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER_PREFERENCES_AUTHOR);
         onCreate(db);
     }
+
+    public void insertMockData(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL("INSERT INTO Autor (autor) VALUES " +
+                "('Agatha Christie')," +
+                "('Terry Pratchett')," +
+                "('J.R.R. Tolkien')," +
+                "('Jane Austen')," +
+                "('Leo Tolstoy')," +
+                "('Charles Dickens')," +
+                "('Fyodor Dostoevsky')," +
+                "('Mark Twain')," +
+                "('Ernest Hemingway')," +
+                "('Virginia Woolf')," +
+                "('Haruki Murakami')," +
+                "('Gabriel Garcia Marquez')," +
+                "('Margaret Atwood')," +
+                "('George R.R. Martin')," +
+                "('Philip K. Dick')," +
+                "('Herman Melville')," +
+                "('Oscar Wilde')," +
+                "('Arthur Conan Doyle')," +
+                "('H.P. Lovecraft')," +
+                "('Kurt Vonnegut')");
+
+        // Adăugare date mock pentru genuri
+        db.execSQL("INSERT INTO Genre (genre) VALUES " +
+                "('Mystery')," +
+                "('Comedy')," +
+                "('Fantasy')," +
+                "('Romance')," +
+                "('Classic')," +
+                "('Science Fiction')," +
+                "('Horror')," +
+                "('Adventure')," +
+                "('Thriller')," +
+                "('Historical Fiction')," +
+                "('Dystopian')," +
+                "('Biography')," +
+                "('Young Adult')," +
+                "('Satire')," +
+                "('Poetry')," +
+                "('Crime')," +
+                "('Philosophy')," +
+                "('Self-Help')," +
+                "('Travel')," +
+                "('Western')");
+
+        // Adăugare date mock pentru cărți
+        db.execSQL("INSERT INTO Carte (nume, id_autor, id_genre, photo, descriere, disponibile) VALUES " +
+                "('Murder on the Orient Express', 1, 1, NULL, 'Unul dintre cele mai cunoscute romane de mister scrise de Agatha Christie', 12)," +
+                "('Guards! Guards!', 2, 2, NULL, 'O carte din seria Discworld, plină de umor, scrisă de Terry Pratchett', 18)," +
+                "('The Hobbit', 3, 3, NULL, 'O aventură epică despre un hobbit ce pornește într-o călătorie extraordinară, scrisă de J.R.R. Tolkien', 20)," +
+                "('Pride and Prejudice', 4, 4, NULL, 'Un roman clasic despre dragoste și prejudecăți în societatea engleză din secolul al XIX-lea, scris de Jane Austen', 15)," +
+                "('War and Peace', 5, 5, NULL, 'Un roman monumental despre război și pace în Rusia, scris de Lev Tolstoi', 10)," +
+                "('Great Expectations', 6, 6, NULL, 'O poveste clasică despre aspirații și deziluzii, scrisă de Charles Dickens', 14)," +
+                "('Crime and Punishment', 7, 7, NULL, 'Un roman psihologic despre crima și consecințele sale, scris de Fyodor Dostoevsky', 16)," +
+                "('The Adventures of Tom Sawyer', 8, 8, NULL, 'O aventură clasică despre un băiat în Mississippi, scrisă de Mark Twain', 22)," +
+                "('The Old Man and the Sea', 9, 9, NULL, 'O poveste despre un bătrân pescar și lupta sa cu un pește gigant, scrisă de Ernest Hemingway', 19)," +
+                "('To the Lighthouse', 10, 10, NULL, 'Un roman modernist despre viața și conștiința unei familii, scris de Virginia Woolf', 11)," +
+                "('Norwegian Wood', 11, 11, NULL, 'O poveste despre dragoste și pierdere în Tokyo, scrisă de Haruki Murakami', 17)," +
+                "('One Hundred Years of Solitude', 12, 12, NULL, 'Un roman magic-realism despre familia Buendía, scris de Gabriel Garcia Marquez', 13)," +
+                "('The Handmaid''s Tale', 13, 13, NULL, 'O distopie despre o societate totalitaristă și rolul femeilor, scrisă de Margaret Atwood', 8)," +
+                "('A Game of Thrones', 14, 3, NULL, 'Primul roman din seria A Song of Ice and Fire, scrisă de George R.R. Martin', 25)," +
+                "('Do Androids Dream of Electric Sheep?', 15, 6, NULL, 'Un roman science fiction despre identitate și realitate, scris de Philip K. Dick', 7)," +
+                "('Moby-Dick', 16, 14, NULL, 'Un roman despre obsesie și vânătoare de balene, scris de Herman Melville', 21)," +
+                "('The Picture of Dorian Gray', 17, 4, NULL, 'Un roman despre vanitate și moralitate, scris de Oscar Wilde', 18)," +
+                "('The Adventures of Sherlock Holmes', 18, 1, NULL, 'O colecție de povestiri despre celebrul detectiv Sherlock Holmes, scrise de Arthur Conan Doyle', 23)," +
+                "('At the Mountains of Madness', 19, 7, NULL, 'O poveste cosmic-horror despre o expediție în Antarctica, scrisă de H.P. Lovecraft', 9)," +
+                "('Slaughterhouse-Five', 20, 8, NULL, 'Un roman despre război și călătorii în timp, scris de Kurt Vonnegut', 14)");
+    }
+
+    public boolean authenticateUser(String userMail, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_USER +
+                " WHERE " + COLUMN_USER_EMAIL + " = ?" +
+                " AND " + COLUMN_USER_PASSWORD + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{userMail, password});
+        boolean isValid = cursor.getCount() > 0;
+        cursor.close();
+        return isValid;
+    }
+
+    public boolean uniqueEmailRegister(String email){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_USER +
+                " WHERE " + COLUMN_USER_EMAIL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{email});
+        boolean isValid=cursor.getCount()==0;
+        cursor.close();
+        return isValid;
+    }
+
+    public void addNewUser(String name, String number, String email, String password){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_NAME, name);
+        values.put(COLUMN_USER_PHONE, number);
+        values.put(COLUMN_USER_EMAIL,email);
+        values.put(COLUMN_USER_PASSWORD,password);
+        db.insert(TABLE_USER, null, values);
+        db.close();
+    }
+
+
 }
