@@ -6,9 +6,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -186,6 +189,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void insertMockData(){
         System.out.println("Suntem in insertMockData din dbhelper");
         SQLiteDatabase db = this.getWritableDatabase();
+        this.onUpgrade(db,0,1);
         db.execSQL("INSERT INTO Autor (autor) VALUES " +
                 "('Agatha Christie')," +
                 "('Terry Pratchett')," +
@@ -256,15 +260,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public boolean authenticateUser(String userMail, String password) {
+    @SuppressLint("Range")
+    public int authenticateUser(String userMail, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_USER +
                 " WHERE " + COLUMN_USER_EMAIL + " = ?" +
                 " AND " + COLUMN_USER_PASSWORD + " = ?";
         Cursor cursor = db.rawQuery(query, new String[]{userMail, password});
-        boolean isValid = cursor.getCount() > 0;
-        cursor.close();
-        return isValid;
+        int userId=-1;
+        if(cursor!=null && cursor.moveToFirst()){
+            userId= cursor.getInt(cursor.getColumnIndex(COLUMN_USER_ID));
+            cursor.close();
+
+        }
+        return userId;
     }
 
     public boolean uniqueEmailRegister(String email){
@@ -277,7 +286,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return isValid;
     }
 
-    public void addNewUser(String name, String number, String email, String password){
+    public int addNewUser(String name, String number, String email, String password){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_USER_NAME, name);
@@ -286,6 +295,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_USER_PASSWORD,password);
         db.insert(TABLE_USER, null, values);
         db.close();
+        return this.authenticateUser(email,password);
     }
 
     @SuppressLint("Range")
@@ -298,6 +308,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 Book book = new Book();
+                book.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_ID)));
                 book.setName(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_NAME)));
                 String queryAuthor = "SELECT * FROM " + TABLE_AUTHOR+" WHERE "
                         + COLUMN_AUTHOR_ID + "=?";
@@ -343,6 +354,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 Book book = new Book();
+                book.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_ID)));
                 book.setName(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_NAME)));
                 String queryAuthor = "SELECT * FROM " + TABLE_AUTHOR+" WHERE "
                         + COLUMN_AUTHOR_ID + "=?";
@@ -370,6 +382,130 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 book.setImage(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_PHOTO)));
                 book.setDisponible(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_AVAILABLE)));
+                booksList.add(book);
+            }
+            cursor.close();
+        }
+        return booksList;
+    }
+
+    @SuppressLint("Range")
+    public Book getBookByNameAndAuthor(String name, String author){
+        Book book = new Book();
+        int authorId=-1;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String queryAuthor = "SELECT * FROM " + TABLE_AUTHOR + " WHERE " +
+                COLUMN_AUTHOR_NAME + "=?";
+        Cursor cursorAuthor = db.rawQuery(queryAuthor, new String[]{author});
+        if (cursorAuthor.moveToFirst()) {
+            authorId= cursorAuthor.getInt(cursorAuthor.getColumnIndex(COLUMN_AUTHOR_ID));
+        }
+        cursorAuthor.close();
+
+        String query = "SELECT * FROM " + TABLE_BOOK + " WHERE " +
+                COLUMN_BOOK_NAME + " =? AND " + COLUMN_AUTHOR_ID +
+                "=?";
+        Cursor cursor = db.rawQuery(query, new String[]{name, String.valueOf(authorId)});
+        if (cursor != null && cursor.moveToFirst()) {
+            book.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_ID)));
+            book.setName(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_NAME)));
+            book.setAuthor(author);
+            String queryGenre = "SELECT * FROM " + TABLE_GENRE+" WHERE "
+                    + COLUMN_GENRE_ID + "=?";
+            Cursor cursorGenre = db.rawQuery(queryGenre, new String[]{cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_GENRE_ID))});
+
+            if (cursorGenre.moveToFirst()) {
+                // Cursor has at least one row, so it's safe to retrieve data
+                book.setGenre(cursorGenre.getString(cursorGenre.getColumnIndex(COLUMN_GENRE_NAME)));
+            } else {
+                // Cursor is empty, handle this case accordingly (e.g., set a default value for the author)
+                book.setGenre("Unknown");
+            }
+            cursorGenre.close();
+
+            book.setImage(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_PHOTO)));
+            book.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_DESCRIPTION)));
+            book.setDisponible(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_AVAILABLE)));
+            cursor.close();
+        }
+
+        return book;
+    }
+
+    @SuppressLint("Range")
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void borrowBook(int idBook, int idUser){
+        LocalDate currentDate = LocalDate.now();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_LOAN_USER_ID, idUser);
+        values.put(COLUMN_LOAN_BOOK_ID, idBook);
+        values.put(COLUMN_LOAN_REQUEST_DATE,currentDate.toString());
+
+        String query = "SELECT * FROM " + TABLE_BOOK +
+                " WHERE " + COLUMN_BOOK_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idBook)});
+        if(cursor!=null && cursor.moveToFirst()){
+            if(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_AVAILABLE))>0){
+                values.put(COLUMN_LOAN_START_DATE,currentDate.toString());
+            }
+            cursor.close();
+        }
+        db.insert(TABLE_LOAN, null, values);
+        db.close();
+    }
+
+    @SuppressLint("Range")
+    public List<Book> getBorrowedBooks(int idUser){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_LOAN +
+                " WHERE " + COLUMN_LOAN_USER_ID + " =? AND "
+                + COLUMN_LOAN_RETURN_DATE + " IS NULL" ;
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idUser)});
+
+        List<Book> booksList = new ArrayList<>();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                Book book = new Book();
+                if(cursor.getString(cursor.getColumnIndex(COLUMN_LOAN_START_DATE))!=null){
+                    book.setState("Disponibil din " + cursor.getString(cursor.getColumnIndex(COLUMN_LOAN_START_DATE)));
+                }else{
+                    book.setState("Rezervat pe " + cursor.getString(cursor.getColumnIndex(COLUMN_LOAN_REQUEST_DATE)));
+                }
+
+                String queryBook = "SELECT * FROM " + TABLE_BOOK +
+                        " WHERE " + COLUMN_BOOK_ID + "=?";
+                Cursor cursorBook = db.rawQuery(queryBook, new String[]{String.valueOf(cursor.getInt(cursor.getColumnIndex(COLUMN_LOAN_BOOK_ID)))});
+                if(cursorBook!=null && cursorBook.moveToFirst()) {
+                    System.out.println("YEEEEEEEEEEEEES");
+                    book.setId(cursorBook.getInt(cursorBook.getColumnIndex(COLUMN_BOOK_ID)));
+                    book.setName(cursorBook.getString(cursorBook.getColumnIndex(COLUMN_BOOK_NAME)));
+                    String queryAuthor = "SELECT * FROM " + TABLE_AUTHOR + " WHERE "
+                            + COLUMN_AUTHOR_ID + "=?";
+                    Cursor cursorAuthor = db.rawQuery(queryAuthor, new String[]{cursorBook.getString(cursorBook.getColumnIndex(COLUMN_BOOK_AUTHOR_ID))});
+                    if (cursorAuthor.moveToFirst()) {
+                        book.setAuthor(cursorAuthor.getString(cursorAuthor.getColumnIndex(COLUMN_AUTHOR_NAME)));
+                    } else {
+                        book.setAuthor("Unknown");
+                    }
+                    cursorAuthor.close();
+                    String queryGenre = "SELECT * FROM " + TABLE_GENRE + " WHERE "
+                            + COLUMN_GENRE_ID + "=?";
+                    Cursor cursorGenre = db.rawQuery(queryGenre, new String[]{cursorBook.getString(cursorBook.getColumnIndex(COLUMN_BOOK_GENRE_ID))});
+
+                    if (cursorGenre.moveToFirst()) {
+                        book.setGenre(cursorGenre.getString(cursorGenre.getColumnIndex(COLUMN_GENRE_NAME)));
+                    } else {
+                        book.setGenre("Unknown");
+                    }
+                    cursorGenre.close();
+
+                    book.setImage(cursorBook.getString(cursorBook.getColumnIndex(COLUMN_BOOK_PHOTO)));
+                    book.setDisponible(cursorBook.getInt(cursorBook.getColumnIndex(COLUMN_BOOK_AVAILABLE)));
+                    cursorBook.close();
+                }
                 booksList.add(book);
             }
             cursor.close();

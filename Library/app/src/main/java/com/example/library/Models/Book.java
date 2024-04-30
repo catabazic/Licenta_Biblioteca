@@ -1,6 +1,8 @@
 package com.example.library.Models;
 
-public class Book {
+import java.io.Serializable;
+
+public class Book implements Serializable {
     private String name;
     private String author;
     private String state;
@@ -8,8 +10,17 @@ public class Book {
     private String description;
     private int disponible;
     private String image;
+    private int id;
 
     public Book() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setName(String name) {
@@ -73,7 +84,7 @@ public class Book {
         return description;
     }
 
-    public int isDisponible() {
+    public int getDisponible() {
         return disponible;
     }
 

@@ -1,6 +1,7 @@
 package com.example.library.Activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -54,7 +55,12 @@ public class RegisterActivity extends AppCompatActivity {
                 String password2 = password2EditText.getText().toString();
 
                 if(name.length()>1 && isPhoneNumberCorrect(number) && isEmailCorrect(email) && isPasswordOk(password1,password2)){
-                    dbHelper.addNewUser(name,number,email,password1);
+                    int id = dbHelper.addNewUser(name,number,email,password1);
+                    SharedPreferences.Editor editor = MainActivity.sharedPreferences.edit();
+                    editor.putBoolean("isLoggedIn",true);
+                    editor.putInt("user_id", id);
+                    editor.apply();
+
                     startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
                     finish();
                 }

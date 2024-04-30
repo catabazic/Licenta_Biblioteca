@@ -35,14 +35,11 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String username = usernameEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
-                System.out.println("Üsername: " + username + ", password: " + password);
+                System.out.println("Username: " + username + ", password: " + password);
 
                 // Check credentials (e.g., against local database or server)
                 if (isValidCredentials(username, password)) {
-                    SharedPreferences.Editor editor = MainActivity.sharedPreferences.edit();
 
-                    editor.putBoolean("isLoggedIn",true);
-                    editor.apply();
                     // Navigate to home screen
                     startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                     finish();
@@ -71,10 +68,14 @@ public class LoginActivity extends AppCompatActivity {
 
     private boolean isValidCredentials(String username, String password) {
         try {
-            // Initialize DatabaseHelper
             DatabaseHelper dbHelper = new DatabaseHelper(LoginActivity.this);
-//            dbHelper.justAdd();
-            if (dbHelper.authenticateUser(username, password)) {
+            int id=dbHelper.authenticateUser(username, password);
+            if (id!=-1) {
+                SharedPreferences.Editor editor = MainActivity.sharedPreferences.edit();
+
+                editor.putBoolean("isLoggedIn",true);
+                editor.putInt("user_id", id);
+                editor.apply();
                 return true;
             }
         } catch (Exception e) {

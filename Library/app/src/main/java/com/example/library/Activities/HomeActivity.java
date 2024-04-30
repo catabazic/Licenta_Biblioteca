@@ -3,20 +3,24 @@ package com.example.library.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.library.Interfaces.OnItemClickListener;
 import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.example.library.Adapters.LibraryBookAdapter;
 import com.example.library.Database.DatabaseHelper;
 import com.example.library.Models.Book;
+
+import java.io.Serializable;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements OnItemClickListener {
     FloatingActionButton homeActionButton;
     FloatingActionButton searchActionButton;
     FloatingActionButton booksActionButton;
@@ -45,15 +49,15 @@ public class HomeActivity extends AppCompatActivity {
 
 
         popularRecyclerView = findViewById(R.id.PopularBooksRecyclerView);
-        LibraryBookAdapter adapterPopular = new LibraryBookAdapter(popularBooks);
         popularRecyclerView.setHasFixedSize(true);
         popularRecyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this, LinearLayoutManager.HORIZONTAL,false));
+        LibraryBookAdapter adapterPopular = new LibraryBookAdapter(popularBooks, this);
         popularRecyclerView.setAdapter(adapterPopular);
 
         newRecyclerView = findViewById(R.id.NewBooksRecyclerView);
-        LibraryBookAdapter adapterNew = new LibraryBookAdapter(newBooks);
         newRecyclerView.setHasFixedSize(true);
         newRecyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this, LinearLayoutManager.HORIZONTAL,false));
+        LibraryBookAdapter adapterNew = new LibraryBookAdapter(newBooks, this);
         newRecyclerView.setAdapter(adapterNew);
 
         homeActionButton.setOnClickListener(new View.OnClickListener() {
@@ -94,5 +98,18 @@ public class HomeActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    public void onItemClick(Book book) {
+        /*String bookName = book.getName();
+        String author = book.getAuthor();*/
+        DatabaseHelper dbHelper = new DatabaseHelper(HomeActivity.this);
+        dbHelper.getBookByNameAndAuthor(book.getName(),book.getAuthor());
+        Intent intent = new Intent(HomeActivity.this, SelectedBookActivity.class);
+        intent.putExtra("book",book);
+//        intent.putExtra("fromPage", this);
+        startActivity(intent);
+
     }
 }

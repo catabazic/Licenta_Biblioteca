@@ -35,6 +35,8 @@
         </activity>
         <activity android:name=".Activities.SearchActivity">
         </activity>
+        <activity android:name=".Activities.SelectedBookActivity">
+        </activity>
     </application>
 
 </manifest>

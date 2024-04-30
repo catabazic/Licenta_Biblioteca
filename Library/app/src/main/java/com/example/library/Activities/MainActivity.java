@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         DatabaseHelper dbHelper = new DatabaseHelper(MainActivity.this);
-        dbHelper.insertMockData();
+//        dbHelper.insertMockData();
 
         sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
 

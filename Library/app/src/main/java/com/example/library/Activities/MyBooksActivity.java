@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.library.Database.DatabaseHelper;
 import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -42,9 +43,13 @@ public class MyBooksActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        bookList = new ArrayList<>();
+        /*bookList = new ArrayList<>();
         bookList.add(new Book("Litera stacojie", "NATHANIEL HAWTHORNE", "Stare: Imprumut pana pe data de 15.06.2024"));
-        bookList.add(new Book("Another Book", "Another Author", "Another State"));
+        bookList.add(new Book("Another Book", "Another Author", "Another State"));*/
+
+
+        DatabaseHelper dbHelper = new DatabaseHelper(MyBooksActivity.this);
+        bookList = dbHelper.getBorrowedBooks(MainActivity.sharedPreferences.getInt("user_id",-1));
 
         adapter = new BookAdapter(bookList);
         recyclerView.setAdapter(adapter);
