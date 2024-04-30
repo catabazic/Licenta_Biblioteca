@@ -13,7 +13,7 @@
         android:theme="@style/Theme.Library"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,19 +21,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".HomeActivity">
+        <activity android:name=".Activities.HomeActivity">
         </activity>
-        <activity android:name=".LoginActivity">
+        <activity android:name=".Activities.LoginActivity">
         </activity>
-        <activity android:name=".RegisterActivity">
+        <activity android:name=".Activities.RegisterActivity">
         </activity>
-        <activity android:name=".MessagesActivity">
+        <activity android:name=".Activities.MessagesActivity">
         </activity>
-        <activity android:name=".MyBooksActivity">
+        <activity android:name=".Activities.MyBooksActivity">
         </activity>
-        <activity android:name=".ProfileActivity">
+        <activity android:name=".Activities.ProfileActivity">
         </activity>
-        <activity android:name=".SearchActivity">
+        <activity android:name=".Activities.SearchActivity">
         </activity>
     </application>
 

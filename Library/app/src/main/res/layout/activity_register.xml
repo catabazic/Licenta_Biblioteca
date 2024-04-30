@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#D8CBD2"
-    tools:context=".RegisterActivity">
+    tools:context=".Activities.RegisterActivity">
 
     <TextView
         android:id="@+id/RegisterTxt"
@@ -136,7 +136,7 @@
 
 
     <Button
-        android:id="@+id/RegisterChoice
+        android:id="@+id/RegisterChoice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="#D7CAD1"

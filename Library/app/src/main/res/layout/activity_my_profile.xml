@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#D8CBD2"
-    tools:context=".ProfileActivity">
+    tools:context=".Activities.ProfileActivity">
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/Coordination"

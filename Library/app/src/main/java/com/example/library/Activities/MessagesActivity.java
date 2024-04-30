@@ -1,4 +1,4 @@
-package com.example.library;
+package com.example.library.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,19 +6,21 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class HomeActivity extends AppCompatActivity {
+public class MessagesActivity extends AppCompatActivity {
     FloatingActionButton homeActionButton;
     FloatingActionButton searchActionButton;
     FloatingActionButton booksActionButton;
     FloatingActionButton messagesActionButton;
     FloatingActionButton userActionButton;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_messages);
 
         homeActionButton = findViewById(R.id.homeActionButton);
         searchActionButton = findViewById(R.id.searchActionButton);
@@ -29,7 +31,7 @@ public class HomeActivity extends AppCompatActivity {
         homeActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, HomeActivity.class));
+                startActivity(new Intent(MessagesActivity.this, HomeActivity.class));
                 finish();
             }
         });
@@ -37,14 +39,14 @@ public class HomeActivity extends AppCompatActivity {
         searchActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, SearchActivity.class));
+                startActivity(new Intent(MessagesActivity.this, SearchActivity.class));
                 finish();            }
         });
 
         booksActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, MyBooksActivity.class));
+                startActivity(new Intent(MessagesActivity.this, MyBooksActivity.class));
                 finish();
             }
         });
@@ -52,7 +54,7 @@ public class HomeActivity extends AppCompatActivity {
         messagesActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, MessagesActivity.class));
+                startActivity(new Intent(MessagesActivity.this, MessagesActivity.class));
                 finish();
             }
         });
@@ -60,7 +62,7 @@ public class HomeActivity extends AppCompatActivity {
         userActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
+                startActivity(new Intent(MessagesActivity.this, ProfileActivity.class));
                 finish();
             }
         });

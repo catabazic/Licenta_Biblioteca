@@ -1,4 +1,4 @@
-package com.example.library;
+package com.example.library.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,6 +6,7 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class SearchActivity extends AppCompatActivity {

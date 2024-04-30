@@ -30,21 +30,21 @@
         android:paddingLeft="10dp">
 
         <TextView
-            android:id="@+id/textView13"
+            android:id="@+id/BooksBookName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Litera stacojie"
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/textView14"
+            android:id="@+id/BooksBookAuthor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="10dp"
             android:text="NATHANIEL HAWTHORNE" />
 
         <TextView
-            android:id="@+id/textView15"
+            android:id="@+id/BooksBookState"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="10dp"

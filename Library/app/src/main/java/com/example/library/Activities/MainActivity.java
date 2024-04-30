@@ -1,18 +1,15 @@
-package com.example.library;
+package com.example.library.Activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import com.example.library.Database.DatabaseHelper;
+import com.example.library.R;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,8 +22,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        /*DatabaseHelper dbHelper = new DatabaseHelper(MainActivity.this);
-        dbHelper.insertMockData();*/
+        DatabaseHelper dbHelper = new DatabaseHelper(MainActivity.this);
+        dbHelper.insertMockData();
+
         sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
 
         boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);

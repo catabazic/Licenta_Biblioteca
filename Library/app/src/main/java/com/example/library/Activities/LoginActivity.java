@@ -1,4 +1,4 @@
-package com.example.library;
+package com.example.library.Activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +9,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.library.Database.DatabaseHelper;
+import com.example.library.R;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText usernameEditText;

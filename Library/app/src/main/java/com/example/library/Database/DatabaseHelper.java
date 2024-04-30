@@ -1,5 +1,6 @@
-package com.example.library;
+package com.example.library.Database;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -8,7 +9,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
-import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.example.library.Models.Book;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -89,15 +93,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_USER_PASSWORD + " TEXT)";
         db.execSQL(createUserTableQuery);
 
-        String createBookTableQuery = "CREATE TABLE " + TABLE_BOOK + " (" +
-                COLUMN_BOOK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COLUMN_BOOK_NAME + " TEXT, " +
-                COLUMN_BOOK_AUTHOR_ID + " INTEGER, " +
-                COLUMN_BOOK_GENRE_ID + " INTEGER, " +
-                COLUMN_BOOK_PHOTO + " TEXT, " +
-                COLUMN_BOOK_DESCRIPTION + " TEXT, " +
-                COLUMN_BOOK_AVAILABLE + " INTEGER)";
-        db.execSQL(createBookTableQuery);
 
         String createGenreTableQuery = "CREATE TABLE " + TABLE_GENRE + " (" +
                 COLUMN_GENRE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -108,6 +103,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_AUTHOR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_AUTHOR_NAME + " TEXT)";
         db.execSQL(createAuthorTableQuery);
+
+        String createBookTableQuery = "CREATE TABLE " + TABLE_BOOK + " (" +
+                COLUMN_BOOK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_BOOK_NAME + " TEXT, " +
+                COLUMN_BOOK_AUTHOR_ID + " INTEGER NOT NULL REFERENCES " + TABLE_AUTHOR + "(" + COLUMN_AUTHOR_ID + "), " +
+                COLUMN_BOOK_GENRE_ID + " INTEGER NOT NULL REFERENCES " + TABLE_GENRE + "(" + COLUMN_GENRE_ID + "), " +
+                COLUMN_BOOK_PHOTO + " TEXT, " +
+                COLUMN_BOOK_DESCRIPTION + " TEXT, " +
+                COLUMN_BOOK_AVAILABLE + " INTEGER)";
+        db.execSQL(createBookTableQuery);
 
         String createReviewTableQuery = "CREATE TABLE " + TABLE_REVIEW + " (" +
                 COLUMN_REVIEW_BOOK_ID + " INTEGER, " +
@@ -159,7 +164,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(" + COLUMN_USER_PREFERENCES_AUTHOR_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COLUMN_USER_ID + "), " +
                 "FOREIGN KEY(" + COLUMN_USER_PREFERENCES_AUTHOR_AUTHOR_ID + ") REFERENCES " + TABLE_AUTHOR + "(" + COLUMN_AUTHOR_ID + "))";
         db.execSQL(createUserPreferencesAuthorTableQuery);
-        db.close();
+        System.out.println("Suntem in onCrate din dbhelper");
     }
 
 
@@ -179,7 +184,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void insertMockData(){
-        SQLiteDatabase db = this.getReadableDatabase();
+        System.out.println("Suntem in insertMockData din dbhelper");
+        SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("INSERT INTO Autor (autor) VALUES " +
                 "('Agatha Christie')," +
                 "('Terry Pratchett')," +
@@ -247,6 +253,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "('The Adventures of Sherlock Holmes', 18, 1, NULL, 'O colecție de povestiri despre celebrul detectiv Sherlock Holmes, scrise de Arthur Conan Doyle', 23)," +
                 "('At the Mountains of Madness', 19, 7, NULL, 'O poveste cosmic-horror despre o expediție în Antarctica, scrisă de H.P. Lovecraft', 9)," +
                 "('Slaughterhouse-Five', 20, 8, NULL, 'Un roman despre război și călătorii în timp, scris de Kurt Vonnegut', 14)");
+        db.close();
     }
 
     public boolean authenticateUser(String userMail, String password) {
@@ -279,6 +286,95 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_USER_PASSWORD,password);
         db.insert(TABLE_USER, null, values);
         db.close();
+    }
+
+    @SuppressLint("Range")
+    public List<Book> getPopularBooks(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_BOOK;
+        Cursor cursor = db.rawQuery(query, null);
+
+        List<Book> booksList = new ArrayList<>();
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                Book book = new Book();
+                book.setName(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_NAME)));
+                String queryAuthor = "SELECT * FROM " + TABLE_AUTHOR+" WHERE "
+                        + COLUMN_AUTHOR_ID + "=?";
+                Cursor cursorAuthor = db.rawQuery(queryAuthor, new String[]{cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_AUTHOR_ID))});
+                if (cursorAuthor.moveToFirst()) {
+                    // Cursor has at least one row, so it's safe to retrieve data
+                    book.setAuthor(cursorAuthor.getString(cursorAuthor.getColumnIndex(COLUMN_AUTHOR_NAME)));
+                } else {
+                    // Cursor is empty, handle this case accordingly (e.g., set a default value for the author)
+                    book.setAuthor("Unknown");
+                }
+                cursorAuthor.close();
+                String queryGenre = "SELECT * FROM " + TABLE_GENRE+" WHERE "
+                        + COLUMN_GENRE_ID + "=?";
+                Cursor cursorGenre = db.rawQuery(queryGenre, new String[]{cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_GENRE_ID))});
+
+                if (cursorGenre.moveToFirst()) {
+                    // Cursor has at least one row, so it's safe to retrieve data
+                    book.setGenre(cursorGenre.getString(cursorGenre.getColumnIndex(COLUMN_GENRE_NAME)));
+                } else {
+                    // Cursor is empty, handle this case accordingly (e.g., set a default value for the author)
+                    book.setGenre("Unknown");
+                }
+                cursorGenre.close();
+
+                book.setImage(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_PHOTO)));
+                book.setDisponible(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_AVAILABLE)));
+                booksList.add(book);
+
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return booksList;
+    }
+
+    @SuppressLint("Range")
+    public List<Book> getNewBooks(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_BOOK + " ORDER BY " + COLUMN_BOOK_ID + " DESC";
+        Cursor cursor = db.rawQuery(query, null);
+
+        List<Book> booksList = new ArrayList<>();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                Book book = new Book();
+                book.setName(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_NAME)));
+                String queryAuthor = "SELECT * FROM " + TABLE_AUTHOR+" WHERE "
+                        + COLUMN_AUTHOR_ID + "=?";
+                Cursor cursorAuthor = db.rawQuery(queryAuthor, new String[]{cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_AUTHOR_ID))});
+                if (cursorAuthor.moveToFirst()) {
+                    // Cursor has at least one row, so it's safe to retrieve data
+                    book.setAuthor(cursorAuthor.getString(cursorAuthor.getColumnIndex(COLUMN_AUTHOR_NAME)));
+                } else {
+                    // Cursor is empty, handle this case accordingly (e.g., set a default value for the author)
+                    book.setAuthor("Unknown");
+                }
+                cursorAuthor.close();
+                String queryGenre = "SELECT * FROM " + TABLE_GENRE+" WHERE "
+                        + COLUMN_GENRE_ID + "=?";
+                Cursor cursorGenre = db.rawQuery(queryGenre, new String[]{cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_GENRE_ID))});
+
+                if (cursorGenre.moveToFirst()) {
+                    // Cursor has at least one row, so it's safe to retrieve data
+                    book.setGenre(cursorGenre.getString(cursorGenre.getColumnIndex(COLUMN_GENRE_NAME)));
+                } else {
+                    // Cursor is empty, handle this case accordingly (e.g., set a default value for the author)
+                    book.setGenre("Unknown");
+                }
+                cursorGenre.close();
+
+                book.setImage(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_PHOTO)));
+                book.setDisponible(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_AVAILABLE)));
+                booksList.add(book);
+            }
+            cursor.close();
+        }
+        return booksList;
     }
 
 

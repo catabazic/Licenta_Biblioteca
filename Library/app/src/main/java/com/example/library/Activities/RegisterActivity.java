@@ -1,4 +1,4 @@
-package com.example.library;
+package com.example.library.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +15,9 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.example.library.Database.DatabaseHelper;
+import com.example.library.R;
 
 public class RegisterActivity extends AppCompatActivity {
 

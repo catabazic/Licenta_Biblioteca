@@ -1,12 +1,21 @@
-package com.example.library;
+package com.example.library.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.example.library.Adapters.BookAdapter;
+import com.example.library.Models.Book;
 
 public class MyBooksActivity extends AppCompatActivity {
     FloatingActionButton homeActionButton;
@@ -14,6 +23,10 @@ public class MyBooksActivity extends AppCompatActivity {
     FloatingActionButton booksActionButton;
     FloatingActionButton messagesActionButton;
     FloatingActionButton userActionButton;
+
+    private RecyclerView recyclerView; //booksRecView
+    private BookAdapter adapter;
+    private List<Book> bookList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +38,16 @@ public class MyBooksActivity extends AppCompatActivity {
         booksActionButton = findViewById(R.id.booksActionButton);
         messagesActionButton = findViewById(R.id.messagesActionButton);
         userActionButton = findViewById(R.id.userActionButton);
+        recyclerView = findViewById(R.id.booksRecView);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        bookList = new ArrayList<>();
+        bookList.add(new Book("Litera stacojie", "NATHANIEL HAWTHORNE", "Stare: Imprumut pana pe data de 15.06.2024"));
+        bookList.add(new Book("Another Book", "Another Author", "Another State"));
+
+        adapter = new BookAdapter(bookList);
+        recyclerView.setAdapter(adapter);
 
         homeActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
