@@ -37,6 +37,8 @@
         </activity>
         <activity android:name=".Activities.SelectedBookActivity">
         </activity>
+        <activity android:name=".Activities.HistoryActivity">
+        </activity>
     </application>
 
 </manifest>

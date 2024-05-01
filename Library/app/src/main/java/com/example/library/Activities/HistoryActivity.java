@@ -8,17 +8,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.library.Adapters.BookAdapter;
 import com.example.library.Database.DatabaseHelper;
 import com.example.library.Interfaces.OnItemClickListener;
+import com.example.library.Models.Book;
 import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
-import com.example.library.Adapters.BookAdapter;
-import com.example.library.Models.Book;
-
-public class MyBooksActivity extends AppCompatActivity implements OnItemClickListener {
+public class HistoryActivity extends AppCompatActivity implements OnItemClickListener {
     FloatingActionButton homeActionButton;
     FloatingActionButton searchActionButton;
     FloatingActionButton booksActionButton;
@@ -32,7 +31,7 @@ public class MyBooksActivity extends AppCompatActivity implements OnItemClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_books);
+        setContentView(R.layout.activity_history);
 
         homeActionButton = findViewById(R.id.homeActionButton);
         searchActionButton = findViewById(R.id.searchActionButton);
@@ -48,8 +47,8 @@ public class MyBooksActivity extends AppCompatActivity implements OnItemClickLis
         bookList.add(new Book("Another Book", "Another Author", "Another State"));*/
 
 
-        DatabaseHelper dbHelper = new DatabaseHelper(MyBooksActivity.this);
-        bookList = dbHelper.getBorrowedBooks(MainActivity.sharedPreferences.getInt("user_id",-1));
+        DatabaseHelper dbHelper = new DatabaseHelper(HistoryActivity.this);
+        bookList = dbHelper.getAllHistory(MainActivity.sharedPreferences.getInt("user_id", -1));
 
         adapter = new BookAdapter(bookList, this);
         recyclerView.setAdapter(adapter);
@@ -57,7 +56,7 @@ public class MyBooksActivity extends AppCompatActivity implements OnItemClickLis
         homeActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MyBooksActivity.this, HomeActivity.class));
+                startActivity(new Intent(HistoryActivity.this, HomeActivity.class));
                 finish();
             }
         });
@@ -65,7 +64,7 @@ public class MyBooksActivity extends AppCompatActivity implements OnItemClickLis
         searchActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MyBooksActivity.this, SearchActivity.class));
+                startActivity(new Intent(HistoryActivity.this, SearchActivity.class));
                 finish();
             }
         });
@@ -75,7 +74,7 @@ public class MyBooksActivity extends AppCompatActivity implements OnItemClickLis
             public void onClick(View v) {
                 // If you're already in MyBooksActivity, you might not want to restart it
                 // You can handle this case differently if needed
-                startActivity(new Intent(MyBooksActivity.this, MyBooksActivity.class));
+                startActivity(new Intent(HistoryActivity.this, MyBooksActivity.class));
                 finish();
             }
         });
@@ -83,7 +82,7 @@ public class MyBooksActivity extends AppCompatActivity implements OnItemClickLis
         messagesActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MyBooksActivity.this, MessagesActivity.class));
+                startActivity(new Intent(HistoryActivity.this, MessagesActivity.class));
                 finish();
             }
         });
@@ -91,7 +90,7 @@ public class MyBooksActivity extends AppCompatActivity implements OnItemClickLis
         userActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MyBooksActivity.this, ProfileActivity.class));
+                startActivity(new Intent(HistoryActivity.this, ProfileActivity.class));
                 finish();
             }
         });
@@ -99,11 +98,12 @@ public class MyBooksActivity extends AppCompatActivity implements OnItemClickLis
 
     @Override
     public void onItemClick(Book book) {
-        DatabaseHelper dbHelper = new DatabaseHelper(MyBooksActivity.this);
-        dbHelper.getBookByNameAndAuthor(book.getName(),book.getAuthor());
-        Intent intent = new Intent(MyBooksActivity.this, SelectedBookActivity.class);
-        intent.putExtra("book",book);
+        DatabaseHelper dbHelper = new DatabaseHelper(HistoryActivity.this);
+        dbHelper.getBookByNameAndAuthor(book.getName(), book.getAuthor());
+        Intent intent = new Intent(HistoryActivity.this, SelectedBookActivity.class);
+        intent.putExtra("book", book);
 //        intent.putExtra("fromPage", this);
         startActivity(intent);
     }
+
 }

@@ -25,8 +25,6 @@ public class SelectedBookActivity extends AppCompatActivity {
     FloatingActionButton userActionButton;
     ImageButton backButton;
     private Book book;
-    private Object fromPage;
-    private ConstraintLayout constraintLayout;
     private TextView chatNameTxt;
     private TextView BookNameTxt;
     private TextView BookAuthorTxt;
@@ -54,7 +52,6 @@ public class SelectedBookActivity extends AppCompatActivity {
 
         backButton=findViewById(R.id.bookBackBtn);
 
-        constraintLayout = findViewById(R.id.constraintLayout);
         chatNameTxt = findViewById(R.id.chatNameTxt);
         BookNameTxt = findViewById(R.id.BookNameTxt);
         BookAuthorTxt = findViewById(R.id.BookAuthorTxt);

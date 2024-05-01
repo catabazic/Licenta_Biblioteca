@@ -6,6 +6,7 @@ public class Book implements Serializable {
     private String name;
     private String author;
     private String state;
+    private String retur;
     private String genre;
     private String description;
     private int disponible;
@@ -21,6 +22,14 @@ public class Book implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getRetur() {
+        return retur;
+    }
+
+    public void setRetur(String retur) {
+        this.retur = retur;
     }
 
     public void setName(String name) {

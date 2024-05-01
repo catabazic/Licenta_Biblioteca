@@ -1,9 +1,9 @@
 <!-- item_chat_message.xml -->
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
 
+    android:id="@+id/wholeBookLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#5BFFFFFF"
@@ -20,7 +20,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_weight="0"
-        app:srcCompat="@drawable/_057249787_0_240" />
+        app:srcCompat="@drawable/no_photo" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -49,6 +49,12 @@
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
             android:text="Stare: Imprumut pana pe data de 15.06.2024" />
+
+        <TextView
+            android:id="@+id/BooksBookState2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
 
     </LinearLayout>
 </LinearLayout>
