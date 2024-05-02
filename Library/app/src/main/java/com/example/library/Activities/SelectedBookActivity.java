@@ -61,13 +61,23 @@ public class SelectedBookActivity extends AppCompatActivity {
         reservButton = findViewById(R.id.BookReservationBtn);
 
         updateUI(book);
+        DatabaseHelper dbHelper = new DatabaseHelper(SelectedBookActivity.this);
+        if(dbHelper.isBookBorrowed(MainActivity.sharedPreferences.getInt("user_id",-1),book.getId())){
+            reservButton.setText("Read Book");
+        }
+
 
         reservButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
-                DatabaseHelper dbHelper = new DatabaseHelper(SelectedBookActivity.this);
-                dbHelper.borrowBook(book.getId(),MainActivity.sharedPreferences.getInt("user_id",-1));
+                if(dbHelper.isBookBorrowed(MainActivity.sharedPreferences.getInt("user_id",-1),book.getId())){
+
+                }else {
+                    dbHelper.borrowBook(book.getId(), MainActivity.sharedPreferences.getInt("user_id", -1));
+                    reservButton.setText("Read Book");
+                    BookAvailabilityTxt.setText("Disponibilitate: " + String.valueOf(book.getDisponible()-1));
+                }
             }
         });
 

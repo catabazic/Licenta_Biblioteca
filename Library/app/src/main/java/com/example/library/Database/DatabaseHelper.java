@@ -337,6 +337,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 book.setImage(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_PHOTO)));
                 book.setDisponible(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_AVAILABLE)));
+                book.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_DESCRIPTION)));
                 booksList.add(book);
 
             } while (cursor.moveToNext());
@@ -383,6 +384,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 book.setImage(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_PHOTO)));
                 book.setDisponible(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_AVAILABLE)));
+                book.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_DESCRIPTION)));
                 booksList.add(book);
             }
             cursor.close();
@@ -439,29 +441,53 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void borrowBook(int idBook, int idUser){
         LocalDate currentDate = LocalDate.now();
 
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_LOAN_USER_ID, idUser);
-        values.put(COLUMN_LOAN_BOOK_ID, idBook);
-        values.put(COLUMN_LOAN_REQUEST_DATE,currentDate.toString());
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
 
-        String query = "SELECT * FROM " + TABLE_BOOK +
-                " WHERE " + COLUMN_BOOK_ID + " = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idBook)});
-        if(cursor!=null && cursor.moveToFirst()){
-            if(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_AVAILABLE))>0){
-                values.put(COLUMN_LOAN_START_DATE,currentDate.toString());
-                String queryBook = "UPDATE " + TABLE_BOOK +
-                        " SET " +  COLUMN_BOOK_AVAILABLE + " = " + COLUMN_BOOK_AVAILABLE + " - 1" +
-                        " WHERE " + COLUMN_BOOK_ID +" = ?";
-                Cursor cursorBook = db.rawQuery(queryBook, new String[]{String.valueOf(idBook)});
-                cursorBook.close();
+        try {
+            db = this.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_LOAN_USER_ID, idUser);
+            values.put(COLUMN_LOAN_BOOK_ID, idBook);
+            values.put(COLUMN_LOAN_REQUEST_DATE, currentDate.toString());
+
+            String query = "SELECT * FROM " + TABLE_BOOK +
+                    " WHERE " + COLUMN_BOOK_ID + " = ?";
+            cursor = db.rawQuery(query, new String[]{String.valueOf(idBook)});
+
+            if(cursor != null && cursor.moveToFirst()){
+                int availableBooks = cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_AVAILABLE));
+                if(availableBooks > 0){
+                    values.put(COLUMN_LOAN_START_DATE, currentDate.toString());
+
+                    ContentValues updateValues = new ContentValues();
+                    updateValues.put(COLUMN_BOOK_AVAILABLE, availableBooks - 1);
+                    String whereClause = COLUMN_BOOK_ID + "=?";
+                    String[] whereArgs = {String.valueOf(idBook)};
+                    db.beginTransaction();
+                    try {
+                        db.update(TABLE_BOOK, updateValues, whereClause, whereArgs);
+                        db.insert(TABLE_LOAN, null, values);
+                        db.setTransactionSuccessful();
+                    } finally {
+                        db.endTransaction();
+                    }
+                }
             }
-            cursor.close();
+        } catch (Exception e) {
+            // Handle exceptions appropriately
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.close();
+            }
         }
-        db.insert(TABLE_LOAN, null, values);
-        db.close();
     }
+
 
     @SuppressLint("Range")
     public List<Book> getBorrowedBooks(int idUser){
@@ -510,6 +536,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                     book.setImage(cursorBook.getString(cursorBook.getColumnIndex(COLUMN_BOOK_PHOTO)));
                     book.setDisponible(cursorBook.getInt(cursorBook.getColumnIndex(COLUMN_BOOK_AVAILABLE)));
+                    book.setDescription(cursorBook.getString(cursorBook.getColumnIndex(COLUMN_BOOK_DESCRIPTION)));
+
                     cursorBook.close();
                 }
                 booksList.add(book);
@@ -565,6 +593,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                     book.setImage(cursorBook.getString(cursorBook.getColumnIndex(COLUMN_BOOK_PHOTO)));
                     book.setDisponible(cursorBook.getInt(cursorBook.getColumnIndex(COLUMN_BOOK_AVAILABLE)));
+                    book.setDescription(cursorBook.getString(cursorBook.getColumnIndex(COLUMN_BOOK_DESCRIPTION)));
+
                     cursorBook.close();
                 }
                 booksList.add(book);
@@ -592,5 +622,118 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return user;
     }
+
+    public boolean isBookBorrowed(int idUser, int idBook){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_LOAN +
+                " WHERE " + COLUMN_LOAN_USER_ID + " = ? AND " +
+                COLUMN_LOAN_BOOK_ID + "=?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idUser), String.valueOf(idBook)});
+        boolean isValid=cursor.getCount()>0;
+        System.out.println(isValid);
+        cursor.close();
+        return isValid;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @SuppressLint("Range")
+    public void booksReturn(int idUser) {
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        try {
+            LocalDate currentDate = LocalDate.now();
+            LocalDate twoWeeksAgo = currentDate.minusWeeks(2);
+            db = this.getWritableDatabase();
+            String query = "SELECT * FROM " + TABLE_LOAN +
+                    " WHERE " + COLUMN_LOAN_USER_ID + "=? AND " +
+                    COLUMN_LOAN_START_DATE + "=?";
+            cursor = db.rawQuery(query, new String[]{String.valueOf(idUser), twoWeeksAgo.toString()});
+            if (cursor != null && cursor.moveToFirst()) {
+                db.beginTransaction();
+                do {
+                    ContentValues updateValues = new ContentValues();
+                    updateValues.put(COLUMN_LOAN_RETURN_DATE, currentDate.toString());
+                    String whereClause = COLUMN_LOAN_BOOK_ID + "=? AND " + COLUMN_LOAN_USER_ID + "=?";
+                    String[] whereArgs = {cursor.getString(cursor.getColumnIndex(COLUMN_LOAN_BOOK_ID)), String.valueOf(idUser)};
+                    db.update(TABLE_LOAN, updateValues, whereClause, whereArgs);
+                } while (cursor.moveToNext());
+                db.setTransactionSuccessful();
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // Handle exception properly
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.endTransaction();
+                db.close();
+            }
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void anulateRezervationOfBook(int idUser, int idBook){
+        SQLiteDatabase db = null;
+        try {
+            db.beginTransaction();
+            LocalDate currentDate = LocalDate.now();
+            ContentValues updateValues = new ContentValues();
+            updateValues.put(COLUMN_LOAN_RETURN_DATE, currentDate.toString());
+            String whereClause = COLUMN_LOAN_BOOK_ID + "=? AND " + COLUMN_LOAN_USER_ID + "=?";
+            String[] whereArgs = {String.valueOf(idBook), String.valueOf(idUser)};
+            db.update(TABLE_LOAN, updateValues, whereClause, whereArgs);
+            db.setTransactionSuccessful();
+        }catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (db != null) {
+                db.endTransaction();
+                db.close();
+            }
+        }
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @SuppressLint("Range")
+    public void bookIsAvailable() {
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        try {
+            db = this.getWritableDatabase();
+            String query = "SELECT * FROM " + TABLE_LOAN +
+                    " WHERE " + COLUMN_LOAN_START_DATE + " IS NULL AND " +
+                    COLUMN_LOAN_RETURN_DATE + " IS NOT NULL";
+            cursor = db.rawQuery(query, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                db.beginTransaction();
+                do {
+                    String queryBook = "SELECT * FROM " + TABLE_BOOK +
+                            " WHERE " + COLUMN_BOOK_ID + "=? AND " +
+                            COLUMN_BOOK_AVAILABLE + ">0 ";
+                    Cursor cursorBook = db.rawQuery(queryBook, new String[]{String.valueOf(cursor.getInt(cursor.getColumnIndex(COLUMN_LOAN_BOOK_ID)))});
+                    if (cursorBook != null && cursorBook.moveToFirst()) {
+                        this.borrowBook(cursor.getInt(cursor.getColumnIndex(COLUMN_LOAN_BOOK_ID)), cursor.getInt(cursor.getColumnIndex(COLUMN_LOAN_USER_ID)));
+                    }
+                    if (cursorBook != null) {
+                        cursorBook.close();
+                    }
+                } while (cursor.moveToNext());
+                db.setTransactionSuccessful();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.endTransaction();
+                db.close();
+            }
+        }
+    }
+
 
 }
