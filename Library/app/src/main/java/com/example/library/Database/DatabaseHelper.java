@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.library.Models.Book;
+import com.example.library.Models.Review;
 import com.example.library.Models.User;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -53,6 +54,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_REVIEW_BOOK_ID = "id_carte";
     private static final String COLUMN_REVIEW_USER_ID = "id_user";
     private static final String COLUMN_REVIEW_RATING = "nota";
+    private static final String COLUMN_REVIEW_TITLE = "titlu";
     private static final String COLUMN_REVIEW_COMMENT = "comentariu";
     private static final String COLUMN_REVIEW_DATE = "data";
 
@@ -121,7 +123,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String createReviewTableQuery = "CREATE TABLE " + TABLE_REVIEW + " (" +
                 COLUMN_REVIEW_BOOK_ID + " INTEGER, " +
                 COLUMN_REVIEW_USER_ID + " INTEGER, " +
-                COLUMN_REVIEW_RATING + " INTEGER, " +
+                COLUMN_REVIEW_RATING + " FLOAT, " +
+                COLUMN_REVIEW_TITLE + " TEXT, " +
                 COLUMN_REVIEW_COMMENT + " TEXT, " +
                 COLUMN_REVIEW_DATE + " TEXT, " +
                 "FOREIGN KEY(" + COLUMN_REVIEW_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COLUMN_BOOK_ID + "), " +
@@ -187,10 +190,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void insertMockData(){
+    public void insertMockData() {
         System.out.println("Suntem in insertMockData din dbhelper");
         SQLiteDatabase db = this.getWritableDatabase();
-        this.onUpgrade(db,0,1);
+        this.onUpgrade(db, 0, 1);
         db.execSQL("INSERT INTO Autor (autor) VALUES " +
                 "('Agatha Christie')," +
                 "('Terry Pratchett')," +
@@ -268,39 +271,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " WHERE " + COLUMN_USER_EMAIL + " = ?" +
                 " AND " + COLUMN_USER_PASSWORD + " = ?";
         Cursor cursor = db.rawQuery(query, new String[]{userMail, password});
-        int userId=-1;
-        if(cursor!=null && cursor.moveToFirst()){
-            userId= cursor.getInt(cursor.getColumnIndex(COLUMN_USER_ID));
+        int userId = -1;
+        if (cursor != null && cursor.moveToFirst()) {
+            userId = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_ID));
             cursor.close();
 
         }
         return userId;
     }
 
-    public boolean uniqueEmailRegister(String email){
+    public boolean uniqueEmailRegister(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_USER +
                 " WHERE " + COLUMN_USER_EMAIL + " = ?";
         Cursor cursor = db.rawQuery(query, new String[]{email});
-        boolean isValid=cursor.getCount()==0;
+        boolean isValid = cursor.getCount() == 0;
         cursor.close();
         return isValid;
     }
 
-    public int addNewUser(String name, String number, String email, String password){
+    public int addNewUser(String name, String number, String email, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_USER_NAME, name);
         values.put(COLUMN_USER_PHONE, number);
-        values.put(COLUMN_USER_EMAIL,email);
-        values.put(COLUMN_USER_PASSWORD,password);
+        values.put(COLUMN_USER_EMAIL, email);
+        values.put(COLUMN_USER_PASSWORD, password);
         db.insert(TABLE_USER, null, values);
         db.close();
-        return this.authenticateUser(email,password);
+        return this.authenticateUser(email, password);
     }
 
     @SuppressLint("Range")
-    public List<Book> getPopularBooks(){
+    public List<Book> getPopularBooks() {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_BOOK;
         Cursor cursor = db.rawQuery(query, null);
@@ -311,7 +314,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Book book = new Book();
                 book.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_ID)));
                 book.setName(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_NAME)));
-                String queryAuthor = "SELECT * FROM " + TABLE_AUTHOR+" WHERE "
+                String queryAuthor = "SELECT * FROM " + TABLE_AUTHOR + " WHERE "
                         + COLUMN_AUTHOR_ID + "=?";
                 Cursor cursorAuthor = db.rawQuery(queryAuthor, new String[]{cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_AUTHOR_ID))});
                 if (cursorAuthor.moveToFirst()) {
@@ -322,7 +325,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     book.setAuthor("Unknown");
                 }
                 cursorAuthor.close();
-                String queryGenre = "SELECT * FROM " + TABLE_GENRE+" WHERE "
+                String queryGenre = "SELECT * FROM " + TABLE_GENRE + " WHERE "
                         + COLUMN_GENRE_ID + "=?";
                 Cursor cursorGenre = db.rawQuery(queryGenre, new String[]{cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_GENRE_ID))});
 
@@ -347,7 +350,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
-    public List<Book> getNewBooks(){
+    public List<Book> getNewBooks() {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_BOOK + " ORDER BY " + COLUMN_BOOK_ID + " DESC";
         Cursor cursor = db.rawQuery(query, null);
@@ -358,7 +361,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Book book = new Book();
                 book.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_ID)));
                 book.setName(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_NAME)));
-                String queryAuthor = "SELECT * FROM " + TABLE_AUTHOR+" WHERE "
+                String queryAuthor = "SELECT * FROM " + TABLE_AUTHOR + " WHERE "
                         + COLUMN_AUTHOR_ID + "=?";
                 Cursor cursorAuthor = db.rawQuery(queryAuthor, new String[]{cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_AUTHOR_ID))});
                 if (cursorAuthor.moveToFirst()) {
@@ -369,7 +372,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     book.setAuthor("Unknown");
                 }
                 cursorAuthor.close();
-                String queryGenre = "SELECT * FROM " + TABLE_GENRE+" WHERE "
+                String queryGenre = "SELECT * FROM " + TABLE_GENRE + " WHERE "
                         + COLUMN_GENRE_ID + "=?";
                 Cursor cursorGenre = db.rawQuery(queryGenre, new String[]{cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_GENRE_ID))});
 
@@ -393,16 +396,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
-    public Book getBookByNameAndAuthor(String name, String author){
+    public Book getBookByNameAndAuthor(String name, String author) {
         Book book = new Book();
-        int authorId=-1;
+        int authorId = -1;
 
         SQLiteDatabase db = this.getReadableDatabase();
         String queryAuthor = "SELECT * FROM " + TABLE_AUTHOR + " WHERE " +
                 COLUMN_AUTHOR_NAME + "=?";
         Cursor cursorAuthor = db.rawQuery(queryAuthor, new String[]{author});
         if (cursorAuthor.moveToFirst()) {
-            authorId= cursorAuthor.getInt(cursorAuthor.getColumnIndex(COLUMN_AUTHOR_ID));
+            authorId = cursorAuthor.getInt(cursorAuthor.getColumnIndex(COLUMN_AUTHOR_ID));
         }
         cursorAuthor.close();
 
@@ -414,7 +417,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             book.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_ID)));
             book.setName(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_NAME)));
             book.setAuthor(author);
-            String queryGenre = "SELECT * FROM " + TABLE_GENRE+" WHERE "
+            String queryGenre = "SELECT * FROM " + TABLE_GENRE + " WHERE "
                     + COLUMN_GENRE_ID + "=?";
             Cursor cursorGenre = db.rawQuery(queryGenre, new String[]{cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_GENRE_ID))});
 
@@ -438,7 +441,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @SuppressLint("Range")
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void borrowBook(int idBook, int idUser){
+    public void borrowBook(int idBook, int idUser) {
         LocalDate currentDate = LocalDate.now();
 
         SQLiteDatabase db = null;
@@ -456,9 +459,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     " WHERE " + COLUMN_BOOK_ID + " = ?";
             cursor = db.rawQuery(query, new String[]{String.valueOf(idBook)});
 
-            if(cursor != null && cursor.moveToFirst()){
+            if (cursor != null && cursor.moveToFirst()) {
                 int availableBooks = cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_AVAILABLE));
-                if(availableBooks > 0){
+                if (availableBooks > 0) {
                     values.put(COLUMN_LOAN_START_DATE, currentDate.toString());
 
                     ContentValues updateValues = new ContentValues();
@@ -490,27 +493,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     @SuppressLint("Range")
-    public List<Book> getBorrowedBooks(int idUser){
+    public List<Book> getBorrowedBooks(int idUser) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_LOAN +
                 " WHERE " + COLUMN_LOAN_USER_ID + " =? AND "
-                + COLUMN_LOAN_RETURN_DATE + " IS NULL" ;
+                + COLUMN_LOAN_RETURN_DATE + " IS NULL";
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idUser)});
 
         List<Book> booksList = new ArrayList<>();
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 Book book = new Book();
-                if(cursor.getString(cursor.getColumnIndex(COLUMN_LOAN_START_DATE))!=null){
+                if (cursor.getString(cursor.getColumnIndex(COLUMN_LOAN_START_DATE)) != null) {
                     book.setState("Disponibil din " + cursor.getString(cursor.getColumnIndex(COLUMN_LOAN_START_DATE)));
-                }else{
+                } else {
                     book.setState("Rezervat pe " + cursor.getString(cursor.getColumnIndex(COLUMN_LOAN_REQUEST_DATE)));
                 }
 
                 String queryBook = "SELECT * FROM " + TABLE_BOOK +
                         " WHERE " + COLUMN_BOOK_ID + "=?";
                 Cursor cursorBook = db.rawQuery(queryBook, new String[]{String.valueOf(cursor.getInt(cursor.getColumnIndex(COLUMN_LOAN_BOOK_ID)))});
-                if(cursorBook!=null && cursorBook.moveToFirst()) {
+                if (cursorBook != null && cursorBook.moveToFirst()) {
                     System.out.println("YEEEEEEEEEEEEES");
                     book.setId(cursorBook.getInt(cursorBook.getColumnIndex(COLUMN_BOOK_ID)));
                     book.setName(cursorBook.getString(cursorBook.getColumnIndex(COLUMN_BOOK_NAME)));
@@ -548,26 +551,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
-    public List<Book> getAllHistory(int idUser){
+    public List<Book> getAllHistory(int idUser) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_LOAN +
-                " WHERE " + COLUMN_LOAN_USER_ID + " =? " ;
+                " WHERE " + COLUMN_LOAN_USER_ID + " =? ";
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idUser)});
 
         List<Book> booksList = new ArrayList<>();
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 Book book = new Book();
-                if(cursor.getString(cursor.getColumnIndex(COLUMN_LOAN_START_DATE))!=null){
+                if (cursor.getString(cursor.getColumnIndex(COLUMN_LOAN_START_DATE)) != null) {
                     book.setState("Disponibil din " + cursor.getString(cursor.getColumnIndex(COLUMN_LOAN_START_DATE)));
-                }else{
+                } else {
                     book.setState("Rezervat pe " + cursor.getString(cursor.getColumnIndex(COLUMN_LOAN_REQUEST_DATE)));
                 }
 
                 String queryBook = "SELECT * FROM " + TABLE_BOOK +
                         " WHERE " + COLUMN_BOOK_ID + "=?";
                 Cursor cursorBook = db.rawQuery(queryBook, new String[]{String.valueOf(cursor.getInt(cursor.getColumnIndex(COLUMN_LOAN_BOOK_ID)))});
-                if(cursorBook!=null && cursorBook.moveToFirst()) {
+                if (cursorBook != null && cursorBook.moveToFirst()) {
                     System.out.println("YEEEEEEEEEEEEES");
                     book.setId(cursorBook.getInt(cursorBook.getColumnIndex(COLUMN_BOOK_ID)));
                     book.setName(cursorBook.getString(cursorBook.getColumnIndex(COLUMN_BOOK_NAME)));
@@ -606,13 +609,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     @SuppressLint("Range")
-    public User getUserById(int id){
-        User user=new User();
+    public User getUserById(int id) {
+        User user = new User();
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_USER +
-                " WHERE " + COLUMN_USER_ID + " =? " ;
+                " WHERE " + COLUMN_USER_ID + " =? ";
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
-        if(cursor!=null && cursor.moveToFirst()){
+        if (cursor != null && cursor.moveToFirst()) {
             user.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_USER_ID)));
             user.setName(cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME)));
             user.setEmail(cursor.getString(cursor.getColumnIndex(COLUMN_USER_EMAIL)));
@@ -623,13 +626,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return user;
     }
 
-    public boolean isBookBorrowed(int idUser, int idBook){
+    public boolean isBookBorrowed(int idUser, int idBook) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_LOAN +
                 " WHERE " + COLUMN_LOAN_USER_ID + " = ? AND " +
                 COLUMN_LOAN_BOOK_ID + "=?";
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idUser), String.valueOf(idBook)});
-        boolean isValid=cursor.getCount()>0;
+        boolean isValid = cursor.getCount() > 0;
         System.out.println(isValid);
         cursor.close();
         return isValid;
@@ -673,7 +676,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void anulateRezervationOfBook(int idUser, int idBook){
+    public void anulateRezervationOfBook(int idUser, int idBook) {
         SQLiteDatabase db = null;
         try {
             db.beginTransaction();
@@ -684,7 +687,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String[] whereArgs = {String.valueOf(idBook), String.valueOf(idUser)};
             db.update(TABLE_LOAN, updateValues, whereClause, whereArgs);
             db.setTransactionSuccessful();
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (db != null) {
@@ -735,5 +738,120 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+
+    @SuppressLint("Range")
+    public float getRatingOfBook(int id_book) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_REVIEW +
+                " WHERE " + COLUMN_REVIEW_BOOK_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id_book)});
+        float value = 0;
+        int number = 0;
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                value = cursor.getFloat(cursor.getColumnIndex(COLUMN_REVIEW_RATING));
+                number++;
+            }
+            cursor.close();
+        }
+        return value / number;
+    }
+
+    @SuppressLint("Range")
+    public List<Integer> getNumberOfRatings(int id_book) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_REVIEW +
+                " WHERE " + COLUMN_REVIEW_BOOK_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id_book)});
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            list.add( 0);
+        }
+        int one = 0, two = 0, three = 0, four = 0, five = 0, number = 0;
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                float ratingNumber = cursor.getInt(cursor.getColumnIndex(COLUMN_REVIEW_RATING));
+                if (ratingNumber == 1 || ratingNumber == 0.5) {
+                    one++;
+                } else if (ratingNumber == 2 || ratingNumber == 1.5) {
+                    two++;
+                } else if (ratingNumber == 3 || ratingNumber == 2.5) {
+                    three++;
+                } else if (ratingNumber == 4 || ratingNumber == 3.5) {
+                    four++;
+                } else if (ratingNumber == 5 || ratingNumber == 4.5) {
+                    five++;
+                }
+                number++;
+            }
+            cursor.close();
+            list.set(0, number);
+            list.set(1, one / number * 100);
+            list.set(2, two / number * 100);
+            list.set(3, three / number * 100);
+            list.set(4, four / number * 100);
+            list.set(5, five / number * 100);
+        }
+        return list;
+    }
+
+    @SuppressLint("Range")
+    public List<Review> getAllReviewsOfBook(int id_book) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_REVIEW +
+                " WHERE " + COLUMN_REVIEW_BOOK_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id_book)});
+        List<Review> list = new ArrayList<>();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                Review review = new Review();
+                review.setId_user(cursor.getInt(cursor.getColumnIndex(COLUMN_REVIEW_USER_ID)));
+                review.setId_book(cursor.getInt(cursor.getColumnIndex(COLUMN_REVIEW_BOOK_ID)));
+                review.setReviewText(cursor.getString(cursor.getColumnIndex(COLUMN_REVIEW_COMMENT)));
+                review.setReviewTitle(cursor.getString(cursor.getColumnIndex(COLUMN_REVIEW_TITLE)));
+                review.setDate(cursor.getString(cursor.getColumnIndex(COLUMN_REVIEW_DATE)));
+                review.setRating(cursor.getFloat(cursor.getColumnIndex(COLUMN_REVIEW_RATING)));
+                list.add(review);
+            }
+            cursor.close();
+        }
+        return list;
+    }
+
+    @SuppressLint("Range")
+    public List<Review> getAllReviewsOfUser(int id_user) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_REVIEW +
+                " WHERE " + COLUMN_REVIEW_USER_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id_user)});
+        List<Review> list = new ArrayList<>();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                Review review = new Review();
+                review.setId_user(cursor.getInt(cursor.getColumnIndex(COLUMN_REVIEW_USER_ID)));
+                review.setId_book(cursor.getInt(cursor.getColumnIndex(COLUMN_REVIEW_BOOK_ID)));
+                review.setReviewText(cursor.getString(cursor.getColumnIndex(COLUMN_REVIEW_COMMENT)));
+                review.setReviewTitle(cursor.getString(cursor.getColumnIndex(COLUMN_REVIEW_TITLE)));
+                review.setDate(cursor.getString(cursor.getColumnIndex(COLUMN_REVIEW_DATE)));
+                review.setRating(cursor.getFloat(cursor.getColumnIndex(COLUMN_REVIEW_RATING)));
+                list.add(review);
+            }
+            cursor.close();
+        }
+        return list;
+    }
+
+    public void addReviewForABook(Review review) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_REVIEW_BOOK_ID, review.getId_book());
+        values.put(COLUMN_REVIEW_USER_ID, review.getId_user());
+        values.put(COLUMN_REVIEW_RATING, review.getRating());
+        values.put(COLUMN_REVIEW_TITLE, review.getReviewTitle());
+        values.put(COLUMN_REVIEW_COMMENT, review.getReviewText());
+        values.put(COLUMN_REVIEW_DATE, review.getDate());
+        db.insert(TABLE_REVIEW, null, values);
+        db.close();
+    }
 
 }

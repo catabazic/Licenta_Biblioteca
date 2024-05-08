@@ -31,10 +31,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         DatabaseHelper dbHelper = new DatabaseHelper(MainActivity.this);
 //        dbHelper.insertMockData();
-        scheduleNotification(this);
+//        scheduleNotification(this);
 
-        Intent serviceIntent = new Intent(this, MyBackgroundService.class);
-        startService(serviceIntent);
+//        Intent serviceIntent = new Intent(this, MyBackgroundService.class);
+//        startService(serviceIntent);
 
         sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
 

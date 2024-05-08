@@ -43,6 +43,8 @@
         </activity>
         <activity android:name=".Activities.HistoryActivity">
         </activity>
+        <activity android:name=".Activities.ReviewBookActivity">
+        </activity>
         <service android:name=".Server.MyBackgroundService" />
     </application>
 

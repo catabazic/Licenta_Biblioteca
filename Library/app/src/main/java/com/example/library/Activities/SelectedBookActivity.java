@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
@@ -16,6 +18,8 @@ import com.example.library.Database.DatabaseHelper;
 import com.example.library.Models.Book;
 import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.List;
 
 public class SelectedBookActivity extends AppCompatActivity {
     FloatingActionButton homeActionButton;
@@ -32,6 +36,18 @@ public class SelectedBookActivity extends AppCompatActivity {
     private TextView BookAvailabilityTxt;
     private TextView BookDescriptionTxt;
     private Button reservButton;
+
+    private TextView ratingNote;
+    private TextView ratingNumber;
+    private TextView seeAllRatings;
+    private ProgressBar rating5;
+    private ProgressBar rating4;
+    private ProgressBar rating3;
+    private ProgressBar rating2;
+    private ProgressBar rating1;
+
+    private RatingBar ratingBar;
+    private DatabaseHelper dbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +68,17 @@ public class SelectedBookActivity extends AppCompatActivity {
 
         backButton=findViewById(R.id.bookBackBtn);
 
+        ratingNote=findViewById(R.id.BookRating);
+        ratingNumber=findViewById(R.id.bookRatingNumber);
+        seeAllRatings=findViewById(R.id.SeeAllRatingsTxt);
+        ratingBar=findViewById(R.id.ratingBar);
+        rating5=findViewById(R.id.progressBar5);
+        rating4=findViewById(R.id.progressBar4);
+        rating3=findViewById(R.id.progressBar3);
+        rating2=findViewById(R.id.progressBar2);
+        rating1=findViewById(R.id.progressBar1);
+
+
         chatNameTxt = findViewById(R.id.chatNameTxt);
         BookNameTxt = findViewById(R.id.BookNameTxt);
         BookAuthorTxt = findViewById(R.id.BookAuthorTxt);
@@ -61,11 +88,25 @@ public class SelectedBookActivity extends AppCompatActivity {
         reservButton = findViewById(R.id.BookReservationBtn);
 
         updateUI(book);
-        DatabaseHelper dbHelper = new DatabaseHelper(SelectedBookActivity.this);
+        dbHelper = new DatabaseHelper(SelectedBookActivity.this);
         if(dbHelper.isBookBorrowed(MainActivity.sharedPreferences.getInt("user_id",-1),book.getId())){
             reservButton.setText("Read Book");
         }
 
+
+        seeAllRatings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+
+            }
+        });
 
         reservButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -130,16 +171,25 @@ public class SelectedBookActivity extends AppCompatActivity {
     }
 
     private void updateUI(Book book) {
-        // Update chat name (if needed)
         chatNameTxt.setText(book.getName());
 
-        // Update book details
         BookNameTxt.setText(book.getName());
         BookAuthorTxt.setText(book.getAuthor());
         BookGenreTxt.setText(book.getGenre());
         BookAvailabilityTxt.setText("Disponibilitate: " + book.getDisponible());
         BookDescriptionTxt.setText(book.getDescription());
 
+
+        ratingNote.setText(String.valueOf(dbHelper.getRatingOfBook(book.getId())));
+        List<Integer> list = dbHelper.getNumberOfRatings(book.getId());
+        String numberOfRatingsStr = String.valueOf(list.get(0));
+        numberOfRatingsStr+=" Reviews";
+        ratingNumber.setText(numberOfRatingsStr);
+        rating1.setProgress(list.get(1));
+        rating2.setProgress(list.get(2));
+        rating3.setProgress(list.get(3));
+        rating4.setProgress(list.get(4));
+        rating5.setProgress(list.get(5));
 
     }
 }
