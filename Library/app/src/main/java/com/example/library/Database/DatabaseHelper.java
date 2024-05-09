@@ -261,6 +261,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "('The Adventures of Sherlock Holmes', 18, 1, NULL, 'O colecție de povestiri despre celebrul detectiv Sherlock Holmes, scrise de Arthur Conan Doyle', 23)," +
                 "('At the Mountains of Madness', 19, 7, NULL, 'O poveste cosmic-horror despre o expediție în Antarctica, scrisă de H.P. Lovecraft', 9)," +
                 "('Slaughterhouse-Five', 20, 8, NULL, 'Un roman despre război și călătorii în timp, scris de Kurt Vonnegut', 14)");
+
+        db.execSQL("INSERT INTO " + TABLE_USER + "(" + COLUMN_USER_NAME + ", " + COLUMN_USER_PHOTO + ", " + COLUMN_USER_PHONE + ", " + COLUMN_USER_EMAIL + ", " + COLUMN_USER_PASSWORD + ") VALUES ('John Doe', 'photo_url', '123456789', 'john@example.com', 'password')");
+        db.execSQL("INSERT INTO " + TABLE_USER + "(" + COLUMN_USER_NAME + ", " + COLUMN_USER_PHOTO + ", " + COLUMN_USER_PHONE + ", " + COLUMN_USER_EMAIL + ", " + COLUMN_USER_PASSWORD + ") VALUES ('Jane Smith', 'photo_url', '987654321', 'jane@example.com', 'password')");
+        db.execSQL("INSERT INTO " + TABLE_USER + "(" + COLUMN_USER_NAME + ", " + COLUMN_USER_PHOTO + ", " + COLUMN_USER_PHONE + ", " + COLUMN_USER_EMAIL + ", " + COLUMN_USER_PASSWORD + ") VALUES ('Alice Johnson', 'photo_url', '555555555', 'alice@example.com', 'password')");
+        db.execSQL("INSERT INTO " + TABLE_USER + "(" + COLUMN_USER_NAME + ", " + COLUMN_USER_PHOTO + ", " + COLUMN_USER_PHONE + ", " + COLUMN_USER_EMAIL + ", " + COLUMN_USER_PASSWORD + ") VALUES ('Bob Williams', 'photo_url', '777777777', 'bob@example.com', 'password')");
+        db.execSQL("INSERT INTO " + TABLE_USER + "(" + COLUMN_USER_NAME + ", " + COLUMN_USER_PHOTO + ", " + COLUMN_USER_PHONE + ", " + COLUMN_USER_EMAIL + ", " + COLUMN_USER_PASSWORD + ") VALUES ('Eve Brown', 'photo_url', '999999999', 'eve@example.com', 'password')");
+
+        db.execSQL("INSERT INTO " + TABLE_REVIEW + "(" + COLUMN_REVIEW_BOOK_ID + ", " + COLUMN_REVIEW_USER_ID + ", " + COLUMN_REVIEW_RATING + ", " + COLUMN_REVIEW_TITLE + ", " + COLUMN_REVIEW_COMMENT + ", " + COLUMN_REVIEW_DATE + ") VALUES (1, 1, 4.5, 'Great book', 'Enjoyed reading it', '2024-05-08')");
+        db.execSQL("INSERT INTO " + TABLE_REVIEW + "(" + COLUMN_REVIEW_BOOK_ID + ", " + COLUMN_REVIEW_USER_ID + ", " + COLUMN_REVIEW_RATING + ", " + COLUMN_REVIEW_TITLE + ", " + COLUMN_REVIEW_COMMENT + ", " + COLUMN_REVIEW_DATE + ") VALUES (2, 2, 3.0, 'Okay book', 'Not bad', '2024-05-08')");
+        db.execSQL("INSERT INTO " + TABLE_REVIEW + "(" + COLUMN_REVIEW_BOOK_ID + ", " + COLUMN_REVIEW_USER_ID + ", " + COLUMN_REVIEW_RATING + ", " + COLUMN_REVIEW_TITLE + ", " + COLUMN_REVIEW_COMMENT + ", " + COLUMN_REVIEW_DATE + ") VALUES (3, 3, 5.0, 'Excellent book', 'Highly recommended', '2024-05-08')");
+        db.execSQL("INSERT INTO " + TABLE_REVIEW + "(" + COLUMN_REVIEW_BOOK_ID + ", " + COLUMN_REVIEW_USER_ID + ", " + COLUMN_REVIEW_RATING + ", " + COLUMN_REVIEW_TITLE + ", " + COLUMN_REVIEW_COMMENT + ", " + COLUMN_REVIEW_DATE + ") VALUES (1, 4, 2.5, 'Disappointing', 'Expected more', '2024-05-08')");
+        db.execSQL("INSERT INTO " + TABLE_REVIEW + "(" + COLUMN_REVIEW_BOOK_ID + ", " + COLUMN_REVIEW_USER_ID + ", " + COLUMN_REVIEW_RATING + ", " + COLUMN_REVIEW_TITLE + ", " + COLUMN_REVIEW_COMMENT + ", " + COLUMN_REVIEW_DATE + ") VALUES (2, 5, 4.0, 'Nice read', 'Enjoyable', '2024-05-08')");
+
+        db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (1, 1, '2024-05-08', '2024-05-10', '2024-05-20')");
+        db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (2, 2, '2024-05-08', '2024-05-12', '2024-05-25')");
+        db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (3, 3, '2024-05-08', '2024-05-15', '2024-05-30')");
+        db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (4, 1, '2024-05-08', '2024-05-18', '2024-06-05')");
+        db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (5, 2, '2024-05-08', '2024-05-20', '2024-06-10')");
+
         db.close();
     }
 
@@ -610,12 +629,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @SuppressLint("Range")
     public User getUserById(int id) {
-        User user = new User();
+        User user = null;
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_USER +
                 " WHERE " + COLUMN_USER_ID + " =? ";
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
         if (cursor != null && cursor.moveToFirst()) {
+            user = new User();
             user.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_USER_ID)));
             user.setName(cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME)));
             user.setEmail(cursor.getString(cursor.getColumnIndex(COLUMN_USER_EMAIL)));
@@ -749,10 +769,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int number = 0;
         if (cursor != null) {
             while (cursor.moveToNext()) {
-                value = cursor.getFloat(cursor.getColumnIndex(COLUMN_REVIEW_RATING));
+                value += cursor.getFloat(cursor.getColumnIndex(COLUMN_REVIEW_RATING));
                 number++;
             }
             cursor.close();
+        }
+        if (number == 0) {
+            return 0;
         }
         return value / number;
     }
@@ -765,32 +788,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id_book)});
         List<Integer> list = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
-            list.add( 0);
+            list.add(0);
         }
         int one = 0, two = 0, three = 0, four = 0, five = 0, number = 0;
         if (cursor != null) {
             while (cursor.moveToNext()) {
-                float ratingNumber = cursor.getInt(cursor.getColumnIndex(COLUMN_REVIEW_RATING));
-                if (ratingNumber == 1 || ratingNumber == 0.5) {
+                double ratingNumber = cursor.getFloat(cursor.getColumnIndex(COLUMN_REVIEW_RATING));
+                if (ratingNumber <= 1.0) {
                     one++;
-                } else if (ratingNumber == 2 || ratingNumber == 1.5) {
+                } else if (ratingNumber <= 2.0) {
                     two++;
-                } else if (ratingNumber == 3 || ratingNumber == 2.5) {
+                } else if (ratingNumber <= 3.0) {
                     three++;
-                } else if (ratingNumber == 4 || ratingNumber == 3.5) {
+                } else if (ratingNumber <= 4.0) {
                     four++;
-                } else if (ratingNumber == 5 || ratingNumber == 4.5) {
+                } else if (ratingNumber <= 5.0) {
                     five++;
                 }
                 number++;
             }
             cursor.close();
             list.set(0, number);
-            list.set(1, one / number * 100);
-            list.set(2, two / number * 100);
-            list.set(3, three / number * 100);
-            list.set(4, four / number * 100);
-            list.set(5, five / number * 100);
+            if (number == 0) {
+                for (int i = 1; i <= 5; i++) {
+                    list.set(i, 0);
+                }
+            } else {
+                list.set(1, (int) ((double) one / number * 100));
+                list.set(2, (int) ((double) two / number * 100));
+                list.set(3, (int) ((double) three / number * 100));
+                list.set(4, (int) ((double) four / number * 100));
+                list.set(5, (int) ((double) five / number * 100));
+            }
         }
         return list;
     }
@@ -854,4 +883,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    @SuppressLint("Range")
+    public Book getBookById(int idBook) {
+        Book book = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_BOOK +
+                " WHERE " + COLUMN_BOOK_ID + " =? ";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idBook)});
+        if (cursor != null && cursor.moveToFirst()) {
+            book = new Book();
+            book.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_ID)));
+            book.setName(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_NAME)));
+            cursor.close();
+        }
+        return book;
+    }
 }

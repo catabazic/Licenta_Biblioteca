@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/bookBackBtn"
+            android:id="@+id/reviewBackBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="#D7CAD1"
@@ -42,7 +42,7 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/bookBackBtn"
+            app:layout_constraintStart_toEndOf="@+id/reviewBackBtn"
             app:layout_constraintTop_toTopOf="parent" />
 
 

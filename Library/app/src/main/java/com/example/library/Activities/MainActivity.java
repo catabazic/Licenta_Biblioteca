@@ -12,6 +12,7 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.library.Database.DatabaseHelper;
+import com.example.library.Models.User;
 import com.example.library.R;
 import com.example.library.Server.AlarmReceiver;
 import com.example.library.Server.MyBackgroundService;
@@ -37,7 +38,13 @@ public class MainActivity extends AppCompatActivity {
 //        startService(serviceIntent);
 
         sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-
+        User user = dbHelper.getUserById(sharedPreferences.getInt("user_id",-1));
+        if(user==null){
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("isLoggedIn",false);
+            editor.putInt("user_id", -1);
+            editor.apply();
+        }
         boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
         if (isLoggedIn) {
             startActivity(new Intent(MainActivity.this, HomeActivity.class));

@@ -29,7 +29,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         TextView bookAuthor;
         TextView bookState;
         TextView bookRetur;
-        TextView books;
         LinearLayout layout;
 
         public BookViewHolder(View itemView) {

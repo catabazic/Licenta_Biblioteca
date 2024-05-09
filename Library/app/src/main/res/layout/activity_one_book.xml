@@ -21,7 +21,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/bookBackBtn"
+            android:id="@+id/reviewBackBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="#D7CAD1"
@@ -43,7 +43,7 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/bookBackBtn"
+            app:layout_constraintStart_toEndOf="@+id/reviewBackBtn"
             app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -170,7 +170,7 @@
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView38"
-                app:layout_constraintEnd_toStartOf="@+id/imageView7"
+                app:layout_constraintEnd_toStartOf="@+id/imageView38"
                 app:srcCompat="@drawable/ic_star_empty" />
 
             <ImageView
@@ -178,7 +178,7 @@
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView36"
-                app:layout_constraintEnd_toStartOf="@+id/imageView9"
+                app:layout_constraintEnd_toStartOf="@+id/imageView36"
                 app:srcCompat="@drawable/ic_star_empty" />
 
             <ImageView
@@ -186,16 +186,15 @@
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView37"
-                app:layout_constraintEnd_toStartOf="@+id/imageView10"
+                app:layout_constraintEnd_toStartOf="@+id/imageView37"
                 app:srcCompat="@drawable/ic_star_empty" />
 
             <ImageView
                 android:id="@+id/imageView39"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
-                android:layout_marginEnd="5dp"
                 app:layout_constraintBottom_toBottomOf="@+id/progressBar1"
-                app:layout_constraintEnd_toStartOf="@+id/progressBar5"
+                app:layout_constraintEnd_toStartOf="@+id/imageView35"
                 app:layout_constraintTop_toBottomOf="@+id/progressBar2"
                 app:srcCompat="@drawable/ic_star_full" />
 
@@ -203,8 +202,9 @@
                 android:id="@+id/imageView38"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
+                android:layout_marginEnd="5dp"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView39"
-                app:layout_constraintEnd_toStartOf="@+id/imageView5"
+                app:layout_constraintEnd_toStartOf="@+id/progressBar1"
                 app:srcCompat="@drawable/ic_star_empty" />
 
             <ImageView
@@ -212,7 +212,7 @@
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView32"
-                app:layout_constraintEnd_toStartOf="@+id/imageView5"
+                app:layout_constraintEnd_toStartOf="@+id/imageView32"
                 app:srcCompat="@drawable/ic_star_full" />
 
             <ImageView
@@ -220,24 +220,24 @@
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView31"
-                app:layout_constraintEnd_toStartOf="@+id/imageView10"
+                app:layout_constraintEnd_toStartOf="@+id/imageView31"
                 app:srcCompat="@drawable/ic_star_empty" />
 
             <ImageView
                 android:id="@+id/imageView31"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
+                android:layout_marginEnd="5dp"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView34"
-                app:layout_constraintEnd_toStartOf="@+id/imageView7"
+                app:layout_constraintEnd_toStartOf="@+id/progressBar2"
                 app:srcCompat="@drawable/ic_star_empty" />
 
             <ImageView
                 android:id="@+id/imageView32"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
-                android:layout_marginEnd="5dp"
                 app:layout_constraintBottom_toBottomOf="@+id/progressBar2"
-                app:layout_constraintEnd_toStartOf="@+id/progressBar5"
+                app:layout_constraintEnd_toStartOf="@+id/imageView33"
                 app:layout_constraintTop_toBottomOf="@+id/progressBar3"
                 app:srcCompat="@drawable/ic_star_full" />
 
@@ -246,15 +246,16 @@
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView30"
-                app:layout_constraintEnd_toStartOf="@+id/imageView9"
+                app:layout_constraintEnd_toStartOf="@+id/imageView30"
                 app:srcCompat="@drawable/ic_star_empty" />
 
             <ImageView
                 android:id="@+id/imageView29"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
+                android:layout_marginEnd="5dp"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView28"
-                app:layout_constraintEnd_toStartOf="@+id/imageView10"
+                app:layout_constraintEnd_toStartOf="@+id/progressBar3"
                 app:srcCompat="@drawable/ic_star_empty" />
 
             <ImageView
@@ -269,9 +270,8 @@
                 android:id="@+id/imageView25"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
-                android:layout_marginEnd="5dp"
                 app:layout_constraintBottom_toBottomOf="@+id/progressBar3"
-                app:layout_constraintEnd_toStartOf="@+id/progressBar5"
+                app:layout_constraintEnd_toStartOf="@+id/imageView28"
                 app:layout_constraintTop_toBottomOf="@+id/progressBar4"
                 app:srcCompat="@drawable/ic_star_full" />
 
@@ -280,7 +280,7 @@
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView29"
-                app:layout_constraintEnd_toStartOf="@+id/imageView9"
+                app:layout_constraintEnd_toStartOf="@+id/imageView29"
                 app:srcCompat="@drawable/ic_star_empty" />
 
             <ImageView
@@ -288,7 +288,7 @@
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView25"
-                app:layout_constraintEnd_toStartOf="@+id/imageView5"
+                app:layout_constraintEnd_toStartOf="@+id/imageView25"
                 app:srcCompat="@drawable/ic_star_full" />
 
             <ImageView
@@ -312,9 +312,8 @@
                 android:id="@+id/imageView4"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
-                android:layout_marginEnd="5dp"
                 app:layout_constraintBottom_toBottomOf="@+id/progressBar4"
-                app:layout_constraintEnd_toStartOf="@+id/progressBar5"
+                app:layout_constraintEnd_toStartOf="@+id/imageView13"
                 app:layout_constraintTop_toBottomOf="@+id/progressBar5"
                 app:srcCompat="@drawable/ic_star_full" />
 
@@ -330,8 +329,9 @@
                 android:id="@+id/imageView14"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
-                app:layout_constraintBottom_toBottomOf="@+id/imageView13"
-                app:layout_constraintEnd_toStartOf="@+id/imageView9"
+                android:layout_marginEnd="5dp"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView6"
+                app:layout_constraintEnd_toStartOf="@+id/progressBar4"
                 app:srcCompat="@drawable/ic_star_empty" />
 
             <ImageView

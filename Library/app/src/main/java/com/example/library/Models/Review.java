@@ -9,6 +9,7 @@ public class Review {
     private String reviewText;
 
     public Review() {
+        rating = 0;
     }
 
     public int getId_user() {

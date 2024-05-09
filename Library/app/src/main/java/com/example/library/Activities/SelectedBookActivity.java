@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.library.Database.DatabaseHelper;
 import com.example.library.Models.Book;
@@ -56,8 +55,6 @@ public class SelectedBookActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if(intent != null) {
             book = (Book) intent.getSerializableExtra("book");
-//            fromPage = intent.getSerializableExtra("fromPage");
-
         }
 
         homeActionButton = findViewById(R.id.homeActionButton);
@@ -66,7 +63,7 @@ public class SelectedBookActivity extends AppCompatActivity {
         messagesActionButton = findViewById(R.id.messagesActionButton);
         userActionButton = findViewById(R.id.userActionButton);
 
-        backButton=findViewById(R.id.bookBackBtn);
+        backButton=findViewById(R.id.reviewBackBtn);
 
         ratingNote=findViewById(R.id.BookRating);
         ratingNumber=findViewById(R.id.bookRatingNumber);
@@ -87,8 +84,8 @@ public class SelectedBookActivity extends AppCompatActivity {
         BookDescriptionTxt = findViewById(R.id.BookDescriptionTxt);
         reservButton = findViewById(R.id.BookReservationBtn);
 
-        updateUI(book);
         dbHelper = new DatabaseHelper(SelectedBookActivity.this);
+        updateUI(book);
         if(dbHelper.isBookBorrowed(MainActivity.sharedPreferences.getInt("user_id",-1),book.getId())){
             reservButton.setText("Read Book");
         }
@@ -97,14 +94,19 @@ public class SelectedBookActivity extends AppCompatActivity {
         seeAllRatings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(SelectedBookActivity.this, ReviewsBookAllActivity.class);
+                intent.putExtra("book",book);
+                startActivity(intent);
+                finish();
             }
         });
 
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-
+                Intent intent = new Intent(SelectedBookActivity.this, ReviewBookActivity.class);
+                intent.putExtra("book",book);
+                startActivity(intent);
             }
         });
 
@@ -185,6 +187,7 @@ public class SelectedBookActivity extends AppCompatActivity {
         String numberOfRatingsStr = String.valueOf(list.get(0));
         numberOfRatingsStr+=" Reviews";
         ratingNumber.setText(numberOfRatingsStr);
+        System.out.println(list.get(0) + ", " + list.get(1) + ", " + list.get(2) + ", " +list.get(3) + ", " +list.get(4) + ", " +list.get(5));
         rating1.setProgress(list.get(1));
         rating2.setProgress(list.get(2));
         rating3.setProgress(list.get(3));

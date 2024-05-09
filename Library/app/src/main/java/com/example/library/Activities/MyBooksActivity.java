@@ -19,13 +19,13 @@ import com.example.library.Adapters.BookAdapter;
 import com.example.library.Models.Book;
 
 public class MyBooksActivity extends AppCompatActivity implements OnItemClickListener {
-    FloatingActionButton homeActionButton;
-    FloatingActionButton searchActionButton;
-    FloatingActionButton booksActionButton;
-    FloatingActionButton messagesActionButton;
-    FloatingActionButton userActionButton;
+    private FloatingActionButton homeActionButton;
+    private FloatingActionButton searchActionButton;
+    private FloatingActionButton booksActionButton;
+    private FloatingActionButton messagesActionButton;
+    private FloatingActionButton userActionButton;
 
-    private RecyclerView recyclerView; //booksRecView
+    private RecyclerView recyclerView;
     private BookAdapter adapter;
     private List<Book> bookList;
 

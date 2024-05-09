@@ -45,6 +45,10 @@
         </activity>
         <activity android:name=".Activities.ReviewBookActivity">
         </activity>
+        <activity android:name=".Activities.ReviewsBookAllActivity">
+        </activity>
+        <activity android:name=".Activities.ReviewsMineActivity">
+        </activity>
         <service android:name=".Server.MyBackgroundService" />
     </application>
 
