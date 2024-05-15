@@ -97,11 +97,12 @@ public class HistoryActivity extends AppCompatActivity implements OnItemClickLis
     }
 
     @Override
-    public void onItemClick(Book book) {
+    public void onItemClick(Object book) {
         DatabaseHelper dbHelper = new DatabaseHelper(HistoryActivity.this);
-        dbHelper.getBookByNameAndAuthor(book.getName(), book.getAuthor());
+        Book thisBook = (Book) book;
+        dbHelper.getBookByNameAndAuthor(thisBook.getName(), thisBook.getAuthor());
         Intent intent = new Intent(HistoryActivity.this, SelectedBookActivity.class);
-        intent.putExtra("book", book);
+        intent.putExtra("book", thisBook);
 //        intent.putExtra("fromPage", this);
         startActivity(intent);
     }

@@ -101,14 +101,10 @@ public class HomeActivity extends AppCompatActivity implements OnItemClickListen
     }
 
     @Override
-    public void onItemClick(Book book) {
-        /*String bookName = book.getName();
-        String author = book.getAuthor();*/
-        DatabaseHelper dbHelper = new DatabaseHelper(HomeActivity.this);
-        dbHelper.getBookByNameAndAuthor(book.getName(),book.getAuthor());
+    public void onItemClick(Object book) {
+        Book thisBook = (Book) book;
         Intent intent = new Intent(HomeActivity.this, SelectedBookActivity.class);
-        intent.putExtra("book",book);
-//        intent.putExtra("fromPage", this);
+        intent.putExtra("book",thisBook);
         startActivity(intent);
 
     }

@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:background="#D8CBD2"
     android:minWidth="48dp"
-    android:minHeight="48dp">
+    android:minHeight="48dp"
+    tools:context=".Activities.ChatActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
@@ -114,179 +115,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
-        <TextView
-            android:id="@+id/textView23"
-            android:layout_width="wrap_content"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/MessagesrecyclerView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/frame_message"
-            android:backgroundTint="#3C6750A3"
-            android:backgroundTintMode="src_in"
-            android:padding="5dp"
-            android:text="Cheers to that!"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <TextView
-            android:id="@+id/textView24"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="100dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/frame_message"
-            android:backgroundTint="#856750A3"
-            android:backgroundTintMode="src_in"
-            android:padding="5dp"
-            android:text="Exactly! It's a win-win. Alright, let's get this plan into motion. Sarah's in for the birthday surprise of a lifetime!"
-            app:layout_constraintBottom_toTopOf="@+id/textView23"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/textView25"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="100dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/frame_message"
-            android:backgroundTint="#3C6750A3"
-            android:backgroundTintMode="src_in"
-            android:padding="5dp"
-            android:text="That's a brilliant idea! Plus, we might benefit from some delicious homemade meals down the line.  "
-            app:layout_constraintBottom_toTopOf="@+id/textView24"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/textView26"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="100dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/frame_message"
-            android:backgroundTint="#856750A3"
-            android:backgroundTintMode="src_in"
-            android:padding="5dp"
-            android:text="How about we all pitch in and get her that cooking class she's been eyeing? It's perfect since she's been talking about mastering her culinary skills."
-            app:layout_constraintBottom_toTopOf="@+id/textView25"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/textView27"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="100dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/frame_message"
-            android:backgroundTint="#3C6750A3"
-            android:backgroundTintMode="src_in"
-            android:padding="5dp"
-            android:text="Definitely. We should start brainstorming gift ideas though. Got any suggestions?"
-            app:layout_constraintBottom_toTopOf="@+id/textView26"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/textView28"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="100dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/frame_message"
-            android:backgroundTint="#856750A3"
-            android:backgroundTintMode="src_in"
-            android:padding="5dp"
-            android:text="She's going to be over the moon. And with all the planning that's gone into it, it's bound to be unforgettable."
-            app:layout_constraintBottom_toTopOf="@+id/textView27"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/textView29"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="100dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/frame_message"
-            android:backgroundTint="#3C6750A3"
-            android:backgroundTintMode="src_in"
-            android:padding="5dp"
-            android:text="Yeah, I heard it's going to be epic. I can't wait to see the look on her face when she walks in."
-            app:layout_constraintBottom_toTopOf="@+id/textView28"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/textView30"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="100dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/frame_message"
-            android:backgroundTint="#856750A3"
-            android:backgroundTintMode="src_in"
-            android:padding="5dp"
-            android:text="So true. Hey, speaking of magic, did you hear about Sarah's surprise birthday party?"
-            app:layout_constraintBottom_toTopOf="@+id/textView29"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/textView31"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="100dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/frame_message"
-            android:backgroundTint="#3C6750A3"
-            android:backgroundTintMode="src_in"
-            android:padding="5dp"
-            android:text="It's movie magic, my friend. Anything is possible!"
-            app:layout_constraintBottom_toTopOf="@+id/textView30"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/textView32"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="100dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/frame_message"
-            android:backgroundTint="#856750A3"
-            android:backgroundTintMode="src_in"
-            android:padding="5dp"
-            android:text="I know, right? I kept wondering, how did they make that giant robot chicken look so realistic?"
-            app:layout_constraintBottom_toTopOf="@+id/textView31"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/textView33"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="100dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/frame_message"
-            android:backgroundTint="#3C6750A3"
-            android:backgroundTintMode="src_in"
-            android:padding="5dp"
-            android:text="Totally! And the way they pulled off those special effects was mind-blowing."
-            app:layout_constraintBottom_toTopOf="@+id/textView32"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

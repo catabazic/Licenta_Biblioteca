@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.library.Models.Book;
+import com.example.library.Models.Chat;
+import com.example.library.Models.Message;
 import com.example.library.Models.Review;
 import com.example.library.Models.User;
 
@@ -279,6 +281,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (3, 3, '2024-05-08', '2024-05-15', '2024-05-30')");
         db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (4, 1, '2024-05-08', '2024-05-18', '2024-06-05')");
         db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (5, 2, '2024-05-08', '2024-05-20', '2024-06-10')");
+
+        db.execSQL("INSERT INTO " + TABLE_CONVERSATION + "(" + COLUMN_CONVERSATION_USER1_ID + ", " + COLUMN_CONVERSATION_USER2_ID + ") VALUES (1, 2)");
+        db.execSQL("INSERT INTO " + TABLE_CONVERSATION + "(" + COLUMN_CONVERSATION_USER1_ID + ", " + COLUMN_CONVERSATION_USER2_ID + ") VALUES (3, 1)");
+        db.execSQL("INSERT INTO " + TABLE_CONVERSATION + "(" + COLUMN_CONVERSATION_USER1_ID + ", " + COLUMN_CONVERSATION_USER2_ID + ") VALUES (2, 3)");
+
+        db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (1, 1, 'Hello there!', '2024-05-09 10:00:00')");
+        db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (1, 2, 'Hi John, how are you?', '2024-05-09 10:05:00')");
+        db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (2, 1, 'Hey, I''m doing great, thanks for asking!', '2024-05-09 10:10:00')");
+        db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (2, 3, 'That''s good to hear!', '2024-05-09 10:15:00')");
+        db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (3, 2, 'What''s up?', '2024-05-09 10:20:00')");
+        db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (3, 3, 'Not much, just chilling. How about you?', '2024-05-09 10:25:00')");
+
 
         db.close();
     }
@@ -897,5 +911,91 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
         }
         return book;
+    }
+
+    @SuppressLint("Range")
+    public List<Chat> getChats(int idUser){
+        List<Chat> chatList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_CONVERSATION +
+                " WHERE " + COLUMN_CONVERSATION_USER1_ID + " =? OR "
+                + COLUMN_CONVERSATION_USER2_ID + "=?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idUser), String.valueOf(idUser)});
+        if (cursor != null){
+            while(cursor.moveToNext()) {
+                Chat chat = new Chat();
+                chat.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_CONVERSATION_ID)));
+                int user1 = cursor.getInt(cursor.getColumnIndex(COLUMN_CONVERSATION_USER1_ID));
+                int user2 = cursor.getInt(cursor.getColumnIndex(COLUMN_CONVERSATION_USER2_ID));
+                if(user1 == idUser){
+                    chat.setName(this.getUserById(user2).getName());
+                }else{
+                    chat.setName(this.getUserById(user1).getName());
+                }
+                String messagequerry = "SELECT * FROM " + TABLE_MESSAGE + " WHERE " +
+                        COLUMN_MESSAGE_CONVERSATION_ID + " =? ";
+                Cursor cursorMess = db.rawQuery(messagequerry, new String[]{String.valueOf(cursor.getInt(cursor.getColumnIndex(COLUMN_CONVERSATION_ID)))});
+                if(cursorMess != null && cursorMess.moveToLast()) {
+                    if(idUser == cursorMess.getInt(cursorMess.getColumnIndex(COLUMN_MESSAGE_USER_ID))){
+                        chat.setLastMessageMine(true);
+                    } else {
+                        chat.setLastMessageMine(false);
+                    }
+                    chat.setMessage(cursorMess.getString(cursorMess.getColumnIndex(COLUMN_MESSAGE_CONTENT)));
+                    chat.setDate(cursorMess.getString(cursorMess.getColumnIndex(COLUMN_MESSAGE_DATE)));
+                    cursorMess.close(); // Close the cursor after retrieving data from the last row
+                }
+                chatList.add(chat);
+            }
+            cursor.close();
+        }
+        return chatList;
+    }
+
+    @SuppressLint("Range")
+    public List<Message> getAllMessages(int idChat){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_MESSAGE +
+                " WHERE " + COLUMN_MESSAGE_CONVERSATION_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idChat)});
+        List<Message> list = new ArrayList<>();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                Message message = new Message();
+                message.setId_user(cursor.getInt(cursor.getColumnIndex(COLUMN_MESSAGE_USER_ID)));
+                message.setMessage(cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_CONTENT)));
+                message.setDate(cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_DATE)));
+                message.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_MESSAGE_CONVERSATION_ID)));
+
+                list.add(message);
+            }
+            cursor.close();
+        }
+        return list;
+    }
+
+    public void addMessage(int idChat, int idUser, String text){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_MESSAGE_USER_ID, idUser);
+        values.put(COLUMN_MESSAGE_CONTENT, text);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            LocalDate currentDate = LocalDate.now();
+            values.put(COLUMN_MESSAGE_DATE, currentDate.toString());
+        }
+        values.put(COLUMN_MESSAGE_CONVERSATION_ID, idChat);
+
+        db.insert(TABLE_MESSAGE, null, values);
+        db.close();
+    }
+
+    public void addChat(int idUser1, int idUser2){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_CONVERSATION_USER1_ID, idUser1);
+        values.put(COLUMN_CONVERSATION_USER2_ID, idUser2);
+
+        db.insert(TABLE_CONVERSATION, null, values);
+        db.close();
     }
 }

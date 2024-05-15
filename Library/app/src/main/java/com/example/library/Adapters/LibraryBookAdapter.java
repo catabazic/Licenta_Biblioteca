@@ -48,9 +48,11 @@ public class LibraryBookAdapter  extends RecyclerView.Adapter<LibraryBookAdapter
 
         @Override
         public void onClick(View v) {
+            System.out.println("i am here");
             if (listener != null) {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
+                    System.out.println("i guess i should be here");
                     Book clickedBook = mBooks.get(position); // Retrieve the clicked book
                     listener.onItemClick(clickedBook); // Pass the clicked book to the listener
                 }

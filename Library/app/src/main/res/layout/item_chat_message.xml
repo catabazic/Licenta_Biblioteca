@@ -1,8 +1,8 @@
 <!-- item_chat_message.xml -->
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/chatLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#5BFFFFFF"
@@ -24,7 +24,7 @@
             android:id="@+id/user_img3"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:srcCompat="@tools:sample/avatars"/>
+            tools:srcCompat="@tools:sample/avatars" />
     </androidx.cardview.widget.CardView>
 
 
@@ -36,7 +36,7 @@
         android:paddingLeft="10dp">
 
         <TextView
-            android:id="@+id/sender_text_view6"
+            android:id="@+id/nameChatTxt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Luna Evergreen"
@@ -44,7 +44,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/message_text_view4"
+            android:id="@+id/messageChatTxt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.2"
@@ -53,11 +53,15 @@
             android:text="You: Hello!"
             android:textSize="14sp" />
     </LinearLayout>
+
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/dateChatTxt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.5"
         android:text="15:15" />
 
 </LinearLayout>
+<!--
+            android:background="#5BFFFFFF"
+            android:background="#A6FFFFFF"-->

@@ -98,12 +98,10 @@ public class MyBooksActivity extends AppCompatActivity implements OnItemClickLis
     }
 
     @Override
-    public void onItemClick(Book book) {
-        DatabaseHelper dbHelper = new DatabaseHelper(MyBooksActivity.this);
-        dbHelper.getBookByNameAndAuthor(book.getName(),book.getAuthor());
+    public void onItemClick(Object book) {
+        Book thisBook = (Book) book;
         Intent intent = new Intent(MyBooksActivity.this, SelectedBookActivity.class);
-        intent.putExtra("book",book);
-//        intent.putExtra("fromPage", this);
+        intent.putExtra("book",thisBook);
         startActivity(intent);
     }
 }
