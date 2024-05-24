@@ -63,7 +63,7 @@ public class SelectedBookActivity extends AppCompatActivity {
         messagesActionButton = findViewById(R.id.messagesActionButton);
         userActionButton = findViewById(R.id.userActionButton);
 
-        backButton=findViewById(R.id.reviewBackBtn);
+        backButton=findViewById(R.id.backBtn);
 
         ratingNote=findViewById(R.id.BookRating);
         ratingNumber=findViewById(R.id.bookRatingNumber);
@@ -76,7 +76,7 @@ public class SelectedBookActivity extends AppCompatActivity {
         rating1=findViewById(R.id.progressBar1);
 
 
-        chatNameTxt = findViewById(R.id.chatNameTxt);
+        chatNameTxt = findViewById(R.id.nameTxt);
         BookNameTxt = findViewById(R.id.BookNameTxt);
         BookAuthorTxt = findViewById(R.id.BookAuthorTxt);
         BookGenreTxt = findViewById(R.id.BookGenreTxt);

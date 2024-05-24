@@ -45,19 +45,15 @@ public class MessagesActivity extends AppCompatActivity implements OnItemClickLi
         userActionButton = findViewById(R.id.userActionButton);
         addConversation=findViewById(R.id.MessagesAddBtn);
 
-
         recyclerView = findViewById(R.id.ListOfMessages);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        DatabaseHelper dbHelper = new DatabaseHelper(MessagesActivity.this);
-        chatList = dbHelper.getChats(MainActivity.sharedPreferences.getInt("user_id", -1));
 
-        adapter = new ChatAdapter(chatList, this);
-        recyclerView.setAdapter(adapter);
+        loadChats();
 
         addConversation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
+                startActivity(new Intent(MessagesActivity.this, SearchUserActivity.class));
             }
         });
 
@@ -99,6 +95,19 @@ public class MessagesActivity extends AppCompatActivity implements OnItemClickLi
                 finish();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadChats();
+    }
+
+    private void loadChats() {
+        DatabaseHelper dbHelper = new DatabaseHelper(MessagesActivity.this);
+        chatList = dbHelper.getChats(MainActivity.sharedPreferences.getInt("user_id", -1));
+        adapter = new ChatAdapter(chatList, this);
+        recyclerView.setAdapter(adapter);
     }
 
     @Override

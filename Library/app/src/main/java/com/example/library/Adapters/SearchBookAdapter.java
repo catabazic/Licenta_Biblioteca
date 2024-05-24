@@ -1,8 +1,11 @@
 package com.example.library.Adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -10,34 +13,33 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.Interfaces.OnItemClickListener;
+import com.example.library.Models.Book;
 import com.example.library.Models.Chat;
+import com.example.library.Models.Message;
 import com.example.library.R;
 
 import java.util.List;
 
-public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
-    List<Chat> chatList;
+public class SearchBookAdapter extends RecyclerView.Adapter<SearchBookAdapter.ViewHolder> {
+    List<Book> bookList;
     private OnItemClickListener listener;
-    private int[] colors = {0x5BFFFFFF,0xA6FFFFFF};
 
 
-    public ChatAdapter(List<Chat> chatList, OnItemClickListener listener) {
-        this.chatList = chatList;
+    public SearchBookAdapter(List<Book> bookList, OnItemClickListener listener) {
+        this.bookList = bookList;
         this.listener=listener;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private TextView name;
-        private TextView message;
-        private TextView date;
+        private TextView author;
         private LinearLayout layout;
 
         ViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             name = itemView.findViewById(R.id.userName);
-            message = itemView.findViewById(R.id.bookAuthor);
-            date = itemView.findViewById(R.id.dateChatTxt);
+            author= itemView.findViewById(R.id.bookAuthor);
             layout = itemView.findViewById(R.id.chatLayout);
         }
 
@@ -49,7 +51,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
                     System.out.println("i guess i should be here");
-                    Chat clickedChat = chatList.get(position);
+                    Book clickedChat = bookList.get(position);
                     listener.onItemClick(clickedChat);
                 }
             }
@@ -58,31 +60,26 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_message, parent, false);
-        return new ChatAdapter.ViewHolder(view);
+    public SearchBookAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_search_book, parent, false);
+        return new SearchBookAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ChatAdapter.ViewHolder holder, int position) {
-        Chat chat = chatList.get(position);
-        holder.date.setText(chat.getDate());
-        holder.name.setText(chat.getName());
-        String mess = new String();
-        if (chat.isLastMessageMine()) {
-            mess += "You: " + chat.getMessage();
-        } else {
-            mess += chat.getName() + ": " + chat.getMessage();
-        }
-        holder.message.setText(mess);
-        int colorIndex=position % colors.length;
-        holder.layout.setBackgroundColor(colors[colorIndex]);
+    public void onBindViewHolder(@NonNull SearchBookAdapter.ViewHolder holder, int position) {
+        Book book = bookList.get(position);
+        holder.name.setText(book.getName());
+        holder.author.setText(book.getAuthor());
     }
 
     @Override
     public int getItemCount() {
-        return chatList.size();
+        return bookList.size();
     }
 
-
+    public void updateData(List<Book> newData) {
+        bookList.clear(); // Clear the existing dataset
+        bookList.addAll(newData); // Add the new data
+        notifyDataSetChanged(); // Notify the adapter that the dataset has changed
+    }
 }

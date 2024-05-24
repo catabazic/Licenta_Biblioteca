@@ -56,7 +56,7 @@ public class ReviewsBookAllActivity  extends AppCompatActivity {
             names.add(dbHelper.getUserById(review.getId_user()).getName());
         }
 
-        backButton=findViewById(R.id.reviewBackBtn);
+        backButton=findViewById(R.id.backBtn);
         ratingNote=findViewById(R.id.BookRating);
         ratingNumber=findViewById(R.id.bookRatingNumber);
         ratingBar=findViewById(R.id.ratingBar);

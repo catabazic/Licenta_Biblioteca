@@ -664,7 +664,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_LOAN +
                 " WHERE " + COLUMN_LOAN_USER_ID + " = ? AND " +
-                COLUMN_LOAN_BOOK_ID + "=?";
+                COLUMN_LOAN_BOOK_ID + "=? AND " +
+                COLUMN_LOAN_RETURN_DATE + " IS NULL";
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idUser), String.valueOf(idBook)});
         boolean isValid = cursor.getCount() > 0;
         System.out.println(isValid);
@@ -989,13 +990,111 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void addChat(int idUser1, int idUser2){
+    @SuppressLint("Range")
+    public Chat addChat(int idUser1, int idUser2){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_CONVERSATION_USER1_ID, idUser1);
         values.put(COLUMN_CONVERSATION_USER2_ID, idUser2);
 
-        db.insert(TABLE_CONVERSATION, null, values);
+        long rowId = db.insert(TABLE_CONVERSATION, null, values);
+        Chat chat = new Chat();
+
+        if (rowId != -1) {
+            String query = "SELECT * FROM " + TABLE_CONVERSATION + " WHERE rowid = ?";
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(rowId)});
+            if (cursor.moveToFirst()) {
+                chat.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_CONVERSATION_ID)));
+            }
+            cursor.close();
+        }
         db.close();
+        return  chat;
     }
+
+    @SuppressLint("Range")
+    public ArrayList<Book> getBooksSearch(String query) {
+        ArrayList<Book> books = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM " + TABLE_BOOK + " b " +
+                        "JOIN " + TABLE_AUTHOR + " a " +
+                        "ON b." + COLUMN_BOOK_AUTHOR_ID + " = a." + COLUMN_AUTHOR_ID + " " +
+                        "WHERE b." + COLUMN_BOOK_NAME + " LIKE ? " +
+                        "OR a." + COLUMN_AUTHOR_NAME + " LIKE ?",
+                new String[]{"%" + query + "%", "%" + query + "%"}
+        );
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                Book book = new Book();
+                book.setName(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_NAME)));
+                book.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_ID)));
+                book.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_DESCRIPTION)));
+                String queryAuthor = "SELECT * FROM " + TABLE_AUTHOR + " WHERE "
+                        + COLUMN_AUTHOR_ID + "=?";
+                Cursor cursorAuthor = db.rawQuery(queryAuthor, new String[]{cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_AUTHOR_ID))});
+                if (cursorAuthor.moveToFirst()) {
+                    book.setAuthor(cursorAuthor.getString(cursorAuthor.getColumnIndex(COLUMN_AUTHOR_NAME)));
+                }
+                cursorAuthor.close();
+                String queryGenre = "SELECT * FROM " + TABLE_GENRE + " WHERE "
+                        + COLUMN_GENRE_ID + "=?";
+                Cursor cursorGenre = db.rawQuery(queryGenre, new String[]{cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_GENRE_ID))});
+
+                if (cursorGenre.moveToFirst()) {
+                    book.setGenre(cursorGenre.getString(cursorGenre.getColumnIndex(COLUMN_GENRE_NAME)));
+                }
+                cursorGenre.close();
+                books.add(book);
+            }
+            cursor.close();
+        }
+        for (Book book : books){
+            System.out.println(book.getName());
+        }
+        return books;
+    }
+
+    @SuppressLint("Range")
+    public List<User> getUserSearch(String q, int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT u.* " +
+                "FROM " + TABLE_USER + " u " +
+                "JOIN " + TABLE_CONVERSATION + " o ON u." + COLUMN_USER_ID + " = o." + COLUMN_USER_ID + " " +
+                "WHERE (u." + COLUMN_USER_NAME + " LIKE ? OR " +
+                "u." + COLUMN_USER_EMAIL + " LIKE ? OR " +
+                "u." + COLUMN_USER_PHONE + " LIKE ?) " +
+                "AND NOT ((o." + COLUMN_CONVERSATION_USER1_ID + " = ? AND " +
+                "o." + COLUMN_CONVERSATION_USER2_ID + " = u." + COLUMN_USER_ID + ") OR " +
+                "(o." + COLUMN_CONVERSATION_USER1_ID + " = u." + COLUMN_USER_ID + " AND " +
+                "o." + COLUMN_CONVERSATION_USER2_ID + " = ?))";
+
+
+        // Using '%' wildcard properly within query string
+        String wildcardQuery = "%" + q + "%";
+        Cursor cursor = db.rawQuery(query, new String[]{wildcardQuery, wildcardQuery, wildcardQuery,
+                String.valueOf(id), String.valueOf(id)});
+        List<User> list = new ArrayList<>();
+
+        if (cursor != null) {
+            try {
+                while (cursor.moveToNext()) {
+                    User user = new User();
+                    user.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_USER_ID)));
+                    user.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_NAME)));
+                    user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EMAIL)));
+                    user.setNumber(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_PHONE)));
+                    list.add(user);
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+
+        for (User user : list) {
+            System.out.println(user.getName());
+        }
+        return list;
+    }
+
 }

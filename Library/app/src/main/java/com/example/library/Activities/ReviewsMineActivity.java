@@ -35,7 +35,7 @@ public class ReviewsMineActivity extends AppCompatActivity {
             names.add(dbHelper.getBookById(review.getId_book()).getName());
         }
 
-        backButton=findViewById(R.id.reviewBackBtn);
+        backButton=findViewById(R.id.backBtn);
         recyclerView = findViewById(R.id.reviewsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ReviewBookAdapter(reviewList, names);

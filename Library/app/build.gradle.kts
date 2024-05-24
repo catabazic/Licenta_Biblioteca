@@ -10,6 +10,7 @@ val DependencyHandlerScope.annotationProcessor: Unit
 
 plugins {
     alias(libs.plugins.androidApplication)
+    alias(libs.plugins.chaquopy)
 }
 
 android {
@@ -24,6 +25,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters += listOf("arm64-v8a", "x86_64")
+        }
     }
 
     buildTypes {
@@ -40,6 +45,24 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
+
+chaquopy {
+    defaultConfig {
+        buildPython("C:\\py\\python.exe")
+        buildPython("C:\\Windows\\py.exe", "-3.12")
+
+        pyc {
+            src = false
+        }
+    }
+    productFlavors { }
+    sourceSets {
+        getByName("main") {
+            srcDir("src/main/python")
+        }
+    }
+}
+
 
 dependencies {
     implementation(libs.appcompat);

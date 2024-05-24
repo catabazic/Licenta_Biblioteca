@@ -1,22 +1,40 @@
 package com.example.library.Activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.library.Adapters.SearchBookAdapter;
+import com.example.library.Database.DatabaseHelper;
+import com.example.library.Interfaces.OnItemClickListener;
+import com.example.library.Models.Book;
 import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class SearchActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
+
+public class SearchActivity extends AppCompatActivity implements OnItemClickListener {
     FloatingActionButton homeActionButton;
     FloatingActionButton searchActionButton;
     FloatingActionButton booksActionButton;
     FloatingActionButton messagesActionButton;
     FloatingActionButton userActionButton;
-
-
+    private SearchView searchView;
+    private RecyclerView listView;
+    private SearchBookAdapter adapter;
+    private List<Book> bookList;
+    private DatabaseHelper dbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +46,43 @@ public class SearchActivity extends AppCompatActivity {
         messagesActionButton = findViewById(R.id.messagesActionButton);
         userActionButton = findViewById(R.id.userActionButton);
 
+        searchView = findViewById(R.id.searchBar);
+        searchView.clearFocus();
+        listView = findViewById(R.id.SearchResults);
+        listView.setLayoutManager(new LinearLayoutManager(this));
+        dbHelper = new DatabaseHelper(this);
+
+        bookList = new ArrayList<>();
+        adapter = new SearchBookAdapter(bookList, this);
+        listView.setAdapter(adapter);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                bookList = dbHelper.getBooksSearch(query);
+                adapter.updateData(bookList);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                bookList = dbHelper.getBooksSearch(newText);
+                adapter.updateData(bookList);
+                return true;
+            }
+        });
+
+        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
+                }
+            }
+        });
         homeActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,5 +121,24 @@ public class SearchActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    public void onItemClick(Object object) {
+        Book thisBook = (Book) object;
+        Intent intent = new Intent(SearchActivity.this, SelectedBookActivity.class);
+        intent.putExtra("book",thisBook);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            View v = getCurrentFocus();
+            if (v instanceof SearchView) {
+                v.clearFocus();
+            }
+        }
+        return super.dispatchTouchEvent(event);
     }
 }

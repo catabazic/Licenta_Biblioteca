@@ -6,16 +6,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.Adapters.MessagesAdapter;
-import com.example.library.Adapters.ReviewBookAdapter;
 import com.example.library.Database.DatabaseHelper;
-import com.example.library.Models.Book;
 import com.example.library.Models.Chat;
 import com.example.library.Models.Message;
 import com.example.library.R;
@@ -45,7 +42,7 @@ public class ChatActivity extends AppCompatActivity {
         sentBtn = findViewById(R.id.chatSentBtn);
         myMessage = findViewById(R.id.chatMassagetxt);
 
-        name = findViewById(R.id.chatNameTxt);
+        name = findViewById(R.id.nameTxt);
         name.setText(chat.getName());
 
         messages = findViewById(R.id.MessagesrecyclerView);
