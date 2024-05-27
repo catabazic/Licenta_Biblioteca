@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         DatabaseHelper dbHelper = new DatabaseHelper(MainActivity.this);
-        dbHelper.insertMockData();
+//        dbHelper.insertMockData();
 //        scheduleNotification(this);
 
 //        Intent serviceIntent = new Intent(this, MyBackgroundService.class);
