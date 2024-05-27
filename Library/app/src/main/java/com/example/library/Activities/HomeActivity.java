@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.Interfaces.OnItemClickListener;
 import com.example.library.R;
+import com.example.library.Recomandation.RecommendationEngine;
+import com.example.library.Recomandation.RecommendationHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.example.library.Adapters.LibraryBookAdapter;
@@ -28,6 +30,8 @@ public class HomeActivity extends AppCompatActivity implements OnItemClickListen
     FloatingActionButton userActionButton;
     List<Book> popularBooks;
     List<Book> newBooks;
+    List<Book> recommBooks;
+    RecyclerView recommRecyclerView;
     RecyclerView popularRecyclerView;
     RecyclerView newRecyclerView;
 
@@ -41,11 +45,22 @@ public class HomeActivity extends AppCompatActivity implements OnItemClickListen
         popularBooks = dbHelper.getPopularBooks();
         newBooks = dbHelper.getNewBooks();
 
+
+        RecommendationHelper recommendationHelper = new RecommendationHelper(dbHelper);
+        RecommendationEngine recommendationEngine = new RecommendationEngine(recommendationHelper, dbHelper);
+        recommBooks = recommendationEngine.recommendBooks(MainActivity.sharedPreferences.getInt("user_id",-1));
+
         homeActionButton = findViewById(R.id.homeActionButton);
         searchActionButton = findViewById(R.id.searchActionButton);
         booksActionButton = findViewById(R.id.booksActionButton);
         messagesActionButton = findViewById(R.id.messagesActionButton);
         userActionButton = findViewById(R.id.userActionButton);
+
+        recommRecyclerView = findViewById(R.id.RecomendedBooksRecyclerView);
+        recommRecyclerView.setHasFixedSize(true);
+        recommRecyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this, LinearLayoutManager.HORIZONTAL,false));
+        LibraryBookAdapter adapterRecomm = new LibraryBookAdapter(recommBooks,this);
+        recommRecyclerView.setAdapter(adapterRecomm);
 
 
         popularRecyclerView = findViewById(R.id.PopularBooksRecyclerView);

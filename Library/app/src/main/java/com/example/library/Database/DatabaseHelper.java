@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
@@ -13,13 +14,18 @@ import androidx.annotation.RequiresApi;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.example.library.Models.Author;
 import com.example.library.Models.Book;
 import com.example.library.Models.Chat;
+import com.example.library.Models.Genre;
 import com.example.library.Models.Message;
 import com.example.library.Models.Review;
 import com.example.library.Models.User;
+import com.example.library.Models.View;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -66,6 +72,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_LOAN_REQUEST_DATE = "data_cerere";
     private static final String COLUMN_LOAN_START_DATE = "data_inceput";
     private static final String COLUMN_LOAN_RETURN_DATE = "data_intoarcere";
+
+    private static final String TABLE_VIEW = "vizualizari";
+    private static final String COLUMN_VIEW_USER_ID = "user_id";
+    private static final String COLUMN_VIEW_BOOK_ID = "book_id";
+    private static final String COLUMN_VIEW_DATE = "data_vizualizare";
+    private static final String COLUMN_VIEW_TIME = "timp_vizualizare";
+
 
     private static final String TABLE_CONVERSATION = "conversatii";
     private static final String COLUMN_CONVERSATION_ID = "ID";
@@ -143,6 +156,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(" + COLUMN_LOAN_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COLUMN_BOOK_ID + "))";
         db.execSQL(createLoanTableQuery);
 
+        String createViewTableQuery = "CREATE TABLE " + TABLE_VIEW + " (" +
+                COLUMN_VIEW_USER_ID + " INTEGER, " +
+                COLUMN_VIEW_BOOK_ID + " INTEGER, " +
+                COLUMN_VIEW_DATE + " TEXT, " +
+                COLUMN_VIEW_TIME + " TEXT, " +
+                "FOREIGN KEY(" + COLUMN_VIEW_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COLUMN_USER_ID + "), " +
+                "FOREIGN KEY(" + COLUMN_VIEW_BOOK_ID + ") REFERENCES " + TABLE_BOOK + "(" + COLUMN_BOOK_ID + "))";
+        db.execSQL(createViewTableQuery);
+
+
         String createConversationTableQuery = "CREATE TABLE " + TABLE_CONVERSATION + " (" +
                 COLUMN_CONVERSATION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_CONVERSATION_USER1_ID + " INTEGER, " +
@@ -185,6 +208,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_AUTHOR);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_REVIEW);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_LOAN);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_VIEW);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONVERSATION);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER_PREFERENCES_GENRE);
@@ -195,109 +219,133 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void insertMockData() {
         System.out.println("Suntem in insertMockData din dbhelper");
         SQLiteDatabase db = this.getWritableDatabase();
+
+        // Actualizează schema bazei de date
         this.onUpgrade(db, 0, 1);
-        db.execSQL("INSERT INTO Autor (autor) VALUES " +
-                "('Agatha Christie')," +
-                "('Terry Pratchett')," +
-                "('J.R.R. Tolkien')," +
-                "('Jane Austen')," +
-                "('Leo Tolstoy')," +
-                "('Charles Dickens')," +
-                "('Fyodor Dostoevsky')," +
-                "('Mark Twain')," +
-                "('Ernest Hemingway')," +
-                "('Virginia Woolf')," +
-                "('Haruki Murakami')," +
-                "('Gabriel Garcia Marquez')," +
-                "('Margaret Atwood')," +
-                "('George R.R. Martin')," +
-                "('Philip K. Dick')," +
-                "('Herman Melville')," +
-                "('Oscar Wilde')," +
-                "('Arthur Conan Doyle')," +
-                "('H.P. Lovecraft')," +
-                "('Kurt Vonnegut')");
 
-        // Adăugare date mock pentru genuri
-        db.execSQL("INSERT INTO Genre (genre) VALUES " +
-                "('Mystery')," +
-                "('Comedy')," +
-                "('Fantasy')," +
-                "('Romance')," +
-                "('Classic')," +
-                "('Science Fiction')," +
-                "('Horror')," +
-                "('Adventure')," +
-                "('Thriller')," +
-                "('Historical Fiction')," +
-                "('Dystopian')," +
-                "('Biography')," +
-                "('Young Adult')," +
-                "('Satire')," +
-                "('Poetry')," +
-                "('Crime')," +
-                "('Philosophy')," +
-                "('Self-Help')," +
-                "('Travel')," +
-                "('Western')");
+        // Începe o tranzacție
+        db.beginTransaction();
+        try {
+            // Inserare date mock pentru autor
+            db.execSQL("INSERT INTO Autor (autor) VALUES " +
+                    "('Agatha Christie')," +
+                    "('Terry Pratchett')," +
+                    "('J.R.R. Tolkien')," +
+                    "('Jane Austen')," +
+                    "('Leo Tolstoy')," +
+                    "('Charles Dickens')," +
+                    "('Fyodor Dostoevsky')," +
+                    "('Mark Twain')," +
+                    "('Ernest Hemingway')," +
+                    "('Virginia Woolf')," +
+                    "('Haruki Murakami')," +
+                    "('Gabriel Garcia Marquez')," +
+                    "('Margaret Atwood')," +
+                    "('George R.R. Martin')," +
+                    "('Philip K. Dick')," +
+                    "('Herman Melville')," +
+                    "('Oscar Wilde')," +
+                    "('Arthur Conan Doyle')," +
+                    "('H.P. Lovecraft')," +
+                    "('Kurt Vonnegut')");
 
-        // Adăugare date mock pentru cărți
-        db.execSQL("INSERT INTO Carte (nume, id_autor, id_genre, photo, descriere, disponibile) VALUES " +
-                "('Murder on the Orient Express', 1, 1, NULL, 'Unul dintre cele mai cunoscute romane de mister scrise de Agatha Christie', 12)," +
-                "('Guards! Guards!', 2, 2, NULL, 'O carte din seria Discworld, plină de umor, scrisă de Terry Pratchett', 18)," +
-                "('The Hobbit', 3, 3, NULL, 'O aventură epică despre un hobbit ce pornește într-o călătorie extraordinară, scrisă de J.R.R. Tolkien', 20)," +
-                "('Pride and Prejudice', 4, 4, NULL, 'Un roman clasic despre dragoste și prejudecăți în societatea engleză din secolul al XIX-lea, scris de Jane Austen', 15)," +
-                "('War and Peace', 5, 5, NULL, 'Un roman monumental despre război și pace în Rusia, scris de Lev Tolstoi', 10)," +
-                "('Great Expectations', 6, 6, NULL, 'O poveste clasică despre aspirații și deziluzii, scrisă de Charles Dickens', 14)," +
-                "('Crime and Punishment', 7, 7, NULL, 'Un roman psihologic despre crima și consecințele sale, scris de Fyodor Dostoevsky', 16)," +
-                "('The Adventures of Tom Sawyer', 8, 8, NULL, 'O aventură clasică despre un băiat în Mississippi, scrisă de Mark Twain', 22)," +
-                "('The Old Man and the Sea', 9, 9, NULL, 'O poveste despre un bătrân pescar și lupta sa cu un pește gigant, scrisă de Ernest Hemingway', 19)," +
-                "('To the Lighthouse', 10, 10, NULL, 'Un roman modernist despre viața și conștiința unei familii, scris de Virginia Woolf', 11)," +
-                "('Norwegian Wood', 11, 11, NULL, 'O poveste despre dragoste și pierdere în Tokyo, scrisă de Haruki Murakami', 17)," +
-                "('One Hundred Years of Solitude', 12, 12, NULL, 'Un roman magic-realism despre familia Buendía, scris de Gabriel Garcia Marquez', 13)," +
-                "('The Handmaid''s Tale', 13, 13, NULL, 'O distopie despre o societate totalitaristă și rolul femeilor, scrisă de Margaret Atwood', 8)," +
-                "('A Game of Thrones', 14, 3, NULL, 'Primul roman din seria A Song of Ice and Fire, scrisă de George R.R. Martin', 25)," +
-                "('Do Androids Dream of Electric Sheep?', 15, 6, NULL, 'Un roman science fiction despre identitate și realitate, scris de Philip K. Dick', 7)," +
-                "('Moby-Dick', 16, 14, NULL, 'Un roman despre obsesie și vânătoare de balene, scris de Herman Melville', 21)," +
-                "('The Picture of Dorian Gray', 17, 4, NULL, 'Un roman despre vanitate și moralitate, scris de Oscar Wilde', 18)," +
-                "('The Adventures of Sherlock Holmes', 18, 1, NULL, 'O colecție de povestiri despre celebrul detectiv Sherlock Holmes, scrise de Arthur Conan Doyle', 23)," +
-                "('At the Mountains of Madness', 19, 7, NULL, 'O poveste cosmic-horror despre o expediție în Antarctica, scrisă de H.P. Lovecraft', 9)," +
-                "('Slaughterhouse-Five', 20, 8, NULL, 'Un roman despre război și călătorii în timp, scris de Kurt Vonnegut', 14)");
+            // Inserare date mock pentru genuri
+            db.execSQL("INSERT INTO Genre (genre) VALUES " +
+                    "('Mystery')," +
+                    "('Comedy')," +
+                    "('Fantasy')," +
+                    "('Romance')," +
+                    "('Classic')," +
+                    "('Science Fiction')," +
+                    "('Horror')," +
+                    "('Adventure')," +
+                    "('Thriller')," +
+                    "('Historical Fiction')," +
+                    "('Dystopian')," +
+                    "('Biography')," +
+                    "('Young Adult')," +
+                    "('Satire')," +
+                    "('Poetry')," +
+                    "('Crime')," +
+                    "('Philosophy')," +
+                    "('Self-Help')," +
+                    "('Travel')," +
+                    "('Western')");
 
-        db.execSQL("INSERT INTO " + TABLE_USER + "(" + COLUMN_USER_NAME + ", " + COLUMN_USER_PHOTO + ", " + COLUMN_USER_PHONE + ", " + COLUMN_USER_EMAIL + ", " + COLUMN_USER_PASSWORD + ") VALUES ('John Doe', 'photo_url', '123456789', 'john@example.com', 'password')");
-        db.execSQL("INSERT INTO " + TABLE_USER + "(" + COLUMN_USER_NAME + ", " + COLUMN_USER_PHOTO + ", " + COLUMN_USER_PHONE + ", " + COLUMN_USER_EMAIL + ", " + COLUMN_USER_PASSWORD + ") VALUES ('Jane Smith', 'photo_url', '987654321', 'jane@example.com', 'password')");
-        db.execSQL("INSERT INTO " + TABLE_USER + "(" + COLUMN_USER_NAME + ", " + COLUMN_USER_PHOTO + ", " + COLUMN_USER_PHONE + ", " + COLUMN_USER_EMAIL + ", " + COLUMN_USER_PASSWORD + ") VALUES ('Alice Johnson', 'photo_url', '555555555', 'alice@example.com', 'password')");
-        db.execSQL("INSERT INTO " + TABLE_USER + "(" + COLUMN_USER_NAME + ", " + COLUMN_USER_PHOTO + ", " + COLUMN_USER_PHONE + ", " + COLUMN_USER_EMAIL + ", " + COLUMN_USER_PASSWORD + ") VALUES ('Bob Williams', 'photo_url', '777777777', 'bob@example.com', 'password')");
-        db.execSQL("INSERT INTO " + TABLE_USER + "(" + COLUMN_USER_NAME + ", " + COLUMN_USER_PHOTO + ", " + COLUMN_USER_PHONE + ", " + COLUMN_USER_EMAIL + ", " + COLUMN_USER_PASSWORD + ") VALUES ('Eve Brown', 'photo_url', '999999999', 'eve@example.com', 'password')");
+            // Inserare date mock pentru cărți
+            db.execSQL("INSERT INTO Carte (nume, id_autor, id_genre, photo, descriere, disponibile) VALUES " +
+                    "('Murder on the Orient Express', 1, 1, NULL, 'Unul dintre cele mai cunoscute romane de mister scrise de Agatha Christie', 12)," +
+                    "('Guards! Guards!', 2, 2, NULL, 'O carte din seria Discworld, plină de umor, scrisă de Terry Pratchett', 18)," +
+                    "('The Hobbit', 3, 3, NULL, 'O aventură epică despre un hobbit ce pornește într-o călătorie extraordinară, scrisă de J.R.R. Tolkien', 20)," +
+                    "('Pride and Prejudice', 4, 4, NULL, 'Un roman clasic despre dragoste și prejudecăți în societatea engleză din secolul al XIX-lea, scris de Jane Austen', 15)," +
+                    "('War and Peace', 5, 5, NULL, 'Un roman monumental despre război și pace în Rusia, scris de Lev Tolstoi', 10)," +
+                    "('Great Expectations', 6, 6, NULL, 'O poveste clasică despre aspirații și deziluzii, scrisă de Charles Dickens', 14)," +
+                    "('Crime and Punishment', 7, 7, NULL, 'Un roman psihologic despre crima și consecințele sale, scris de Fyodor Dostoevsky', 16)," +
+                    "('The Adventures of Tom Sawyer', 8, 8, NULL, 'O aventură clasică despre un băiat în Mississippi, scrisă de Mark Twain', 22)," +
+                    "('The Old Man and the Sea', 9, 9, NULL, 'O poveste despre un bătrân pescar și lupta sa cu un pește gigant, scrisă de Ernest Hemingway', 19)," +
+                    "('To the Lighthouse', 10, 10, NULL, 'Un roman modernist despre viața și conștiința unei familii, scris de Virginia Woolf', 11)," +
+                    "('Norwegian Wood', 11, 11, NULL, 'O poveste despre dragoste și pierdere în Tokyo, scrisă de Haruki Murakami', 17)," +
+                    "('One Hundred Years of Solitude', 12, 12, NULL, 'Un roman magic-realism despre familia Buendía, scris de Gabriel Garcia Marquez', 13)," +
+                    "('The Handmaid''s Tale', 13, 13, NULL, 'O distopie despre o societate totalitaristă și rolul femeilor, scrisă de Margaret Atwood', 8)," +
+                    "('A Game of Thrones', 14, 3, NULL, 'Primul roman din seria A Song of Ice and Fire, scrisă de George R.R. Martin', 25)," +
+                    "('Do Androids Dream of Electric Sheep?', 15, 6, NULL, 'Un roman science fiction despre identitate și realitate, scris de Philip K. Dick', 7)," +
+                    "('Moby-Dick', 16, 14, NULL, 'Un roman despre obsesie și vânătoare de balene, scris de Herman Melville', 21)," +
+                    "('The Picture of Dorian Gray', 17, 4, NULL, 'Un roman despre vanitate și moralitate, scris de Oscar Wilde', 18)," +
+                    "('The Adventures of Sherlock Holmes', 18, 1, NULL, 'O colecție de povestiri despre celebrul detectiv Sherlock Holmes, scrise de Arthur Conan Doyle', 23)," +
+                    "('At the Mountains of Madness', 19, 7, NULL, 'O poveste cosmic-horror despre o expediție în Antarctica, scrisă de H.P. Lovecraft', 9)," +
+                    "('Slaughterhouse-Five', 20, 8, NULL, 'Un roman despre război și călătorii în timp, scris de Kurt Vonnegut', 14)");
 
-        db.execSQL("INSERT INTO " + TABLE_REVIEW + "(" + COLUMN_REVIEW_BOOK_ID + ", " + COLUMN_REVIEW_USER_ID + ", " + COLUMN_REVIEW_RATING + ", " + COLUMN_REVIEW_TITLE + ", " + COLUMN_REVIEW_COMMENT + ", " + COLUMN_REVIEW_DATE + ") VALUES (1, 1, 4.5, 'Great book', 'Enjoyed reading it', '2024-05-08')");
-        db.execSQL("INSERT INTO " + TABLE_REVIEW + "(" + COLUMN_REVIEW_BOOK_ID + ", " + COLUMN_REVIEW_USER_ID + ", " + COLUMN_REVIEW_RATING + ", " + COLUMN_REVIEW_TITLE + ", " + COLUMN_REVIEW_COMMENT + ", " + COLUMN_REVIEW_DATE + ") VALUES (2, 2, 3.0, 'Okay book', 'Not bad', '2024-05-08')");
-        db.execSQL("INSERT INTO " + TABLE_REVIEW + "(" + COLUMN_REVIEW_BOOK_ID + ", " + COLUMN_REVIEW_USER_ID + ", " + COLUMN_REVIEW_RATING + ", " + COLUMN_REVIEW_TITLE + ", " + COLUMN_REVIEW_COMMENT + ", " + COLUMN_REVIEW_DATE + ") VALUES (3, 3, 5.0, 'Excellent book', 'Highly recommended', '2024-05-08')");
-        db.execSQL("INSERT INTO " + TABLE_REVIEW + "(" + COLUMN_REVIEW_BOOK_ID + ", " + COLUMN_REVIEW_USER_ID + ", " + COLUMN_REVIEW_RATING + ", " + COLUMN_REVIEW_TITLE + ", " + COLUMN_REVIEW_COMMENT + ", " + COLUMN_REVIEW_DATE + ") VALUES (1, 4, 2.5, 'Disappointing', 'Expected more', '2024-05-08')");
-        db.execSQL("INSERT INTO " + TABLE_REVIEW + "(" + COLUMN_REVIEW_BOOK_ID + ", " + COLUMN_REVIEW_USER_ID + ", " + COLUMN_REVIEW_RATING + ", " + COLUMN_REVIEW_TITLE + ", " + COLUMN_REVIEW_COMMENT + ", " + COLUMN_REVIEW_DATE + ") VALUES (2, 5, 4.0, 'Nice read', 'Enjoyable', '2024-05-08')");
+            // Inserare date mock pentru utilizatori
+            db.execSQL("INSERT INTO " + TABLE_USER + "(" + COLUMN_USER_NAME + ", " + COLUMN_USER_PHOTO + ", " + COLUMN_USER_PHONE + ", " + COLUMN_USER_EMAIL + ", " + COLUMN_USER_PASSWORD + ") VALUES ('John Doe', 'photo_url', '123456789', 'john@example.com', 'password')");
+            db.execSQL("INSERT INTO " + TABLE_USER + "(" + COLUMN_USER_NAME + ", " + COLUMN_USER_PHOTO + ", " + COLUMN_USER_PHONE + ", " + COLUMN_USER_EMAIL + ", " + COLUMN_USER_PASSWORD + ") VALUES ('Jane Smith', 'photo_url', '987654321', 'jane@example.com', 'password')");
+            db.execSQL("INSERT INTO " + TABLE_USER + "(" + COLUMN_USER_NAME + ", " + COLUMN_USER_PHOTO + ", " + COLUMN_USER_PHONE + ", " + COLUMN_USER_EMAIL + ", " + COLUMN_USER_PASSWORD + ") VALUES ('Alice Johnson', 'photo_url', '555555555', 'alice@example.com', 'password')");
+            db.execSQL("INSERT INTO " + TABLE_USER + "(" + COLUMN_USER_NAME + ", " + COLUMN_USER_PHOTO + ", " + COLUMN_USER_PHONE + ", " + COLUMN_USER_EMAIL + ", " + COLUMN_USER_PASSWORD + ") VALUES ('Bob Williams', 'photo_url', '777777777', 'bob@example.com', 'password')");
+            // Inserare date mock pentru utilizatori (continuare)
+            db.execSQL("INSERT INTO " + TABLE_USER + "(" + COLUMN_USER_NAME + ", " + COLUMN_USER_PHOTO + ", " + COLUMN_USER_PHONE + ", " + COLUMN_USER_EMAIL + ", " + COLUMN_USER_PASSWORD + ") VALUES ('Eve Brown', 'photo_url', '999999999', 'eve@example.com', 'password')");
 
-        db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (1, 1, '2024-05-08', '2024-05-10', '2024-05-20')");
-        db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (2, 2, '2024-05-08', '2024-05-12', '2024-05-25')");
-        db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (3, 3, '2024-05-08', '2024-05-15', '2024-05-30')");
-        db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (4, 1, '2024-05-08', '2024-05-18', '2024-06-05')");
-        db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (5, 2, '2024-05-08', '2024-05-20', '2024-06-10')");
+            // Inserare date mock pentru recenzii
+            db.execSQL("INSERT INTO " + TABLE_REVIEW + "(" + COLUMN_REVIEW_BOOK_ID + ", " + COLUMN_REVIEW_USER_ID + ", " + COLUMN_REVIEW_RATING + ", " + COLUMN_REVIEW_TITLE + ", " + COLUMN_REVIEW_COMMENT + ", " + COLUMN_REVIEW_DATE + ") VALUES (1, 1, 4.5, 'Great book', 'Enjoyed reading it', '2024-05-08')");
+            db.execSQL("INSERT INTO " + TABLE_REVIEW + "(" + COLUMN_REVIEW_BOOK_ID + ", " + COLUMN_REVIEW_USER_ID + ", " + COLUMN_REVIEW_RATING + ", " + COLUMN_REVIEW_TITLE + ", " + COLUMN_REVIEW_COMMENT + ", " + COLUMN_REVIEW_DATE + ") VALUES (2, 2, 3.0, 'Okay book', 'Not bad', '2024-05-08')");
+            db.execSQL("INSERT INTO " + TABLE_REVIEW + "(" + COLUMN_REVIEW_BOOK_ID + ", " + COLUMN_REVIEW_USER_ID + ", " + COLUMN_REVIEW_RATING + ", " + COLUMN_REVIEW_TITLE + ", " + COLUMN_REVIEW_COMMENT + ", " + COLUMN_REVIEW_DATE + ") VALUES (3, 3, 5.0, 'Excellent book', 'Highly recommended', '2024-05-08')");
+            db.execSQL("INSERT INTO " + TABLE_REVIEW + "(" + COLUMN_REVIEW_BOOK_ID + ", " + COLUMN_REVIEW_USER_ID + ", " + COLUMN_REVIEW_RATING + ", " + COLUMN_REVIEW_TITLE + ", " + COLUMN_REVIEW_COMMENT + ", " + COLUMN_REVIEW_DATE + ") VALUES (1, 4, 2.5, 'Disappointing', 'Expected more', '2024-05-08')");
+            db.execSQL("INSERT INTO " + TABLE_REVIEW + "(" + COLUMN_REVIEW_BOOK_ID + ", " + COLUMN_REVIEW_USER_ID + ", " + COLUMN_REVIEW_RATING + ", " + COLUMN_REVIEW_TITLE + ", " + COLUMN_REVIEW_COMMENT + ", " + COLUMN_REVIEW_DATE + ") VALUES (2, 5, 4.0, 'Nice read', 'Enjoyable', '2024-05-08')");
 
-        db.execSQL("INSERT INTO " + TABLE_CONVERSATION + "(" + COLUMN_CONVERSATION_USER1_ID + ", " + COLUMN_CONVERSATION_USER2_ID + ") VALUES (1, 2)");
-        db.execSQL("INSERT INTO " + TABLE_CONVERSATION + "(" + COLUMN_CONVERSATION_USER1_ID + ", " + COLUMN_CONVERSATION_USER2_ID + ") VALUES (3, 1)");
-        db.execSQL("INSERT INTO " + TABLE_CONVERSATION + "(" + COLUMN_CONVERSATION_USER1_ID + ", " + COLUMN_CONVERSATION_USER2_ID + ") VALUES (2, 3)");
+            // Inserare date mock pentru împrumuturi
+            db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (1, 1, '2024-05-08', '2024-05-10', '2024-05-20')");
+            db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (2, 2, '2024-05-08', '2024-05-12', '2024-05-25')");
+            db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (3, 3, '2024-05-08', '2024-05-15', '2024-05-30')");
+            db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (4, 1, '2024-05-08', '2024-05-18', '2024-06-05')");
+            db.execSQL("INSERT INTO " + TABLE_LOAN + "(" + COLUMN_LOAN_USER_ID + ", " + COLUMN_LOAN_BOOK_ID + ", " + COLUMN_LOAN_REQUEST_DATE + ", " + COLUMN_LOAN_START_DATE + ", " + COLUMN_LOAN_RETURN_DATE + ") VALUES (5, 2, '2024-05-08', '2024-05-20', '2024-06-10')");
 
-        db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (1, 1, 'Hello there!', '2024-05-09 10:00:00')");
-        db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (1, 2, 'Hi John, how are you?', '2024-05-09 10:05:00')");
-        db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (2, 1, 'Hey, I''m doing great, thanks for asking!', '2024-05-09 10:10:00')");
-        db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (2, 3, 'That''s good to hear!', '2024-05-09 10:15:00')");
-        db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (3, 2, 'What''s up?', '2024-05-09 10:20:00')");
-        db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (3, 3, 'Not much, just chilling. How about you?', '2024-05-09 10:25:00')");
+            // Inserare date mock pentru conversații
+            db.execSQL("INSERT INTO " + TABLE_CONVERSATION + "(" + COLUMN_CONVERSATION_USER1_ID + ", " + COLUMN_CONVERSATION_USER2_ID + ") VALUES (1, 2)");
+            db.execSQL("INSERT INTO " + TABLE_CONVERSATION + "(" + COLUMN_CONVERSATION_USER1_ID + ", " + COLUMN_CONVERSATION_USER2_ID + ") VALUES (3, 1)");
+            db.execSQL("INSERT INTO " + TABLE_CONVERSATION + "(" + COLUMN_CONVERSATION_USER1_ID + ", " + COLUMN_CONVERSATION_USER2_ID + ") VALUES (2, 3)");
 
+            // Inserare date mock pentru mesaje
+            db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (1, 1, 'Hello there!', '2024-05-09 10:00:00')");
+            db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (1, 2, 'Hi John, how are you?', '2024-05-09 10:05:00')");
+            db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (2, 1, 'Hey, I''m doing great, thanks for asking!', '2024-05-09 10:10:00')");
+            db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (2, 3, 'That''s good to hear!', '2024-05-09 10:15:00')");
+            db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (3, 2, 'What''s up?', '2024-05-09 10:20:00')");
+            db.execSQL("INSERT INTO " + TABLE_MESSAGE + "(" + COLUMN_MESSAGE_CONVERSATION_ID + ", " + COLUMN_MESSAGE_USER_ID + ", " + COLUMN_MESSAGE_CONTENT + ", " + COLUMN_MESSAGE_DATE + ") VALUES (3, 3, 'Not much, just chilling. How about you?', '2024-05-09 10:25:00')");
 
+            // Confirmă tranzacția
+            db.setTransactionSuccessful();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Dacă apare o eroare, tranzacția va fi anulată
+        } finally {
+            // Închide tranzacția
+            db.endTransaction();
+        }
+
+        // Închide baza de date
         db.close();
     }
 
-    @SuppressLint("Range")
+
+            @SuppressLint("Range")
     public int authenticateUser(String userMail, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_USER +
@@ -1095,6 +1143,119 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             System.out.println(user.getName());
         }
         return list;
+    }
+
+    @SuppressLint("Range")
+    public List<Map<String, Object>> getUserPreferences(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Map<String, Object>> preferences = new ArrayList<>();
+
+        String query = "SELECT * FROM " + TABLE_USER_PREFERENCES_GENRE + " WHERE " + COLUMN_USER_PREFERENCES_GENRE_USER_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+        while (cursor.moveToNext()) {
+            Map<String, Object> preference = new HashMap<>();
+            preference.put("genre", getGenreById(cursor.getInt(cursor.getColumnIndex(COLUMN_USER_PREFERENCES_GENRE_GENRE_ID))));
+            preferences.add(preference);
+        }
+        cursor.close();
+
+        query = "SELECT * FROM " + TABLE_USER_PREFERENCES_AUTHOR + " WHERE " + COLUMN_USER_PREFERENCES_AUTHOR_USER_ID + " = ?";
+        cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+        while (cursor.moveToNext()) {
+            Map<String, Object> preference = new HashMap<>();
+            preference.put("author", getAuthorById(cursor.getInt(cursor.getColumnIndex(COLUMN_USER_PREFERENCES_AUTHOR_AUTHOR_ID))));
+            preferences.add(preference);
+        }
+        cursor.close();
+
+        return preferences;
+    }
+
+    @SuppressLint("Range")
+    public List<Review> getUserReviews(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Review> reviews = new ArrayList<>();
+
+        String query = "SELECT * FROM " + TABLE_REVIEW + " WHERE " + COLUMN_REVIEW_USER_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+        while (cursor.moveToNext()) {
+            Review review = new Review();
+            review.setId_book(cursor.getInt(cursor.getColumnIndex(COLUMN_REVIEW_BOOK_ID)));
+            review.setRating(cursor.getFloat(cursor.getColumnIndex(COLUMN_REVIEW_RATING)));
+            review.setId_user(cursor.getInt(cursor.getColumnIndex(COLUMN_REVIEW_USER_ID)));
+            reviews.add(review);
+        }
+        cursor.close();
+
+        return reviews;
+    }
+
+    @SuppressLint("Range")
+    public List<Book> getBookDetails() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Book> books = new ArrayList<>();
+
+        String query = "SELECT * FROM " + TABLE_BOOK;
+        Cursor cursor = db.rawQuery(query, null);
+        while (cursor.moveToNext()) {
+            Book book = new Book();
+            book.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_ID)));
+            book.setAuthor(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_AUTHOR_ID)));
+            book.setGenre(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_GENRE_ID)));
+            books.add(book);
+        }
+        cursor.close();
+        return books;
+    }
+
+    @SuppressLint("Range")
+    public List<View> getUserViews(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<View> views = new ArrayList<>();
+
+        String query = "SELECT * FROM " + TABLE_VIEW + " WHERE " + COLUMN_VIEW_USER_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+        while (cursor.moveToNext()) {
+            View view = new View();
+            view.setBookId(cursor.getInt(cursor.getColumnIndex(COLUMN_VIEW_BOOK_ID)));
+            view.setUserId(cursor.getInt(cursor.getColumnIndex(COLUMN_VIEW_USER_ID)));
+            views.add(view);
+        }
+        cursor.close();
+
+        return views;
+    }
+
+    @SuppressLint("Range")
+    public Author getAuthorById(int id){
+        Author author = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_GENRE +
+                " WHERE " + COLUMN_GENRE_ID + " =? ";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
+        if (cursor != null && cursor.moveToFirst()) {
+            author = new Author();
+            author.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_AUTHOR_ID)));
+            author.setName(cursor.getString(cursor.getColumnIndex(COLUMN_AUTHOR_NAME)));
+            cursor.close();
+        }
+        return author;
+    }
+
+    @SuppressLint("Range")
+    private Genre getGenreById(int id){
+        Genre genre = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_GENRE +
+                " WHERE " + COLUMN_GENRE_ID + " =? ";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
+        if (cursor != null && cursor.moveToFirst()) {
+            genre = new Genre();
+            genre.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_GENRE_ID)));
+            genre.setName(cursor.getString(cursor.getColumnIndex(COLUMN_GENRE_NAME)));
+            cursor.close();
+        }
+        return genre;
     }
 
 }

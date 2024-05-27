@@ -62,12 +62,15 @@ public class ReviewBookActivity extends AppCompatActivity {
         sentTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                review.setReviewTitle(titleTxt.toString());
-                review.setReviewText(commentTxt.toString());
+                System.out.println(titleTxt.getText().toString());
+                System.out.println(commentTxt.getText().toString());
+                review.setReviewTitle(titleTxt.getText().toString());
+                review.setReviewText(commentTxt.getText().toString());
 
                 if(verifyData()){
                     DatabaseHelper dbhelper = new DatabaseHelper(ReviewBookActivity.this);
                     dbhelper.addReviewForABook(review);
+                    finish();
                 }
             }
         });

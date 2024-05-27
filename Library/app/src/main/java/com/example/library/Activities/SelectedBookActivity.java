@@ -18,6 +18,8 @@ import com.example.library.Models.Book;
 import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 public class SelectedBookActivity extends AppCompatActivity {
@@ -182,7 +184,9 @@ public class SelectedBookActivity extends AppCompatActivity {
         BookDescriptionTxt.setText(book.getDescription());
 
 
-        ratingNote.setText(String.valueOf(dbHelper.getRatingOfBook(book.getId())));
+        BigDecimal bd = new BigDecimal(dbHelper.getRatingOfBook(book.getId()));
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        ratingNote.setText(String.valueOf(bd.floatValue()));
         List<Integer> list = dbHelper.getNumberOfRatings(book.getId());
         String numberOfRatingsStr = String.valueOf(list.get(0));
         numberOfRatingsStr+=" Reviews";

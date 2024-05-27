@@ -66,31 +66,37 @@ public class ReviewBookAdapter extends RecyclerView.Adapter<ReviewBookAdapter.Vi
         holder.titleReview.setText(review.getReviewTitle());
         holder.commentReview.setText(review.getReviewText());
         float rating = review.getRating();
-        if(rating<=5){
-            if(rating % 0.5 <0.01){
-                holder.star1.setImageResource(R.drawable.ic_star_half);
-            }
-        } if(rating <= 4){
+        if (rating >= 4.5) {
+            holder.star1.setImageResource(rating >= 5 ? R.drawable.ic_star_full : R.drawable.ic_star_half);
+        } else {
             holder.star1.setImageResource(R.drawable.ic_star_empty);
-            if(rating % 0.5 <0.01){
-                holder.star2.setImageResource(R.drawable.ic_star_half);
-            }
-        } if(rating <= 3){
-            holder.star2.setImageResource(R.drawable.ic_star_empty);
-            if(rating % 0.5 <0.01){
-                holder.star3.setImageResource(R.drawable.ic_star_half);
-            }
-        } if(rating <= 2){
-            holder.star3.setImageResource(R.drawable.ic_star_empty);
-            if(rating % 0.5 <0.01){
-                holder.star4.setImageResource(R.drawable.ic_star_half);
-            }
-        } if(rating <= 1){
-            holder.star4.setImageResource(R.drawable.ic_star_empty);
-            if(rating % 0.5 <0.01){
-                holder.star5.setImageResource(R.drawable.ic_star_half);
-            }
         }
+
+        if (rating >= 3.5) {
+            holder.star2.setImageResource(rating >= 4 ? R.drawable.ic_star_full : R.drawable.ic_star_half);
+        } else {
+            holder.star2.setImageResource(R.drawable.ic_star_empty);
+        }
+
+        if (rating >= 2.5) {
+            holder.star3.setImageResource(rating >= 3 ? R.drawable.ic_star_full : R.drawable.ic_star_half);
+        } else {
+            holder.star3.setImageResource(R.drawable.ic_star_empty);
+        }
+
+        if (rating >= 1.5) {
+            holder.star4.setImageResource(rating >= 2 ? R.drawable.ic_star_full : R.drawable.ic_star_half);
+        } else {
+            holder.star4.setImageResource(R.drawable.ic_star_empty);
+        }
+
+        if (rating >= 0.5) {
+            holder.star5.setImageResource(rating >= 1 ? R.drawable.ic_star_full : R.drawable.ic_star_half);
+        } else {
+            holder.star5.setImageResource(R.drawable.ic_star_empty);
+        }
+
+
 
     }
 

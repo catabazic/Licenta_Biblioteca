@@ -18,6 +18,8 @@ import com.example.library.Models.Book;
 import com.example.library.Models.Review;
 import com.example.library.R;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,7 +97,9 @@ public class ReviewsBookAllActivity  extends AppCompatActivity {
     }
 
     private void updateUI(Book book) {
-        ratingNote.setText(String.valueOf(dbHelper.getRatingOfBook(book.getId())));
+        BigDecimal bd = new BigDecimal(dbHelper.getRatingOfBook(book.getId()));
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        ratingNote.setText(String.valueOf(bd.floatValue()));
         List<Integer> list = dbHelper.getNumberOfRatings(book.getId());
         String numberOfRatingsStr = String.valueOf(list.get(0));
         numberOfRatingsStr+=" Reviews";
