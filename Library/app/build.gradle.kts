@@ -3,14 +3,9 @@ val implementation: Unit
         TODO()
     }
 
-val DependencyHandlerScope.annotationProcessor: Unit
-    get() {
-        TODO("Not yet implemented")
-    }
-
 plugins {
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.chaquopy)
+//    alias(libs.plugins.chaquopy)
 }
 
 android {
@@ -26,9 +21,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        ndk {
-            abiFilters += listOf("arm64-v8a", "x86_64")
-        }
+//        ndk {
+//            abiFilters += listOf("arm64-v8a", "x86_64")
+//        }
     }
 
     buildTypes {
@@ -46,30 +41,35 @@ android {
     }
 }
 
-chaquopy {
-    defaultConfig {
-        buildPython("C:\\py\\python.exe")
-        buildPython("C:\\Windows\\py.exe", "-3.12")
-
-        pyc {
-            src = false
-        }
-    }
-    productFlavors { }
-    sourceSets {
-        getByName("main") {
-            srcDir("src/main/python")
-        }
-    }
-}
+//chaquopy {
+//    defaultConfig {
+//        version = "3.8"
+//        buildPython("C:\\py\\python.exe")
+//        buildPython("C:\\Windows\\py.exe", "-3.8")
+//
+//        pyc {
+//            src = false
+//        }
+//        pip {
+//            install ("pandas")
+//            install ("scikit-learn")
+//        }
+//    }
+//    productFlavors { }
+//    sourceSets {
+//        getByName("main") {
+//            srcDir("src/main/python")
+//        }
+//    }
+//}
 
 
 dependencies {
-    implementation(libs.appcompat);
-    implementation(libs.material);
-    implementation(libs.activity);
-    implementation(libs.constraintlayout);
-    testImplementation(libs.junit);
-    androidTestImplementation(libs.ext.junit);
-    androidTestImplementation(libs.espresso.core);
+    implementation(libs.appcompat)
+    implementation(libs.material)
+    implementation(libs.activity)
+    implementation(libs.constraintlayout)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
 }

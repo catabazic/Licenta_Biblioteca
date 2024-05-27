@@ -13,7 +13,9 @@ import androidx.annotation.RequiresApi;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.example.library.Models.Book;
 import com.example.library.Models.Chat;
@@ -295,6 +297,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
         db.close();
+        System.out.println("Am terminat cu inserarea datelor");
     }
 
     @SuppressLint("Range")
@@ -1096,5 +1099,70 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return list;
     }
+
+    @SuppressLint("Range")
+    public List<Map<String, Object>> getUserPreferences(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Map<String, Object>> preferences = new ArrayList<>();
+
+        String query = "SELECT * FROM " + TABLE_USER_PREFERENCES_GENRE + " WHERE " + COLUMN_USER_PREFERENCES_GENRE_USER_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+        while (cursor.moveToNext()) {
+            Map<String, Object> preference = new HashMap<>();
+            preference.put("genre_id", cursor.getInt(cursor.getColumnIndex(COLUMN_USER_PREFERENCES_GENRE_GENRE_ID)));
+            preferences.add(preference);
+        }
+        cursor.close();
+
+        query = "SELECT * FROM " + TABLE_USER_PREFERENCES_AUTHOR + " WHERE " + COLUMN_USER_PREFERENCES_AUTHOR_USER_ID + " = ?";
+        cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+        while (cursor.moveToNext()) {
+            Map<String, Object> preference = new HashMap<>();
+            preference.put("author_id", cursor.getInt(cursor.getColumnIndex(COLUMN_USER_PREFERENCES_AUTHOR_AUTHOR_ID)));
+            preferences.add(preference);
+        }
+        cursor.close();
+
+        return preferences;
+    }
+
+    @SuppressLint("Range")
+    public List<Review> getUserReviews(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Review> reviews = new ArrayList<>();
+
+        String query = "SELECT * FROM " + TABLE_REVIEW + " WHERE " + COLUMN_REVIEW_USER_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+        while (cursor.moveToNext()) {
+            Review review = new Review();
+            review.setId_book(cursor.getInt(cursor.getColumnIndex(COLUMN_REVIEW_BOOK_ID)));
+            review.setRating(cursor.getFloat(cursor.getColumnIndex(COLUMN_REVIEW_RATING)));
+            review.setId_user(cursor.getInt(cursor.getColumnIndex(COLUMN_REVIEW_USER_ID)));
+            reviews.add(review);
+        }
+        cursor.close();
+
+        return reviews;
+    }
+
+    @SuppressLint("Range")
+    public List<Book> getBookDetails() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Book> books = new ArrayList<>();
+
+        String query = "SELECT * FROM " + TABLE_BOOK;
+        Cursor cursor = db.rawQuery(query, null);
+        while (cursor.moveToNext()) {
+            Book book = new Book();
+            book.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_ID)));
+            book.setAuthor(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_AUTHOR_ID)));
+            book.setGenre(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_GENRE_ID)));
+            books.add(book);
+        }
+        cursor.close();
+        return books;
+    }
+
+
 
 }
