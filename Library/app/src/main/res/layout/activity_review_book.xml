@@ -59,7 +59,7 @@
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
         <TextView
-            android:id="@+id/BackTxtReview"
+            android:id="@+id/BackTxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -72,7 +72,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/SentTxtReview"
+            android:id="@+id/SentTxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -92,8 +92,8 @@
             android:text="Review"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/SentTxtReview"
-            app:layout_constraintStart_toEndOf="@+id/BackTxtReview"
+            app:layout_constraintEnd_toStartOf="@+id/SentTxt"
+            app:layout_constraintStart_toEndOf="@+id/BackTxt"
             app:layout_constraintTop_toTopOf="parent" />
 
         <RatingBar

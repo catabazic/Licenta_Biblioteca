@@ -38,8 +38,8 @@ public class ReviewBookActivity extends AppCompatActivity {
             review.setDate(currentDate.toString());
         }
 
-        backTxt=findViewById(R.id.BackTxtReview);
-        sentTxt=findViewById(R.id.SentTxtReview);
+        backTxt=findViewById(R.id.BackTxt);
+        sentTxt=findViewById(R.id.SentTxt);
         ratingBar=findViewById(R.id.ratingBarReview);
         titleTxt=findViewById(R.id.TitleTxt);
         commentTxt=findViewById(R.id.ReviewTxt);

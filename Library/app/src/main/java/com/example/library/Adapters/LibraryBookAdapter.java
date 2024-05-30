@@ -13,12 +13,14 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.Interfaces.OnItemClickListener;
+import com.example.library.Models.Author;
 import com.example.library.R;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
 
 import com.example.library.Models.Book;
 
@@ -71,7 +73,8 @@ public class LibraryBookAdapter  extends RecyclerView.Adapter<LibraryBookAdapter
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String imageUrl = mBooks.get(position).getImage();
+        Book book = mBooks.get(position);
+        String imageUrl = book.getImage();
         Bitmap bitmap = null;
         try {
             bitmap = BitmapFactory.decodeStream((InputStream) new URL(imageUrl).getContent());
@@ -80,8 +83,17 @@ public class LibraryBookAdapter  extends RecyclerView.Adapter<LibraryBookAdapter
             System.out.println("upsi, no photo");
         }
 
-        holder.bookNameTextView.setText(mBooks.get(position).getName());
-        holder.authorTextView.setText(mBooks.get(position).getAuthor());
+        holder.bookNameTextView.setText(book.getName());
+        Set<Author> authors = book.getAuthors();
+        String aut= null;
+        for(Author author: authors){
+            if(aut == null){
+                aut = author.getName();
+            }else{
+                aut+= " & " + author.getName();
+            }
+        }
+        holder.authorTextView.setText(aut);
     }
 
     @Override

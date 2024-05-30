@@ -1,19 +1,52 @@
 package com.example.library.Models;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Book implements Serializable {
     private String name;
-    private String author;
     private String state;
     private String retur;
-    private String genre;
+    private Set<Author> authors;
+    private Set<Genre> genres;
     private String description;
     private int disponible;
     private String image;
     private int id;
 
     public Book() {
+        authors = new HashSet<>();
+        genres  = new HashSet<>();
+    }
+
+    public void resetAuthors(){
+        this.authors.clear();
+    }
+
+    public void resetGenres(){
+        this.genres.clear();
+    }
+
+    public void setAuthors(List<Author> authors) {
+        for(Author author : authors){
+            this.authors.add(author);
+        }
+    }
+
+    public void setGenres(List<Genre> genres) {
+        for(Genre genre : genres){
+            this.genres.add(genre);
+        }
+    }
+
+    public Set<Author> getAuthors() {
+        return authors;
+    }
+
+    public Set<Genre> getGenres() {
+        return genres;
     }
 
     public int getId() {
@@ -36,18 +69,9 @@ public class Book implements Serializable {
         this.name = name;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
     public void setState(String state) {
         this.state = state;
     }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
-
     public void setDescription(String description) {
         this.description = description;
     }
@@ -60,35 +84,10 @@ public class Book implements Serializable {
         this.image = image;
     }
 
-    // Constructor
-    public Book(String name, String author, String state) {
-        this.name = name;
-        this.author = author;
-        this.state = state;
-    }
-
-    public Book(String name, String author, String genre, String description, int disponible, String image) {
-        this.name = name;
-        this.author = author;
-        this.genre = genre;
-        this.description = description;
-        this.disponible = disponible;
-        this.image=image;
-    }
-
     // Getter methods
     public String getName() {
         return name;
     }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
     public String getDescription() {
         return description;
     }

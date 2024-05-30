@@ -13,12 +13,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.Interfaces.OnItemClickListener;
+import com.example.library.Models.Author;
 import com.example.library.Models.Book;
 import com.example.library.Models.Chat;
 import com.example.library.Models.Message;
 import com.example.library.R;
 
 import java.util.List;
+import java.util.Set;
 
 public class SearchBookAdapter extends RecyclerView.Adapter<SearchBookAdapter.ViewHolder> {
     List<Book> bookList;
@@ -69,7 +71,16 @@ public class SearchBookAdapter extends RecyclerView.Adapter<SearchBookAdapter.Vi
     public void onBindViewHolder(@NonNull SearchBookAdapter.ViewHolder holder, int position) {
         Book book = bookList.get(position);
         holder.name.setText(book.getName());
-        holder.author.setText(book.getAuthor());
+        Set<Author> authors = book.getAuthors();
+        String aut= null;
+        for(Author author: authors){
+            if(aut == null){
+                aut = author.getName();
+            }else{
+                aut+= " & " + author.getName();
+            }
+        }
+        holder.author.setText(aut);
     }
 
     @Override

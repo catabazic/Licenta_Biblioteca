@@ -14,13 +14,16 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.library.Database.DatabaseHelper;
+import com.example.library.Models.Author;
 import com.example.library.Models.Book;
+import com.example.library.Models.Genre;
 import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Set;
 
 public class SelectedBookActivity extends AppCompatActivity {
     FloatingActionButton homeActionButton;
@@ -178,8 +181,28 @@ public class SelectedBookActivity extends AppCompatActivity {
         chatNameTxt.setText(book.getName());
 
         BookNameTxt.setText(book.getName());
-        BookAuthorTxt.setText(book.getAuthor());
-        BookGenreTxt.setText(book.getGenre());
+
+        Set<Author> authors = book.getAuthors();
+        String aut= null;
+        for(Author author: authors){
+            if(aut == null){
+                aut = author.getName();
+            }else{
+                aut+= " & " + author.getName();
+            }
+        }
+        BookAuthorTxt.setText(aut);
+
+        Set<Genre> genres = book.getGenres();
+        String gen= null;
+        for(Genre genre: genres){
+            if(gen == null){
+                gen = genre.getName();
+            }else{
+                gen+= " & " + genre.getName();
+            }
+        }
+        BookGenreTxt.setText(gen);
         BookAvailabilityTxt.setText("Disponibilitate: " + book.getDisponible());
         BookDescriptionTxt.setText(book.getDescription());
 
@@ -187,6 +210,7 @@ public class SelectedBookActivity extends AppCompatActivity {
         BigDecimal bd = new BigDecimal(dbHelper.getRatingOfBook(book.getId()));
         bd = bd.setScale(2, RoundingMode.HALF_UP);
         ratingNote.setText(String.valueOf(bd.floatValue()));
+
         List<Integer> list = dbHelper.getNumberOfRatings(book.getId());
         String numberOfRatingsStr = String.valueOf(list.get(0));
         numberOfRatingsStr+=" Reviews";

@@ -8,9 +8,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.Interfaces.OnItemClickListener;
+import com.example.library.Models.Author;
 import com.example.library.R;
 
 import java.util.List;
+import java.util.Set;
 
 import com.example.library.Models.Book;
 
@@ -64,7 +66,16 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
         Book book = bookList.get(position);
         holder.bookName.setText(book.getName());
-        holder.bookAuthor.setText(book.getAuthor());
+        Set<Author> authors = book.getAuthors();
+        String aut= null;
+        for(Author author: authors){
+            if(aut == null){
+                aut = author.getName();
+            }else{
+                aut+= " & " + author.getName();
+            }
+        }
+        holder.bookAuthor.setText(aut);
         holder.bookState.setText(book.getState());
         holder.bookRetur.setText(book.getRetur());
         int colorIndex=position % colors.length;

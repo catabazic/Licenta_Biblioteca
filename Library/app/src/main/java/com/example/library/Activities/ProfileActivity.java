@@ -45,13 +45,19 @@ public class ProfileActivity extends AppCompatActivity {
         history = findViewById(R.id.profileHistoryBtn);
         myBooks = findViewById(R.id.profileMyBooksBtn);
         myRewievs = findViewById(R.id.profileMyRewiewsBtn);
-        parola = findViewById(R.id.profileParolaBtn);
-        logout = findViewById(R.id.profileLogoutBtn);
+        logout = findViewById(R.id.LogoutBtn);
 
-        name = findViewById(R.id.profileNameTxt);
+        name = findViewById(R.id.profilePhotoBtn);
 
         editProfile();
 
+
+        editProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ProfileActivity.this, ProfileEditActivity.class));
+            }
+        });
         myRewievs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
