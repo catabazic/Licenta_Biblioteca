@@ -1,6 +1,8 @@
 package com.example.library.Models;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
 
 public class User implements Serializable {
     private int id;
@@ -8,9 +10,36 @@ public class User implements Serializable {
     private String email;
     private String number;
     private String photo;
-
-    public User() {
-    }
+//    private Set<Genre> preferedGenres;
+//    private Set<Author> preferedAuthors;
+//
+//    public void resetAuthors(){
+//        this.preferedAuthors.clear();
+//    }
+//
+//    public void resetGenres(){
+//        this.preferedGenres.clear();
+//    }
+//
+//    public void setAuthors(List<Author> authors) {
+//        for(Author author : authors){
+//            this.preferedAuthors.add(author);
+//        }
+//    }
+//
+//    public void setGenres(List<Genre> genres) {
+//        for(Genre genre : genres){
+//            this.preferedGenres.add(genre);
+//        }
+//    }
+//
+//    public Set<Author> getAuthors() {
+//        return preferedAuthors;
+//    }
+//
+//    public Set<Genre> getGenres() {
+//        return preferedGenres;
+//    }
 
     public int getId() {
         return id;

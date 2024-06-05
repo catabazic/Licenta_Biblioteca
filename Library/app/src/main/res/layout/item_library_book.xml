@@ -25,7 +25,9 @@
             android:paddingTop="10dp"
             android:text="Litera stacojie"
             android:textAlignment="center"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:maxLines="1"
+            android:ellipsize="end"  />
 
         <TextView
             android:id="@+id/booksBookAuthor"
@@ -33,5 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:text="NATHANIEL HAWTHORNE"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:maxLines="1"
+            android:ellipsize="end"  />
 </LinearLayout>

@@ -3,6 +3,8 @@ package com.example.library.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,27 +20,26 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.List;
 
 public class HistoryActivity extends AppCompatActivity implements OnItemClickListener {
-    FloatingActionButton homeActionButton;
-    FloatingActionButton searchActionButton;
-    FloatingActionButton booksActionButton;
-    FloatingActionButton messagesActionButton;
-    FloatingActionButton userActionButton;
-
     private RecyclerView recyclerView; //booksRecView
     private BookAdapter adapter;
     private List<Book> bookList;
+    private ImageButton backButton;
+    private TextView text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
-        homeActionButton = findViewById(R.id.homeActionButton);
-        searchActionButton = findViewById(R.id.searchActionButton);
-        booksActionButton = findViewById(R.id.booksActionButton);
-        messagesActionButton = findViewById(R.id.messagesActionButton);
-        userActionButton = findViewById(R.id.userActionButton);
+        Intent intent = getIntent();
+        String type = null;
+        if(intent != null) {
+            type = (String) intent.getSerializableExtra("type");
+        }
+
         recyclerView = findViewById(R.id.booksHistoryRecView);
+        backButton=findViewById(R.id.backBtn);
+        text = findViewById(R.id.historyIntroTxt);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -48,52 +49,22 @@ public class HistoryActivity extends AppCompatActivity implements OnItemClickLis
 
 
         DatabaseHelper dbHelper = new DatabaseHelper(HistoryActivity.this);
-        bookList = dbHelper.getAllHistory(MainActivity.sharedPreferences.getInt("user_id", -1));
-
+        if(type.equals("history")) {
+            bookList = dbHelper.getAllHistory(MainActivity.sharedPreferences.getInt("user_id", -1));
+        }else if (type.equals("my books")){
+            bookList = dbHelper.getBorrowedBooks(MainActivity.sharedPreferences.getInt("user_id",-1));
+            text.setText("Your books");
+        }
         adapter = new BookAdapter(bookList, this);
         recyclerView.setAdapter(adapter);
 
-        homeActionButton.setOnClickListener(new View.OnClickListener() {
+        backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HistoryActivity.this, HomeActivity.class));
                 finish();
             }
         });
 
-        searchActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(HistoryActivity.this, SearchActivity.class));
-                finish();
-            }
-        });
-
-        booksActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // If you're already in MyBooksActivity, you might not want to restart it
-                // You can handle this case differently if needed
-                startActivity(new Intent(HistoryActivity.this, MyBooksActivity.class));
-                finish();
-            }
-        });
-
-        messagesActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(HistoryActivity.this, MessagesActivity.class));
-                finish();
-            }
-        });
-
-        userActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(HistoryActivity.this, ProfileActivity.class));
-                finish();
-            }
-        });
     }
 
     @Override

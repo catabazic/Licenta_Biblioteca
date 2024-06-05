@@ -24,7 +24,6 @@ public class ProfileActivity extends AppCompatActivity {
     Button history;
     Button myBooks;
     Button myRewievs;
-    Button parola;
     Button logout;
     TextView name;
 
@@ -47,7 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
         myRewievs = findViewById(R.id.profileMyRewiewsBtn);
         logout = findViewById(R.id.LogoutBtn);
 
-        name = findViewById(R.id.profilePhotoBtn);
+        name = findViewById(R.id.photoBtn);
 
         editProfile();
 
@@ -68,16 +67,18 @@ public class ProfileActivity extends AppCompatActivity {
         history.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ProfileActivity.this, HistoryActivity.class));
-                finish();
+                Intent intent = new Intent(ProfileActivity.this, HistoryActivity.class);
+                intent.putExtra("type", "history");
+                startActivity(intent);
             }
         });
 
         myBooks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ProfileActivity.this, MyBooksActivity.class));
-                finish();
+                Intent intent = new Intent(ProfileActivity.this, HistoryActivity.class);
+                intent.putExtra("type", "my books");
+                startActivity(intent);
             }
         });
 

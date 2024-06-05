@@ -138,7 +138,7 @@
     </androidx.cardview.widget.CardView>
 
     <TextView
-        android:id="@+id/profilePhotoBtn"
+        android:id="@+id/photoBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -163,7 +163,7 @@
         android:textColor="#6750A3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profilePhotoBtn" />
+        app:layout_constraintTop_toBottomOf="@+id/photoBtn" />
 
     <Button
         android:id="@+id/profileHistoryBtn"

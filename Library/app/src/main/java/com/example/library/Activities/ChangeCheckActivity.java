@@ -12,15 +12,15 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.library.Database.DatabaseHelper;
-import com.example.library.Models.Book;
 import com.example.library.Models.User;
 import com.example.library.R;
 
-public class ChangeCheck extends AppCompatActivity {
+public class ChangeCheckActivity extends AppCompatActivity {
 
     private TextView back;
     private EditText number;
     private Button button;
+    private TextView text;
     private DatabaseHelper dbHelper;
     private User user;
 
@@ -33,14 +33,10 @@ public class ChangeCheck extends AppCompatActivity {
         back = findViewById(R.id.BackTxt);
         number = findViewById(R.id.numberCheck);
         button = findViewById(R.id.buttonCheck);
+        text = findViewById(R.id.ReviewTitleTxt);
 
-        String email = null;
+        String email;
         Intent intent = getIntent();
-        if(intent != null) {
-            email = (String) intent.getSerializableExtra("email");
-        }else{
-            finish();
-        }
 
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,6 +45,7 @@ public class ChangeCheck extends AppCompatActivity {
             }
         });
 
+        email = (String) intent.getSerializableExtra("email");
         String finalEmail = email;
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,21 +56,34 @@ public class ChangeCheck extends AppCompatActivity {
                 if(currentTimestamp - storedTimestamp < expirationTimeMillis){
                     int storedRandomNumber = MainActivity.sharedPreferences.getInt("mailChange", -1);
                     if(Integer.parseInt(number.getText().toString()) == storedRandomNumber){
-                        dbHelper.changeEmail(MainActivity.sharedPreferences.getInt("user_id", -1), finalEmail);
-                        Toast.makeText(ChangeCheck.this, "Email is changed!", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(ChangeCheck.this, ProfileEditActivity.class));
+                        if(((String) intent.getSerializableExtra("page")).equals("change")) {
+                            dbHelper.changeEmail(MainActivity.sharedPreferences.getInt("user_id", -1), finalEmail);
+                            startActivity(new Intent(ChangeCheckActivity.this, ProfileEditActivity.class));
+                        }else if(((String) intent.getSerializableExtra("page")).equals("register")){
+                            String name = (String) intent.getSerializableExtra("name");
+                            String number = (String) intent.getSerializableExtra("number");
+                            String password = (String) intent.getSerializableExtra("password");
+//                            int id = dbHelper.addNewUser(name, number, email, password);
+                            Intent intent = new Intent(ChangeCheckActivity.this, RegisterSelectActivity.class);
+                            intent.putExtra("email", email);
+                            intent.putExtra("name", name);
+                            intent.putExtra("number", number);
+                            intent.putExtra("password", password);
+                            intent.putExtra("page", "register");
+                            startActivity(intent);
+                        }
                         finish();
                     }
                 }
-                SharedPreferences.Editor removeEditor = MainActivity.sharedPreferences.edit();
-                removeEditor.remove("mailChange");
-                removeEditor.remove("mailChangeTimestamp");
-                removeEditor.apply();
-                Toast.makeText(ChangeCheck.this, "Email is not changed!", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(ChangeCheck.this, ChangeCheck.class));
-                finish();
+//                    SharedPreferences.Editor removeEditor = MainActivity.sharedPreferences.edit();
+//                    removeEditor.remove("mailChange");
+//                    removeEditor.remove("mailChangeTimestamp");
+//                    removeEditor.apply();
+                Toast.makeText(ChangeCheckActivity.this, "Email is not set!", Toast.LENGTH_SHORT).show();
             }
         });
 
+
     }
+
 }

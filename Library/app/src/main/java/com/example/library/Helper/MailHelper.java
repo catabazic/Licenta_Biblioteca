@@ -1,4 +1,4 @@
-package com.example.library.Sender;
+package com.example.library.Helper;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,7 +18,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-public class MailSender {
+public class MailHelper {
 
     public interface MailSenderCallback {
         void onSuccess();
@@ -30,7 +30,7 @@ public class MailSender {
     private final Context context;
     private final ExecutorService executorService;
 
-    public MailSender(Context context) {
+    public MailHelper(Context context) {
         this.context = context;
         this.executorService = Executors.newSingleThreadExecutor();
     }

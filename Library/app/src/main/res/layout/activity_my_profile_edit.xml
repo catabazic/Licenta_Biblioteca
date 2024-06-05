@@ -9,6 +9,26 @@
     tools:context=".Activities.ProfileEditActivity">
 
 
+    <EditText
+        android:id="@+id/phoneEditTxt"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/frame"
+        android:ems="10"
+        android:inputType="text"
+        android:paddingLeft="20dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        android:text="Name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameEditText" />
+
     <TextView
         android:id="@+id/BackTxt"
         android:layout_width="wrap_content"
@@ -55,7 +75,7 @@
     </androidx.cardview.widget.CardView>
 
     <TextView
-        android:id="@+id/profilePhotoBtn"
+        android:id="@+id/photoBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -105,7 +125,7 @@
         android:textAlignment="textStart"
         android:textColor="#6750A3"
         app:layout_constraintEnd_toEndOf="@+id/nameEditText"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.666"
         app:layout_constraintStart_toStartOf="@+id/nameEditText"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
 
@@ -126,7 +146,7 @@
         android:text="Name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profilePhotoBtn" />
+        app:layout_constraintTop_toBottomOf="@+id/photoBtn" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -140,13 +160,13 @@
         app:layout_constraintEnd_toEndOf="@+id/nameEditText"
         app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="@+id/nameEditText"
-        app:layout_constraintTop_toBottomOf="@+id/nameEditText">
+        app:layout_constraintTop_toBottomOf="@+id/phoneEditTxt">
 
         <TextView
             android:id="@+id/email"
-            android:layout_width="100dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
             android:background="@drawable/frame_rounded_left"
             android:paddingLeft="20dp"
             android:paddingTop="10dp"
@@ -156,9 +176,9 @@
 
         <TextView
             android:id="@+id/emailBtn"
-            android:layout_width="60dp"
-            android:layout_height="48dp"
-            android:layout_weight="0.5"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:background="@drawable/rounded_left_corners"
             android:backgroundTint="#BDADC5"
             android:paddingLeft="20dp"
@@ -180,32 +200,40 @@
         app:layout_constraintStart_toStartOf="@+id/linearLayout"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
-        <TextView
-            android:id="@+id/phone"
-            android:layout_width="100dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
             android:background="@drawable/frame_rounded_left"
+            android:orientation="vertical"
             android:paddingLeft="20dp"
             android:paddingTop="10dp"
             android:paddingRight="10dp"
-            android:paddingBottom="10dp"
-            android:text="Phone number" />
+            android:paddingBottom="10dp">
+
+            <TextView
+                android:id="@+id/genresTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Favorite genres: " />
+
+            <TextView
+                android:id="@+id/authorsTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Favorite authors: " />
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/phoneBtn"
-            android:layout_width="60dp"
-            android:layout_height="48dp"
-            android:layout_weight="0.5"
+            android:id="@+id/changePreferences"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:background="@drawable/rounded_left_corners"
             android:backgroundTint="#BDADC5"
-            android:paddingLeft="20dp"
-            android:paddingTop="10dp"
-            android:paddingRight="10dp"
-            android:paddingBottom="10dp"
-            android:text="Change number"
+            android:gravity="center"
+            android:text="Change"
             android:textColor="#6750A3" />
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

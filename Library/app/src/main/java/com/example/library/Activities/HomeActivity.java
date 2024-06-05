@@ -10,9 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.Interfaces.OnItemClickListener;
+import com.example.library.Models.User;
 import com.example.library.R;
 //import com.example.library.Recomandation.RecommendationEngine;
 //import com.example.library.Recomandation.RecommendationHelper;
+import com.example.library.Recomandation.Recommender;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.example.library.Adapters.LibraryBookAdapter;
@@ -34,21 +36,21 @@ public class HomeActivity extends AppCompatActivity implements OnItemClickListen
     RecyclerView recommRecyclerView;
     RecyclerView popularRecyclerView;
     RecyclerView newRecyclerView;
+    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         DatabaseHelper dbHelper = new DatabaseHelper(HomeActivity.this);
+        user = dbHelper.getUserById(MainActivity.sharedPreferences.getInt("user_id", -1));
         /*SQLiteDatabase db = dbHelper.getWritableDatabase();
         dbHelper.onUpgrade(db,1,2);*/
         popularBooks = dbHelper.getPopularBooks();
         newBooks = dbHelper.getNewBooks();
 
-
-//        RecommendationHelper recommendationHelper = new RecommendationHelper(dbHelper);
-//        RecommendationEngine recommendationEngine = new RecommendationEngine(recommendationHelper, dbHelper);
-//        recommBooks = recommendationEngine.recommendBooks(MainActivity.sharedPreferences.getInt("user_id",-1));
+        Recommender recommender = new Recommender(dbHelper);
+        recommBooks = recommender.recommendedBooks(user);
 
         homeActionButton = findViewById(R.id.homeActionButton);
         searchActionButton = findViewById(R.id.searchActionButton);
@@ -56,11 +58,11 @@ public class HomeActivity extends AppCompatActivity implements OnItemClickListen
         messagesActionButton = findViewById(R.id.messagesActionButton);
         userActionButton = findViewById(R.id.userActionButton);
 
-//        recommRecyclerView = findViewById(R.id.RecomendedBooksRecyclerView);
-//        recommRecyclerView.setHasFixedSize(true);
-//        recommRecyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this, LinearLayoutManager.HORIZONTAL,false));
-//        LibraryBookAdapter adapterRecomm = new LibraryBookAdapter(recommBooks,this);
-//        recommRecyclerView.setAdapter(adapterRecomm);
+        recommRecyclerView = findViewById(R.id.RecomendedBooksRecyclerView);
+        recommRecyclerView.setHasFixedSize(true);
+        recommRecyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this, LinearLayoutManager.HORIZONTAL,false));
+        LibraryBookAdapter adapterRecomm = new LibraryBookAdapter(recommBooks,this);
+        recommRecyclerView.setAdapter(adapterRecomm);
 
 
         popularRecyclerView = findViewById(R.id.PopularBooksRecyclerView);

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="5dp">
+    android:padding="2dp">
 
     <TextView
-        android:id="@+id/TextMessageTxt"
+        android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
@@ -17,10 +17,7 @@
         android:backgroundTint="#856750A3"
         android:backgroundTintMode="src_in"
         android:maxWidth="500dp"
-        android:padding="15dp"
-        android:text="Exactly! It's a win-win. Alright, let's get this plan into motion. Sarah's in for the birthday surprise of a lifetime!"
+        android:padding="10dp"
+        android:text="Genre"
         android:textSize="20sp" />
-
 </LinearLayout>
-
-    <!--android:backgroundTint="#3C6750A3"-->

@@ -6,15 +6,15 @@ import java.util.List;
 import java.util.Set;
 
 public class Book implements Serializable {
+    private int id;
     private String name;
-    private String state;
-    private String retur;
-    private Set<Author> authors;
-    private Set<Genre> genres;
+    private String image;
     private String description;
     private int disponible;
-    private String image;
-    private int id;
+    private Set<Author> authors;
+    private Set<Genre> genres;
+    private String state;
+    private String retur;
 
     public Book() {
         authors = new HashSet<>();
@@ -84,7 +84,6 @@ public class Book implements Serializable {
         this.image = image;
     }
 
-    // Getter methods
     public String getName() {
         return name;
     }

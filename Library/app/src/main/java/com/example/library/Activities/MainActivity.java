@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         DatabaseHelper dbHelper = new DatabaseHelper(MainActivity.this);
-        dbHelper.insertMockData();
+//        dbHelper.insertMockData();
 //        scheduleNotification(this);
 
 //        Intent serviceIntent = new Intent(this, MyBackgroundService.class);
@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 //

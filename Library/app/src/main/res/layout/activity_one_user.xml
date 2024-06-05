@@ -76,7 +76,7 @@
         app:layout_constraintTop_toBottomOf="@+id/nameTxt" />
 
     <TextView
-        android:id="@+id/phoneTxt"
+        android:id="@+id/preferedGenresTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -90,7 +90,7 @@
         android:id="@+id/addBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="50dp"
         android:backgroundTint="#3C6750A3"
         android:text="Start new conversation"
         android:textAllCaps="false"
@@ -100,6 +100,17 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/profilePhoto"
         app:layout_constraintStart_toStartOf="@+id/profilePhoto"
-        app:layout_constraintTop_toBottomOf="@+id/phoneTxt" />
+        app:layout_constraintTop_toBottomOf="@+id/preferedAuthorsTxt" />
+
+    <TextView
+        android:id="@+id/preferedAuthorsTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="TextView"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@+id/preferedGenresTxt"
+        app:layout_constraintStart_toStartOf="@+id/preferedGenresTxt"
+        app:layout_constraintTop_toBottomOf="@+id/preferedGenresTxt" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

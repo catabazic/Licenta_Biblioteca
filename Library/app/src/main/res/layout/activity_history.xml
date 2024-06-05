@@ -7,137 +7,54 @@
     android:layout_height="match_parent"
     android:background="#D8CBD2"
     tools:context=".Activities.HistoryActivity">
-
-    <TextView
-        android:id="@+id/historyIntroTxt"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Your book history"
-        android:textSize="24sp"
+        android:background="#D7CAD1"
+        android:backgroundTint="#D7CAD1"
+        android:maxHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/Coordination"
-        android:layout_width="0dp"
-        android:layout_height="80dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        <ImageButton
+            android:id="@+id/backBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#D7CAD1"
+            android:contentDescription="back"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="?attr/homeAsUpIndicator" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+        <TextView
+            android:id="@+id/historyIntroTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your book history"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            android:gravity="center"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="@id/Coordination"
-            app:layout_constraintEnd_toEndOf="@id/Coordination">
 
-            <LinearLayout
-                android:id="@+id/home_l"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/homeActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:contentDescription="home"
-                    app:srcCompat="@android:drawable/ic_menu_gallery" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/search_l"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/searchActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.2"
-                    android:clickable="true"
-                    android:contentDescription="Search"
-                    app:srcCompat="@android:drawable/ic_menu_search" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/books_l"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/booksActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:contentDescription="books"
-                    app:srcCompat="?attr/actionModeSelectAllDrawable" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/messages_l"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/messagesActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:contentDescription="messages"
-                    app:srcCompat="@android:drawable/stat_notify_chat" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/user_l"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/userActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:contentDescription="user"
-                    app:srcCompat="@android:drawable/ic_menu_myplaces" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/booksHistoryRecView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="5dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/historyIntroTxt" />
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

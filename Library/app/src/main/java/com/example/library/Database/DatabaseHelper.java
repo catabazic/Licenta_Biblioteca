@@ -459,6 +459,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public void changeName(int id, String name){
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            db.beginTransaction();
+            ContentValues updateValues = new ContentValues();
+            updateValues.put(COLUMN_USER_NAME, name);
+            String whereClause = COLUMN_USER_ID + "=?";
+            String[] whereArgs = {String.valueOf(id)};
+            db.update(TABLE_USER, updateValues, whereClause, whereArgs);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (db != null) {
+                db.endTransaction();
+                db.close();
+            }
+        }
+    }
+
     public boolean uniqueEmailRegister(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_USER +
@@ -479,6 +499,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_USER, null, values);
         db.close();
         return this.authenticateUser(email, password);
+    }
+
+    public void addPreferencesGenre(User user, Genre genre){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_PREFERENCES_GENRE_USER_ID, user.getId());
+        values.put(COLUMN_USER_PREFERENCES_GENRE_GENRE_ID, genre.getId());
+        db.insert(TABLE_USER_PREFERENCES_GENRE, null, values);
+        db.close();
+    }
+
+    public void addPreferencesAuthor(User user, Author author){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_PREFERENCES_AUTHOR_USER_ID, user.getId());
+        values.put(COLUMN_USER_PREFERENCES_AUTHOR_AUTHOR_ID, author.getId());
+        db.insert(TABLE_USER_PREFERENCES_AUTHOR, null, values);
+        db.close();
     }
 
     @SuppressLint("Range")
@@ -623,6 +661,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (cursor != null && cursor.moveToFirst()) {
                 int availableBooks = cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_AVAILABLE));
                 if (availableBooks > 0) {
+                    System.out.println(availableBooks);
                     values.put(COLUMN_LOAN_START_DATE, currentDate.toString());
 
                     ContentValues updateValues = new ContentValues();
@@ -1276,7 +1315,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
-    private Genre getGenreById(int id){
+    public Genre getGenreById(int id){
         Genre genre = null;
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_GENRE +
@@ -1291,4 +1330,116 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return genre;
     }
 
+    @SuppressLint("Range")
+    public List<Genre> getAllGenres(){
+        List<Genre> genres = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_GENRE;
+        Cursor cursor = db.rawQuery(query, new String[]{});
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                Genre genre = new Genre();
+                genre.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_GENRE_ID)));
+                genre.setName(cursor.getString(cursor.getColumnIndex(COLUMN_GENRE_NAME)));
+                genres.add(genre);
+            }
+            cursor.close();
+        }
+        return genres;
+    }
+
+    @SuppressLint("Range")
+    public List<Author> getAllAuthors(){
+        List<Author> authors = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_AUTHOR;
+        Cursor cursor = db.rawQuery(query, new String[]{});
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                Author author = new Author();
+                author.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_AUTHOR_ID)));
+                author.setName(cursor.getString(cursor.getColumnIndex(COLUMN_AUTHOR_NAME)));
+                authors.add(author);
+            }
+            cursor.close();
+        }
+        return authors;
+    }
+
+    @SuppressLint("Range")
+    public List<Genre> getPreferencesGenre(int userId){
+        List<Genre> genreList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_USER_PREFERENCES_GENRE +
+                " WHERE " + COLUMN_USER_PREFERENCES_GENRE_USER_ID + "=?";
+        Cursor cursor = db.rawQuery(query,new String[]{String.valueOf(userId)});
+        if(cursor!=null){
+            while(cursor.moveToNext()){
+                int id = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_PREFERENCES_GENRE_GENRE_ID));
+                genreList.add(this.getGenreById(id));
+            }
+            cursor.close();
+        }
+        return genreList;
+    }
+
+    @SuppressLint("Range")
+    public List<Author> getPreferencesAuthr(int userId){
+        List<Author> authorList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_USER_PREFERENCES_AUTHOR +
+                " WHERE " + COLUMN_USER_PREFERENCES_AUTHOR_USER_ID + "=?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(cursor.getColumnIndex(COLUMN_USER_PREFERENCES_AUTHOR_AUTHOR_ID));
+                authorList.add(this.getAuthorById(id));
+            }
+            cursor.close();
+        }
+        return authorList;
+    }
+
+    public void deletePreferences(int id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String selection = COLUMN_USER_PREFERENCES_GENRE_USER_ID + " = ?";
+        String[] selectionArgs = { String.valueOf(id) };
+
+        db.beginTransaction();
+        try {
+            db.delete(TABLE_USER_PREFERENCES_AUTHOR, selection, selectionArgs);
+            db.delete(TABLE_USER_PREFERENCES_GENRE, selection, selectionArgs);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+        }
+
+        db.close();
+    }
+
+
+    @SuppressLint("Range")
+    public List<Book> getAllBooks() {
+        ArrayList<Book> books = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_BOOK, new String[]{} );
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                Book book = new Book();
+                book.setName(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_NAME)));
+                book.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_BOOK_ID)));
+                book.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_BOOK_DESCRIPTION)));
+                book.setAuthors(getAuthorsOfBook(book.getId()));
+                book.setGenres(getGenresOfBook(book.getId()));
+                books.add(book);
+            }
+            cursor.close();
+        }
+        for (Book book : books){
+            System.out.println(book.getName());
+        }
+        return books;
+    }
 }

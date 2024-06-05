@@ -10,17 +10,21 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.library.Database.DatabaseHelper;
-import com.example.library.Models.Book;
+import com.example.library.Models.Author;
 import com.example.library.Models.Chat;
+import com.example.library.Models.Genre;
 import com.example.library.Models.User;
 import com.example.library.R;
+
+import java.util.List;
 
 public class SelectedUserActivity extends AppCompatActivity {
     private ImageButton backButton;
     private User user;
     private TextView name;
     private TextView email;
-    private TextView phone;
+    private TextView genres;
+    private TextView authors;
     private Button addConv;
     private DatabaseHelper dbHelper;
 
@@ -37,7 +41,8 @@ public class SelectedUserActivity extends AppCompatActivity {
         backButton = findViewById(R.id.backBtn);
         name = findViewById(R.id.nameTxt);
         email = findViewById(R.id.emailTxt);
-        phone = findViewById(R.id.phoneTxt);
+        genres = findViewById(R.id.preferedGenresTxt);
+        authors = findViewById(R.id.preferedAuthorsTxt);
         addConv = findViewById(R.id.addBtn);
         dbHelper = new DatabaseHelper(this);
 
@@ -66,6 +71,32 @@ public class SelectedUserActivity extends AppCompatActivity {
     private void updateData(){
         name.setText(user.getName());
         email.setText(user.getEmail());
-        phone.setText(user.getPhoto());
+        List<Author> authorList = dbHelper.getPreferencesAuthr(user.getId());
+        if(!authorList.isEmpty()) {
+            StringBuilder authorStr = new StringBuilder("Pref authors: ");
+            for (int i = 0; i < authorList.size(); i++) {
+                authorStr.append(authorList.get(i).getName());
+                if (i < authorList.size() - 1) {
+                    authorStr.append(", ");
+                }
+            }
+            authors.setText(authorStr);
+        }else {
+            authors.setText("");
+        }
+
+        List<Genre> genreList = dbHelper.getPreferencesGenre(user.getId());
+        if(!authorList.isEmpty()){
+            StringBuilder genreStr = new StringBuilder("Pref genres: ");
+            for (int i = 0; i < genreList.size(); i++) {
+                genreStr.append(genreList.get(i).getName());
+                if (i < genreList.size() - 1) {
+                    genreStr.append(", ");
+                }
+            }
+            genres.setText(genreStr);
+        }else {
+            genres.setText("");
+        }
     }
 }
