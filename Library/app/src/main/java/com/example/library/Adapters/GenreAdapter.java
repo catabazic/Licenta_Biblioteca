@@ -9,7 +9,7 @@ import android.widget.TextView;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.library.Models.Genre;
+import com.example.library.Models.DB.Genre;
 import com.example.library.R;
 
 import java.util.HashSet;
@@ -23,7 +23,7 @@ public class GenreAdapter extends RecyclerView.Adapter<GenreAdapter.GenreViewHol
     }
 
     private List<Genre> genres;
-    private Set<Integer> selectedGenres;
+    private Set<String> selectedGenres;
     private OnGenreSelectedListener listener;
 
     public GenreAdapter(List<Genre> genres, OnGenreSelectedListener listener) {

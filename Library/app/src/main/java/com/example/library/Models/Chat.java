@@ -3,13 +3,21 @@ package com.example.library.Models;
 import java.io.Serializable;
 
 public class Chat implements Serializable {
-    private int id;
+    private String id;
     private String Name;
     private String message;
     private String date;
     private boolean lastMessageMine;
 
     public Chat() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setName(String name) {
@@ -26,14 +34,6 @@ public class Chat implements Serializable {
 
     public void setLastMessageMine(boolean lastMessageMine) {
         this.lastMessageMine = lastMessageMine;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getName() {

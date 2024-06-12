@@ -9,8 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.library.Database.DatabaseHelper;
-import com.example.library.Models.Review;
+import com.example.library.Models.DB.Review;
 import com.example.library.R;
 
 import java.util.List;
@@ -61,10 +60,10 @@ public class ReviewBookAdapter extends RecyclerView.Adapter<ReviewBookAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Review review = list.get(position);
-        holder.userName.setText(name.get(position));
         holder.date.setText(review.getDate());
         holder.titleReview.setText(review.getReviewTitle());
         holder.commentReview.setText(review.getReviewText());
+        holder.userName.setText(name.get(position));
         float rating = review.getRating();
         if (rating >= 4.5) {
             holder.star1.setImageResource(rating >= 5 ? R.drawable.ic_star_full : R.drawable.ic_star_half);

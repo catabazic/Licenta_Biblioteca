@@ -1,8 +1,10 @@
-package com.example.library.Models;
+package com.example.library.Models.DB;
 
 public class Review {
-    private int id_user;
-    private int id_book;
+    String ID;
+
+    private String id_user;
+    private String id_book;
     private String date;
     private float rating;
     private String reviewTitle;
@@ -12,11 +14,19 @@ public class Review {
         rating = 0;
     }
 
-    public int getId_user() {
+    public String getID() {
+        return ID;
+    }
+
+    public void setID(String ID) {
+        this.ID = ID;
+    }
+
+    public String getId_user() {
         return id_user;
     }
 
-    public int getId_book() {
+    public String getId_book() {
         return id_book;
     }
 
@@ -36,11 +46,11 @@ public class Review {
         return reviewText;
     }
 
-    public void setId_user(int id_user) {
+    public void setId_user(String id_user) {
         this.id_user = id_user;
     }
 
-    public void setId_book(int id_book) {
+    public void setId_book(String id_book) {
         this.id_book = id_book;
     }
 
@@ -48,8 +58,8 @@ public class Review {
         this.date = date;
     }
 
-    public void setRating(float rating) {
-        this.rating = rating;
+    public void setRating(double rating) {
+        this.rating = (float)rating;
     }
 
     public void setReviewTitle(String reviewTitle) {

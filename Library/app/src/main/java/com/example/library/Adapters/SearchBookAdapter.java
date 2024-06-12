@@ -1,26 +1,24 @@
 package com.example.library.Adapters;
 
-import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Interfaces.OnItemClickListener;
-import com.example.library.Models.Author;
-import com.example.library.Models.Book;
-import com.example.library.Models.Chat;
-import com.example.library.Models.Message;
+import com.example.library.Models.DB.Book;
 import com.example.library.R;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 public class SearchBookAdapter extends RecyclerView.Adapter<SearchBookAdapter.ViewHolder> {
     List<Book> bookList;
@@ -71,16 +69,33 @@ public class SearchBookAdapter extends RecyclerView.Adapter<SearchBookAdapter.Vi
     public void onBindViewHolder(@NonNull SearchBookAdapter.ViewHolder holder, int position) {
         Book book = bookList.get(position);
         holder.name.setText(book.getName());
-        Set<Author> authors = book.getAuthors();
-        String aut= null;
-        for(Author author: authors){
-            if(aut == null){
-                aut = author.getName();
-            }else{
-                aut+= " & " + author.getName();
-            }
-        }
-        holder.author.setText(aut);
+//        FirebaseDatabaseHelper database = new FirebaseDatabaseHelper();
+//        Set<String> authors = book.getAuthors();
+//        StringBuilder aut = new StringBuilder();
+//        CountDownLatch latch = new CountDownLatch(authors.size());
+//        for (String id : authors) {
+//            database.getAuthorById(id, author -> {
+//                synchronized (aut) {
+//                    if (aut.length() == 0) {
+//                        aut.append(author.getName());
+//                    } else {
+//                        aut.append(" & ").append(author.getName());
+//                    }
+//                    latch.countDown(); // Move latch countdown here to ensure it's only decremented after aut is updated
+//                }
+//            });
+//        }
+//
+//        // Handler to update UI on the main thread
+//        Handler mainHandler = new Handler(Looper.getMainLooper());
+//        mainHandler.post(() -> {
+//            try {
+//                latch.await(); // Wait for all tasks to complete
+//                holder.author.setText(aut.toString());
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        });
     }
 
     @Override
@@ -89,8 +104,10 @@ public class SearchBookAdapter extends RecyclerView.Adapter<SearchBookAdapter.Vi
     }
 
     public void updateData(List<Book> newData) {
+        System.out.println(bookList.size());
         bookList.clear(); // Clear the existing dataset
         bookList.addAll(newData); // Add the new data
+        System.out.println(bookList.size());
         notifyDataSetChanged(); // Notify the adapter that the dataset has changed
     }
 }

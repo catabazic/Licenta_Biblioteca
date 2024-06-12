@@ -10,13 +10,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.library.Database.DatabaseHelper;
-import com.example.library.Models.Author;
-import com.example.library.Models.Genre;
-import com.example.library.Models.User;
+import com.example.library.Database.FirebaseDatabaseHelper;
+import com.example.library.Models.DB.User;
 import com.example.library.R;
-
-import java.util.List;
 
 public class ProfileEditActivity extends AppCompatActivity {
     private TextView back;
@@ -32,7 +28,7 @@ public class ProfileEditActivity extends AppCompatActivity {
     private Button passwordBtn;
     private Button logoutBtn;
     private User user;
-    private DatabaseHelper dbHelper;
+    private FirebaseDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +48,13 @@ public class ProfileEditActivity extends AppCompatActivity {
         authors = findViewById(R.id.authorsTxt);
         changePreferences = findViewById(R.id.changePreferences);
 
-        dbHelper = new DatabaseHelper(ProfileEditActivity.this);
-        user = dbHelper.getUserById(MainActivity.sharedPreferences.getInt("user_id",-1));
+        dbHelper = new FirebaseDatabaseHelper();
 
-        this.chengeData();
+        dbHelper.getUserById(MainActivity.sharedPreferences.getString("user_id", null), u -> {
+            user = u;
+            this.chengeData();
+        });
+
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -121,32 +120,35 @@ public class ProfileEditActivity extends AppCompatActivity {
         numar.setText(user.getNumber());
         email.setText(user.getEmail());
         nume.setText(user.getName());
-        List<Author> authorList = dbHelper.getPreferencesAuthr(user.getId());
-        if(!authorList.isEmpty()) {
-            StringBuilder authorStr = new StringBuilder("Pref authors: ");
-            for (int i = 0; i < authorList.size(); i++) {
-                authorStr.append(authorList.get(i).getName());
-                if (i < authorList.size() - 1) {
-                    authorStr.append(", ");
+        dbHelper.getPreferencesAuthors(user.getId(), authorList ->{
+            if(!authorList.isEmpty()) {
+                StringBuilder authorStr = new StringBuilder("Pref authors: ");
+                for (int i = 0; i < authorList.size(); i++) {
+                    authorStr.append(authorList.get(i).getName());
+                    if (i < authorList.size() - 1) {
+                        authorStr.append(", ");
+                    }
                 }
+                authors.setText(authorStr);
+            }else {
+                authors.setText("");
             }
-            authors.setText(authorStr);
-        }else {
-            authors.setText("");
-        }
+        });
 
-        List<Genre> genreList = dbHelper.getPreferencesGenre(user.getId());
-        if(!authorList.isEmpty()){
-            StringBuilder genreStr = new StringBuilder("Pref genres: ");
-            for (int i = 0; i < genreList.size(); i++) {
-                genreStr.append(genreList.get(i).getName());
-                if (i < genreList.size() - 1) {
-                    genreStr.append(", ");
+        dbHelper.getPreferencesGenre(user.getId(), genreList ->{
+            if(!genreList.isEmpty()){
+                StringBuilder genreStr = new StringBuilder("Pref genres: ");
+                for (int i = 0; i < genreList.size(); i++) {
+                    genreStr.append(genreList.get(i).getName());
+                    if (i < genreList.size() - 1) {
+                        genreStr.append(", ");
+                    }
                 }
+                genres.setText(genreStr);
+            }else {
+                genres.setText("");
             }
-            genres.setText(genreStr);
-        }else {
-            genres.setText("");
-        }
+        });
+
     }
 }

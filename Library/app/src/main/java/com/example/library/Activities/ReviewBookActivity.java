@@ -10,9 +10,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.library.Database.DatabaseHelper;
-import com.example.library.Models.Book;
-import com.example.library.Models.Review;
+import com.example.library.Database.FirebaseDatabaseHelper;
+import com.example.library.Models.DB.Book;
+import com.example.library.Models.DB.Review;
 import com.example.library.R;
 
 import java.time.LocalDate;
@@ -25,18 +25,20 @@ public class ReviewBookActivity extends AppCompatActivity {
     private RatingBar ratingBar;
     private EditText titleTxt;
     private EditText commentTxt;
+    private FirebaseDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review_book);
         review=new Review();
-        review.setId_user(MainActivity.sharedPreferences.getInt("user_id",-1));
+        review.setId_user(MainActivity.sharedPreferences.getString("user_id",null));
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             LocalDate currentDate = LocalDate.now();
             review.setDate(currentDate.toString());
         }
+        dbHelper = new FirebaseDatabaseHelper();
 
         backTxt=findViewById(R.id.BackTxt);
         sentTxt=findViewById(R.id.SentTxt);
@@ -68,9 +70,9 @@ public class ReviewBookActivity extends AppCompatActivity {
                 review.setReviewText(commentTxt.getText().toString());
 
                 if(verifyData()){
-                    DatabaseHelper dbhelper = new DatabaseHelper(ReviewBookActivity.this);
-                    dbhelper.addReviewForABook(review);
-                    finish();
+                    dbHelper.addReviewForABook(review).addOnSuccessListener(d->{
+                        finish();
+                    });
                 }
             }
         });

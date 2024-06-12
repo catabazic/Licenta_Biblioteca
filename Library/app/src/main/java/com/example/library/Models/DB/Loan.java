@@ -1,26 +1,35 @@
-package com.example.library.Models;
+package com.example.library.Models.DB;
 
 public class Loan {
-    private int userId;
-    private int bookId;
+    String ID;
+    private String userId;
+    private String bookId;
     private String dataCerere;
     private String dataInceput;
     private String dataRetur;
 
     // Getters and Setters
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public String getId() {
+        return ID;
+    }
+
+    public void setId(String ID) {
+        this.ID = ID;
+    }
+
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    public int getBookId() {
+    public String getBookId() {
         return bookId;
     }
 
-    public void setBookId(int bookId) {
+    public void setBookId(String bookId) {
         this.bookId = bookId;
     }
 

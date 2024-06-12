@@ -18,7 +18,8 @@ import androidx.core.view.WindowInsetsCompat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.example.library.Database.DatabaseHelper;
+
+import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Helper.MailHelper;
 import com.example.library.R;
 
@@ -31,14 +32,13 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText password2EditText;
     private Button registerButton;
     private Button otherChoice;
-    private DatabaseHelper dbHelper;
-
+    private FirebaseDatabaseHelper dbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register);
-        dbHelper = new DatabaseHelper(RegisterActivity.this);
+        dbHelper = new FirebaseDatabaseHelper();
 
         nameEditText = findViewById(R.id.NumeRegisterTxt);
         numberEditText = findViewById(R.id.NumarRegisterTxt);
@@ -157,10 +157,10 @@ public class RegisterActivity extends AppCompatActivity {
 
     private boolean isEmailCorrect(String email) {
         try {
-            if (!dbHelper.uniqueEmailRegister(email)) {
+            /*if (!dbHelper.uniqueEmailRegister(email).getResult()) {
                 Toast.makeText(RegisterActivity.this, "This email is already used", Toast.LENGTH_SHORT).show();
                 return false;
-            }
+            }*/
             return true;
         } catch (Exception e) {
             e.printStackTrace();

@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.library.Database.DatabaseHelper;
+import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Interfaces.OnItemClickListener;
 import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -16,7 +16,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.List;
 
 import com.example.library.Adapters.BookAdapter;
-import com.example.library.Models.Book;
+import com.example.library.Models.DB.Book;
 
 public class MyBooksActivity extends AppCompatActivity implements OnItemClickListener {
     private FloatingActionButton homeActionButton;
@@ -28,6 +28,7 @@ public class MyBooksActivity extends AppCompatActivity implements OnItemClickLis
     private RecyclerView recyclerView;
     private BookAdapter adapter;
     private List<Book> bookList;
+    private FirebaseDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +49,13 @@ public class MyBooksActivity extends AppCompatActivity implements OnItemClickLis
         bookList.add(new Book("Another Book", "Another Author", "Another State"));*/
 
 
-        DatabaseHelper dbHelper = new DatabaseHelper(MyBooksActivity.this);
-        bookList = dbHelper.getBorrowedBooks(MainActivity.sharedPreferences.getInt("user_id",-1));
+        dbHelper = new FirebaseDatabaseHelper();
+        dbHelper.getBorrowedBooks(MainActivity.sharedPreferences.getString("user_id",null)).addOnSuccessListener( l->{
+            bookList = l;
+            adapter = new BookAdapter(bookList, this);
+            recyclerView.setAdapter(adapter);
+        });
 
-        adapter = new BookAdapter(bookList, this);
-        recyclerView.setAdapter(adapter);
 
         homeActionButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -14,9 +14,9 @@ import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.Interfaces.OnItemClickListener;
-import com.example.library.Models.Book;
+import com.example.library.Models.DB.Book;
 import com.example.library.Models.Chat;
-import com.example.library.Models.Message;
+import com.example.library.Models.DB.Message;
 import com.example.library.R;
 
 import java.util.List;
@@ -26,8 +26,8 @@ import android.view.Gravity;
 public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHolder> {
     private List<Message> messageList;
 
-    private int idUser;
-    public MessagesAdapter(List<Message> messageList, int idUser) {
+    private String idUser;
+    public MessagesAdapter(List<Message> messageList, String idUser) {
         this.messageList = messageList;
         this.idUser = idUser;
     }
@@ -65,7 +65,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         Drawable backgroundDrawable = holder.textMessage.getBackground();
 
 
-        if (message.getId_user() == idUser) {
+        if (message.getId_user().equals(idUser)) {
             params.gravity = Gravity.END;
             holder.textMessage.setLayoutParams(params);
             DrawableCompat.setTint(backgroundDrawable, 0x3C6750A3);

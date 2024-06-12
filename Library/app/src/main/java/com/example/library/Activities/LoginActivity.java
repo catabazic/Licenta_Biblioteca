@@ -10,7 +10,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.library.Database.DatabaseHelper;
+import com.example.library.Database.FirebaseDatabaseHelper;
+import com.example.library.Database.FirestoreCallback;
 import com.example.library.R;
 
 public class LoginActivity extends AppCompatActivity {
@@ -18,12 +19,14 @@ public class LoginActivity extends AppCompatActivity {
     private EditText passwordEditText;
     private Button loginButton;
     private Button OtherChoice;
+    private FirebaseDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         //DatabaseHelper databaseHelper = new DatabaseHelper(LoginActivity.this);
+        dbHelper = new FirebaseDatabaseHelper();
 
         usernameEditText = findViewById(R.id.EmailLoginTxt);
         passwordEditText = findViewById(R.id.PasswordLoginTxt);
@@ -38,15 +41,18 @@ public class LoginActivity extends AppCompatActivity {
                 System.out.println("Username: " + username + ", password: " + password);
 
                 // Check credentials (e.g., against local database or server)
-                if (isValidCredentials(username, password)) {
+                isValidCredentials(username, password, new FirestoreCallback<Boolean>() {
+                    @Override
+                    public void onComplete(Boolean result) {
+                        if(result){
+                            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                            finish();
+                        }else{
+                            Toast.makeText(LoginActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
 
-                    // Navigate to home screen
-                    startActivity(new Intent(LoginActivity.this, HomeActivity.class));
-                    finish();
-                } else {
-                    // Display error message
-                    Toast.makeText(LoginActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
-                }
+                        }
+                    }
+                });
             }
         });
         OtherChoice.setOnClickListener(new View.OnClickListener() {
@@ -66,21 +72,17 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private boolean isValidCredentials(String username, String password) {
-        try {
-            DatabaseHelper dbHelper = new DatabaseHelper(LoginActivity.this);
-            int id=dbHelper.authenticateUser(username, password);
-            if (id!=-1) {
-                SharedPreferences.Editor editor = MainActivity.sharedPreferences.edit();
-
-                editor.putBoolean("isLoggedIn",true);
-                editor.putInt("user_id", id);
-                editor.apply();
-                return true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
+    private void isValidCredentials(String username, String password, FirestoreCallback<Boolean> callback) {
+         dbHelper.authentificateUser(username, password).addOnSuccessListener( id ->{
+                if (id!=null) {
+                    SharedPreferences.Editor editor = MainActivity.sharedPreferences.edit();
+                    editor.putBoolean("isLoggedIn",true);
+                    editor.putString("user_id", id);
+                    editor.apply();
+                    callback.onComplete(true);
+                }else{
+                    callback.onComplete(false);
+                }
+        });
     }
 }

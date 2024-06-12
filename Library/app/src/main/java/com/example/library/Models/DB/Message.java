@@ -1,19 +1,28 @@
-package com.example.library.Models;
+package com.example.library.Models.DB;
 
 public class Message {
-     private int idConversation;
-     private int idUser;
+     String ID;
+     private String idConversation;
+     private String idUser;
      private String date;
      private String message;
 
      public Message() {
      }
 
-     public void setId(int id) {
+     public String getID() {
+          return ID;
+     }
+
+     public void setID(String ID) {
+          this.ID = ID;
+     }
+
+     public void setId(String id) {
           this.idConversation = id;
      }
 
-     public void setId_user(int id_user) {
+     public void setId_user(String id_user) {
           this.idUser = id_user;
      }
 
@@ -25,11 +34,11 @@ public class Message {
           this.message = message;
      }
 
-     public int getId() {
+     public String getId() {
           return idConversation;
      }
 
-     public int getId_user() {
+     public String getId_user() {
           return idUser;
      }
 

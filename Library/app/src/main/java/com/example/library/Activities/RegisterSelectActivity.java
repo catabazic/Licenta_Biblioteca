@@ -10,34 +10,32 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.library.Adapters.AuthorAdapter;
 import com.example.library.Adapters.GenreAdapter;
-import com.example.library.Adapters.LibraryBookAdapter;
-import com.example.library.Database.DatabaseHelper;
-import com.example.library.Models.Author;
-import com.example.library.Models.Genre;
-import com.example.library.Models.User;
+import com.example.library.Database.FirebaseDatabaseHelper;
+import com.example.library.Models.DB.Author;
+import com.example.library.Models.DB.Genre;
 import com.example.library.R;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class RegisterSelectActivity  extends AppCompatActivity implements GenreAdapter.OnGenreSelectedListener, AuthorAdapter.OnAuthorSelectedListener {
-    private DatabaseHelper dbHelper;
+
+    private FirebaseDatabaseHelper dbHelper;
     private Button button;
     private RecyclerView genresRV;
     private RecyclerView authorsRV;
     private TextView main;
     private List<Genre> genres;
     private List<Author> authors;
-    private Set<Integer> selectedGenres;
-    private Set<Integer> selectedAuthors;
+    private Set<String> selectedGenres;
+    private Set<String> selectedAuthors;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +46,7 @@ public class RegisterSelectActivity  extends AppCompatActivity implements GenreA
         selectedGenres = new HashSet<>();
         selectedAuthors = new HashSet<>();
 
-        dbHelper = new DatabaseHelper(RegisterSelectActivity.this);
+        dbHelper = new FirebaseDatabaseHelper();
         button = findViewById(R.id.RegisterBtn);
         main = findViewById(R.id.mainTxt);
         String page = (String) intent.getSerializableExtra("page");
@@ -57,28 +55,64 @@ public class RegisterSelectActivity  extends AppCompatActivity implements GenreA
             button.setText("Done");
         }
 
-        genres = dbHelper.getAllGenres();
-        genresRV = findViewById(R.id.genres);
-        genresRV.setHasFixedSize(true);
+//        dbHelper.getAllGenres(gen ->{
+//            genres = gen;
+//        });
+        System.out.println("PUR SIS IMPLU CEVA PLEASE");
         int numberOfRows = 3;
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(
-                numberOfRows,
-                StaggeredGridLayoutManager.HORIZONTAL // Horizontal orientation
-        );
-        genresRV.setLayoutManager(layoutManager);
-        GenreAdapter genreAdapter = new GenreAdapter(genres, this);
-        genresRV.setAdapter(genreAdapter);
+        dbHelper.getAllGenres().addOnSuccessListener(g -> {
+            System.out.println("Everything is allright");
+            if(g!=null) {
+                genres = g;
+            }else{
+                genres = new ArrayList<>();
+            }
+            genresRV = findViewById(R.id.genres);
+            genresRV.setHasFixedSize(true);
 
-        authors = dbHelper.getAllAuthors();
-        System.out.println("authors: " + authors.size());
-        authorsRV = findViewById(R.id.authors);        authorsRV.setHasFixedSize(true);
-        StaggeredGridLayoutManager layoutManager1 = new StaggeredGridLayoutManager(
-                numberOfRows,
-                StaggeredGridLayoutManager.HORIZONTAL // Horizontal orientation
-        );
-        authorsRV.setLayoutManager(layoutManager1);
-        AuthorAdapter authorAdapter = new AuthorAdapter(authors, this);
-        authorsRV.setAdapter(authorAdapter);
+            StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(
+                    numberOfRows,
+                    StaggeredGridLayoutManager.HORIZONTAL // Horizontal orientation
+            );
+            genresRV.setLayoutManager(layoutManager);
+            GenreAdapter genreAdapter = new GenreAdapter(genres, this);
+            genresRV.setAdapter(genreAdapter);
+        }).addOnFailureListener(e -> {
+            System.out.println("Something is wrong");
+        });
+        System.out.println("PUR SIS IMPLU ALT CEVA");
+
+//        dbHelper.getAllAuthors(aut -> {
+//            if (aut != null) {
+//                authors = aut;
+//                System.out.println(authors.size());
+//            } else {
+//                // Handle null response gracefully, e.g., show an error message
+//                Log.e(TAG, "Null response received from getAllAuthors");
+//                System.out.println("Null response received from getAllAuthors");
+//            }
+//        });
+        dbHelper.getAllAuthors().addOnSuccessListener(a -> {
+            System.out.println("Everything is allright");
+            if(a!=null){
+                authors = a;
+            }else{
+                genres = new ArrayList<>();
+            }
+            authorsRV = findViewById(R.id.authors);
+            authorsRV.setHasFixedSize(true);
+            StaggeredGridLayoutManager layoutManager1 = new StaggeredGridLayoutManager(
+                    numberOfRows,
+                    StaggeredGridLayoutManager.HORIZONTAL // Horizontal orientation
+            );
+            authorsRV.setLayoutManager(layoutManager1);
+            AuthorAdapter authorAdapter = new AuthorAdapter(authors, this);
+            authorsRV.setAdapter(authorAdapter);
+        }).addOnFailureListener(e -> {
+            System.out.println("Something is wrong");
+        });
+//        System.out.println("something");
+//        System.out.println("authors: " + authors.size());
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,34 +120,36 @@ public class RegisterSelectActivity  extends AppCompatActivity implements GenreA
 
                 if(selectedGenres.size()>=5) {
                     if(!page.equals("register")){
-                        User user = dbHelper.getUserById(MainActivity.sharedPreferences.getInt("user_id",-1));
-                        dbHelper.deletePreferences(user.getId());
-                        for (Integer genreId : selectedGenres) {
-                            dbHelper.addPreferencesGenre(user, dbHelper.getGenreById(genreId));
-                        }
-                        for (Integer authorId : selectedAuthors) {
-                            dbHelper.addPreferencesAuthor(user, dbHelper.getAuthorById(authorId));
-                        }
+                        String userId= MainActivity.sharedPreferences.getString("user_id", null);
+                        dbHelper.deletePreferences(userId);
 
+                        for (String genreId : selectedGenres) {
+                            dbHelper.addPreferencesGenre(userId, genreId);
+                        }
+                        for (String authorId : selectedAuthors) {
+                            dbHelper.addPreferencesAuthor(userId, authorId);
+                        }
                         finish();
                     }else {
                         String name = (String) intent.getSerializableExtra("name");
                         String number = (String) intent.getSerializableExtra("number");
                         String password = (String) intent.getSerializableExtra("password");
                         String email = (String) intent.getSerializableExtra("email");
-                        int id = dbHelper.addNewUser(name, number, email, password);
-                        SharedPreferences.Editor editor = MainActivity.sharedPreferences.edit();
-                        editor.putBoolean("isLoggedIn", true);
-                        editor.putInt("user_id", id);
-                        editor.apply();
+                        dbHelper.addNewUser(name, number, email, password).addOnSuccessListener(i ->{
+                            String id = i;
+                            SharedPreferences.Editor editor = MainActivity.sharedPreferences.edit();
+                            editor.putBoolean("isLoggedIn", true);
+                            editor.putString("user_id", id);
+                            editor.apply();
 
-                        User user = dbHelper.getUserById(id);
-                        for (Integer genreId : selectedGenres) {
-                            dbHelper.addPreferencesGenre(user, dbHelper.getGenreById(genreId));
-                        }
-                        for (Integer authorId : selectedAuthors) {
-                            dbHelper.addPreferencesAuthor(user, dbHelper.getAuthorById(authorId));
-                        }
+                            for (String genreId : selectedGenres) {
+                                dbHelper.addPreferencesGenre(id, genreId);
+                            }
+                            for (String authorId : selectedAuthors) {
+                                dbHelper.addPreferencesAuthor(id, authorId);
+                            }
+
+                        });
 
                         startActivity(new Intent(RegisterSelectActivity.this, RegisterPhotoActivity.class));
                         finish();
@@ -132,7 +168,7 @@ public class RegisterSelectActivity  extends AppCompatActivity implements GenreA
         } else {
             selectedGenres.add(genre.getId());
         }
-        for(Integer genre1 : selectedGenres){
+        for(String genre1 : selectedGenres){
             System.out.println(genre1);
         }
 //        Toast.makeText(this, "Selected genres count: " + selectedGenres.size(), Toast.LENGTH_SHORT).show();
@@ -145,7 +181,7 @@ public class RegisterSelectActivity  extends AppCompatActivity implements GenreA
         } else {
             selectedAuthors.add(author.getId());
         }
-        for(Integer genre1 : selectedAuthors){
+        for(String genre1 : selectedAuthors){
             System.out.println(genre1);
         }
 //        Toast.makeText(this, "Selected author count: " + selectedAuthors.size(), Toast.LENGTH_SHORT).show();

@@ -13,15 +13,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.Adapters.ReviewBookAdapter;
-import com.example.library.Database.DatabaseHelper;
-import com.example.library.Models.Book;
-import com.example.library.Models.Review;
+import com.example.library.Database.FirebaseDatabaseHelper;
+import com.example.library.Models.DB.Book;
+import com.example.library.Models.DB.Review;
 import com.example.library.R;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ReviewsBookAllActivity  extends AppCompatActivity {
     private ImageButton backButton;
@@ -35,8 +36,7 @@ public class ReviewsBookAllActivity  extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RatingBar ratingBar;
     private Book book;
-    private List<Review> reviewList;
-    private DatabaseHelper dbHelper;
+    private FirebaseDatabaseHelper dbHelper;
     private ReviewBookAdapter adapter;
 
     @Override
@@ -44,7 +44,7 @@ public class ReviewsBookAllActivity  extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_reviews_book);
 
-        dbHelper = new DatabaseHelper(ReviewsBookAllActivity.this);
+        dbHelper = new FirebaseDatabaseHelper();
 
         Intent intent = getIntent();
         if(intent != null) {
@@ -52,11 +52,34 @@ public class ReviewsBookAllActivity  extends AppCompatActivity {
             System.out.println("It was set");
             System.out.println(book.getId());
         }
-        reviewList = dbHelper.getAllReviewsOfBook(book.getId());
-        List<String> names= new ArrayList<String>();
-        for(Review review : reviewList){
-            names.add(dbHelper.getUserById(review.getId_user()).getName());
-        }
+        recyclerView = findViewById(R.id.reviewsRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        dbHelper.getAllReviewsOfBook(book.getId()).addOnSuccessListener(reviewList -> {
+            List<String> names = new ArrayList<>();
+            AtomicInteger pendingTasks = new AtomicInteger(reviewList.size());
+
+            for (Review review : reviewList) {
+                dbHelper.getUserById(review.getId_user(), user -> {
+                    if (user != null) {
+                        names.add(user.getName());
+                    } else {
+                        names.add("Unknown User");
+                    }
+
+                    // Check if all tasks are completed
+                    if (pendingTasks.decrementAndGet() == 0) {
+                        // All users fetched, update the RecyclerView
+                        adapter = new ReviewBookAdapter(reviewList, names);
+                        recyclerView.setAdapter(adapter);
+                        System.out.println("Reviews are here");
+                    }
+                });
+            }
+
+        }).addOnFailureListener(e -> {
+            System.out.println("There was a problem fetching reviews");
+        });
+
 
         backButton=findViewById(R.id.backBtn);
         ratingNote=findViewById(R.id.BookRating);
@@ -68,13 +91,7 @@ public class ReviewsBookAllActivity  extends AppCompatActivity {
         rating2=findViewById(R.id.progressBar2);
         rating1=findViewById(R.id.progressBar1);
 
-        recyclerView = findViewById(R.id.reviewsRecyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ReviewBookAdapter(reviewList, names);
-        recyclerView.setAdapter(adapter);
-
         updateUI(book);
-
 
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
@@ -97,18 +114,21 @@ public class ReviewsBookAllActivity  extends AppCompatActivity {
     }
 
     private void updateUI(Book book) {
-        BigDecimal bd = new BigDecimal(dbHelper.getRatingOfBook(book.getId()));
-        bd = bd.setScale(2, RoundingMode.HALF_UP);
-        ratingNote.setText(String.valueOf(bd.floatValue()));
-        List<Integer> list = dbHelper.getNumberOfRatings(book.getId());
-        String numberOfRatingsStr = String.valueOf(list.get(0));
-        numberOfRatingsStr+=" Reviews";
-        ratingNumber.setText(numberOfRatingsStr);
-        rating1.setProgress(list.get(1));
-        rating2.setProgress(list.get(2));
-        rating3.setProgress(list.get(3));
-        rating4.setProgress(list.get(4));
-        rating5.setProgress(list.get(5));
+        dbHelper.getRatingOfBook(book.getId()).addOnSuccessListener(f ->{
+            BigDecimal bd =new BigDecimal(f);
+            bd = bd.setScale(2, RoundingMode.HALF_UP);
+            ratingNote.setText(String.valueOf(bd.floatValue()));
+        });
+        dbHelper.getNumberOfRatings(book.getId()).addOnSuccessListener(list ->{
+            String numberOfRatingsStr = String.valueOf(list.get(0));
+            numberOfRatingsStr+=" Reviews";
+            ratingNumber.setText(numberOfRatingsStr);
+            rating1.setProgress(list.get(1));
+            rating2.setProgress(list.get(2));
+            rating3.setProgress(list.get(3));
+            rating4.setProgress(list.get(4));
+            rating5.setProgress(list.get(5));
+        });
 
     }
 

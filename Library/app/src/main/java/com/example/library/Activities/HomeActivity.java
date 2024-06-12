@@ -3,14 +3,14 @@ package com.example.library.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Interfaces.OnItemClickListener;
-import com.example.library.Models.User;
+import com.example.library.Models.DB.User;
 import com.example.library.R;
 //import com.example.library.Recomandation.RecommendationEngine;
 //import com.example.library.Recomandation.RecommendationHelper;
@@ -18,10 +18,8 @@ import com.example.library.Recomandation.Recommender;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.example.library.Adapters.LibraryBookAdapter;
-import com.example.library.Database.DatabaseHelper;
-import com.example.library.Models.Book;
+import com.example.library.Models.DB.Book;
 
-import java.io.Serializable;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements OnItemClickListener {
@@ -37,20 +35,51 @@ public class HomeActivity extends AppCompatActivity implements OnItemClickListen
     RecyclerView popularRecyclerView;
     RecyclerView newRecyclerView;
     User user;
+    private FirebaseDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        DatabaseHelper dbHelper = new DatabaseHelper(HomeActivity.this);
-        user = dbHelper.getUserById(MainActivity.sharedPreferences.getInt("user_id", -1));
-        /*SQLiteDatabase db = dbHelper.getWritableDatabase();
-        dbHelper.onUpgrade(db,1,2);*/
-        popularBooks = dbHelper.getPopularBooks();
-        newBooks = dbHelper.getNewBooks();
+        dbHelper = new FirebaseDatabaseHelper();
+//        FirebaseMockData mock = new FirebaseMockData();
+//        mock.insertMockData();
 
-        Recommender recommender = new Recommender(dbHelper);
-        recommBooks = recommender.recommendedBooks(user);
+
+
+        dbHelper.getPopularBooks().addOnSuccessListener(popularBooks->{
+                popularRecyclerView = findViewById(R.id.PopularBooksRecyclerView);
+                popularRecyclerView.setHasFixedSize(true);
+                popularRecyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this, LinearLayoutManager.HORIZONTAL,false));
+                LibraryBookAdapter adapterPopular = new LibraryBookAdapter(popularBooks, this);
+                popularRecyclerView.setAdapter(adapterPopular);
+        });
+
+        Recommender recommender = new Recommender();
+        recommender.recommendedBooks(MainActivity.sharedPreferences.getString("user_id", null), l ->{
+            recommRecyclerView = findViewById(R.id.RecomendedBooksRecyclerView);
+            recommRecyclerView.setHasFixedSize(true);
+            recommRecyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this, LinearLayoutManager.HORIZONTAL,false));
+            LibraryBookAdapter adapterRecomm = new LibraryBookAdapter(l,this);
+            recommRecyclerView.setAdapter(adapterRecomm);
+            System.out.println("it's done");
+        });
+
+
+        System.out.println("i m kinda here");
+        dbHelper.getNewBooks().addOnSuccessListener(l ->{
+            System.out.println(l.size());
+            for(Book book: l){
+                System.out.println(book.getName());
+            }
+            newBooks = l;
+            newRecyclerView = findViewById(R.id.NewBooksRecyclerView);
+            newRecyclerView.setHasFixedSize(true);
+            newRecyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this, LinearLayoutManager.HORIZONTAL,false));
+            LibraryBookAdapter adapterNew = new LibraryBookAdapter(newBooks, this);
+            newRecyclerView.setAdapter(adapterNew);
+        });
+
 
         homeActionButton = findViewById(R.id.homeActionButton);
         searchActionButton = findViewById(R.id.searchActionButton);
@@ -58,24 +87,6 @@ public class HomeActivity extends AppCompatActivity implements OnItemClickListen
         messagesActionButton = findViewById(R.id.messagesActionButton);
         userActionButton = findViewById(R.id.userActionButton);
 
-        recommRecyclerView = findViewById(R.id.RecomendedBooksRecyclerView);
-        recommRecyclerView.setHasFixedSize(true);
-        recommRecyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this, LinearLayoutManager.HORIZONTAL,false));
-        LibraryBookAdapter adapterRecomm = new LibraryBookAdapter(recommBooks,this);
-        recommRecyclerView.setAdapter(adapterRecomm);
-
-
-        popularRecyclerView = findViewById(R.id.PopularBooksRecyclerView);
-        popularRecyclerView.setHasFixedSize(true);
-        popularRecyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this, LinearLayoutManager.HORIZONTAL,false));
-        LibraryBookAdapter adapterPopular = new LibraryBookAdapter(popularBooks, this);
-        popularRecyclerView.setAdapter(adapterPopular);
-
-        newRecyclerView = findViewById(R.id.NewBooksRecyclerView);
-        newRecyclerView.setHasFixedSize(true);
-        newRecyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this, LinearLayoutManager.HORIZONTAL,false));
-        LibraryBookAdapter adapterNew = new LibraryBookAdapter(newBooks, this);
-        newRecyclerView.setAdapter(adapterNew);
 
         homeActionButton.setOnClickListener(new View.OnClickListener() {
             @Override

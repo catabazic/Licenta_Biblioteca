@@ -1,12 +1,22 @@
-package com.example.library.Models;
+package com.example.library.Models.DB;
 
 public class View {
+    String ID;
+
     private int userId;
     private int bookId;
     private String date;
     private String time;
 
     public View() {
+    }
+
+    public String getID() {
+        return ID;
+    }
+
+    public void setID(String ID) {
+        this.ID = ID;
     }
 
     // Getters and Setters

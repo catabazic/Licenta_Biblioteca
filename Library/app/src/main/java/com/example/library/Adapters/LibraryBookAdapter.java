@@ -3,17 +3,19 @@ package com.example.library.Adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Interfaces.OnItemClickListener;
-import com.example.library.Models.Author;
 import com.example.library.R;
 
 import java.io.IOException;
@@ -21,8 +23,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
 
-import com.example.library.Models.Book;
+import com.example.library.Models.DB.Book;
 
 public class LibraryBookAdapter  extends RecyclerView.Adapter<LibraryBookAdapter.ViewHolder> {
     private List<Book> mBooks;
@@ -56,6 +60,7 @@ public class LibraryBookAdapter  extends RecyclerView.Adapter<LibraryBookAdapter
                 if (position != RecyclerView.NO_POSITION) {
                     System.out.println("i guess i should be here");
                     Book clickedBook = mBooks.get(position); // Retrieve the clicked book
+                    System.out.println(clickedBook.getName());
                     listener.onItemClick(clickedBook); // Pass the clicked book to the listener
                 }
             }
@@ -75,6 +80,7 @@ public class LibraryBookAdapter  extends RecyclerView.Adapter<LibraryBookAdapter
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Book book = mBooks.get(position);
         String imageUrl = book.getImage();
+
         Bitmap bitmap = null;
         try {
             bitmap = BitmapFactory.decodeStream((InputStream) new URL(imageUrl).getContent());
@@ -84,17 +90,41 @@ public class LibraryBookAdapter  extends RecyclerView.Adapter<LibraryBookAdapter
         }
 
         holder.bookNameTextView.setText(book.getName());
-        Set<Author> authors = book.getAuthors();
-        String aut= null;
-        for(Author author: authors){
-            if(aut == null){
-                aut = author.getName();
-            }else{
-                aut+= " & " + author.getName();
+
+        FirebaseDatabaseHelper database = new FirebaseDatabaseHelper();
+        Set<String> authors = book.getAuthors();
+        StringBuilder aut = new StringBuilder();
+        CountDownLatch latch = new CountDownLatch(authors.size());
+
+        // Run database operations in a background thread
+        Executors.newSingleThreadExecutor().execute(() -> {
+            for (String id : authors) {
+                database.getAuthorById(id, author -> {
+                    synchronized (aut) {
+                        if (author != null) {
+                            if (aut.length() == 0) {
+                                aut.append(author.getName());
+                            } else {
+                                aut.append(" & ").append(author.getName());
+                            }
+                        }
+                        latch.countDown();
+                    }
+                });
             }
-        }
-        holder.authorTextView.setText(aut);
+
+            try {
+                latch.await();
+                // Post the result back to the main thread
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    holder.authorTextView.setText(aut.toString());
+                });
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
     }
+
 
     @Override
     public int getItemCount() {

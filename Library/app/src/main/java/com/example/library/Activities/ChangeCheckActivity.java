@@ -1,7 +1,6 @@
 package com.example.library.Activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -11,8 +10,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.library.Database.DatabaseHelper;
-import com.example.library.Models.User;
+import com.example.library.Database.FirebaseDatabaseHelper;
+import com.example.library.Models.DB.User;
 import com.example.library.R;
 
 public class ChangeCheckActivity extends AppCompatActivity {
@@ -21,14 +20,14 @@ public class ChangeCheckActivity extends AppCompatActivity {
     private EditText number;
     private Button button;
     private TextView text;
-    private DatabaseHelper dbHelper;
+    private FirebaseDatabaseHelper dbHelper;
     private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_check);
-        dbHelper = new DatabaseHelper(this);
+        dbHelper = new FirebaseDatabaseHelper();
 
         back = findViewById(R.id.BackTxt);
         number = findViewById(R.id.numberCheck);
@@ -57,8 +56,9 @@ public class ChangeCheckActivity extends AppCompatActivity {
                     int storedRandomNumber = MainActivity.sharedPreferences.getInt("mailChange", -1);
                     if(Integer.parseInt(number.getText().toString()) == storedRandomNumber){
                         if(((String) intent.getSerializableExtra("page")).equals("change")) {
-                            dbHelper.changeEmail(MainActivity.sharedPreferences.getInt("user_id", -1), finalEmail);
-                            startActivity(new Intent(ChangeCheckActivity.this, ProfileEditActivity.class));
+                            dbHelper.changeEmail(MainActivity.sharedPreferences.getString("user_id", null), finalEmail).addOnSuccessListener(a->{
+                                startActivity(new Intent(ChangeCheckActivity.this, ProfileEditActivity.class));
+                            });
                         }else if(((String) intent.getSerializableExtra("page")).equals("register")){
                             String name = (String) intent.getSerializableExtra("name");
                             String number = (String) intent.getSerializableExtra("number");

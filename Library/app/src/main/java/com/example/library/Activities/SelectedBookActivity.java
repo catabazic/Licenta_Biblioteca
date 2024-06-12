@@ -3,6 +3,8 @@ package com.example.library.Activities;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -13,17 +15,21 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.library.Database.DatabaseHelper;
-import com.example.library.Models.Author;
-import com.example.library.Models.Book;
-import com.example.library.Models.Genre;
+import com.example.library.Database.FirebaseDatabaseHelper;
+import com.example.library.Models.DB.Author;
+import com.example.library.Models.DB.Book;
+import com.example.library.Models.DB.Genre;
 import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 
 public class SelectedBookActivity extends AppCompatActivity {
     FloatingActionButton homeActionButton;
@@ -51,7 +57,7 @@ public class SelectedBookActivity extends AppCompatActivity {
     private ProgressBar rating1;
 
     private RatingBar ratingBar;
-    private DatabaseHelper dbHelper;
+    private FirebaseDatabaseHelper dbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +66,7 @@ public class SelectedBookActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if(intent != null) {
             book = (Book) intent.getSerializableExtra("book");
+            System.out.println("we are here : " + book.getName());
         }
 
         homeActionButton = findViewById(R.id.homeActionButton);
@@ -89,11 +96,14 @@ public class SelectedBookActivity extends AppCompatActivity {
         BookDescriptionTxt = findViewById(R.id.BookDescriptionTxt);
         reservButton = findViewById(R.id.BookReservationBtn);
 
-        dbHelper = new DatabaseHelper(SelectedBookActivity.this);
+        dbHelper = new FirebaseDatabaseHelper();
         updateUI(book);
-        if(dbHelper.isBookBorrowed(MainActivity.sharedPreferences.getInt("user_id",-1),book.getId())){
-            reservButton.setText("Read Book");
-        }
+        dbHelper.isBookBorrowed(MainActivity.sharedPreferences.getString("user_id",null),book.getId()).addOnSuccessListener(b->{
+            if(b){
+                reservButton.setText("Read Book");
+            }
+        });
+        System.out.println("we know if book is borrowed");
 
 
         seeAllRatings.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +112,6 @@ public class SelectedBookActivity extends AppCompatActivity {
                 Intent intent = new Intent(SelectedBookActivity.this, ReviewsBookAllActivity.class);
                 intent.putExtra("book",book);
                 startActivity(intent);
-                finish();
             }
         });
 
@@ -119,13 +128,16 @@ public class SelectedBookActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
-                if(dbHelper.isBookBorrowed(MainActivity.sharedPreferences.getInt("user_id",-1),book.getId())){
+                dbHelper.isBookBorrowed(MainActivity.sharedPreferences.getString("user_id",null),book.getId()).addOnSuccessListener(b->{
+                    if(b) {
 
-                }else {
-                    dbHelper.borrowBook(book.getId(), MainActivity.sharedPreferences.getInt("user_id", -1));
-                    reservButton.setText("Read Book");
-                    BookAvailabilityTxt.setText("Disponibilitate: " + String.valueOf(book.getDisponible()-1));
-                }
+                    }else{
+                        dbHelper.borrowBook(book.getId(), MainActivity.sharedPreferences.getString("user_id",null));
+                        reservButton.setText("Read Book");
+                        String disp = "Disponibilitate: " + String.valueOf(book.getDisponible()-1);
+                        BookAvailabilityTxt.setText(disp);
+                    }
+                });
             }
         });
 
@@ -175,52 +187,143 @@ public class SelectedBookActivity extends AppCompatActivity {
             }
         });
 
+        System.out.println("we are at the end");
+
     }
 
     private void updateUI(Book book) {
+        // Update text views immediately if possible
         chatNameTxt.setText(book.getName());
-
         BookNameTxt.setText(book.getName());
-
-        Set<Author> authors = book.getAuthors();
-        String aut= null;
-        for(Author author: authors){
-            if(aut == null){
-                aut = author.getName();
-            }else{
-                aut+= " & " + author.getName();
-            }
-        }
-        BookAuthorTxt.setText(aut);
-
-        Set<Genre> genres = book.getGenres();
-        String gen= null;
-        for(Genre genre: genres){
-            if(gen == null){
-                gen = genre.getName();
-            }else{
-                gen+= " & " + genre.getName();
-            }
-        }
-        BookGenreTxt.setText(gen);
         BookAvailabilityTxt.setText("Disponibilitate: " + book.getDisponible());
         BookDescriptionTxt.setText(book.getDescription());
 
+        Set<String> authors = book.getAuthors();
+        Set<String> genres = book.getGenres();
 
-        BigDecimal bd = new BigDecimal(dbHelper.getRatingOfBook(book.getId()));
-        bd = bd.setScale(2, RoundingMode.HALF_UP);
-        ratingNote.setText(String.valueOf(bd.floatValue()));
+        StringBuilder autBuilder = new StringBuilder();
+        List<CompletableFuture<Author>> futures = new ArrayList<>();
 
-        List<Integer> list = dbHelper.getNumberOfRatings(book.getId());
-        String numberOfRatingsStr = String.valueOf(list.get(0));
-        numberOfRatingsStr+=" Reviews";
-        ratingNumber.setText(numberOfRatingsStr);
-        System.out.println(list.get(0) + ", " + list.get(1) + ", " + list.get(2) + ", " +list.get(3) + ", " +list.get(4) + ", " +list.get(5));
-        rating1.setProgress(list.get(1));
-        rating2.setProgress(list.get(2));
-        rating3.setProgress(list.get(3));
-        rating4.setProgress(list.get(4));
-        rating5.setProgress(list.get(5));
+        // Collect all futures
+        for (String id : authors) {
+            CompletableFuture<Author> futureAuthor = new CompletableFuture<>();
+            dbHelper.getAuthorById(id, futureAuthor::complete);
+            futures.add(futureAuthor);
+        }
 
+        // Combine all futures
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenRun(() -> {
+            for (CompletableFuture<Author> future : futures) {
+                try {
+                    Author author = future.get();
+                    if (autBuilder.length() > 0) {
+                        autBuilder.append(" & ");
+                    }
+                    autBuilder.append(author.getName());
+                } catch (ExecutionException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            BookAuthorTxt.setText(autBuilder.toString());
+        });
+
+        StringBuilder gen = new StringBuilder();
+        List<CompletableFuture<Genre>> futuresG = new ArrayList<>();
+
+        // Collect all futures
+        for (String id : genres) {
+            CompletableFuture<Genre> futureGenre = new CompletableFuture<>();
+            dbHelper.getGenreById(id, futureGenre::complete);
+            futuresG.add(futureGenre);
+        }
+
+        // Combine all futures
+        CompletableFuture.allOf(futuresG.toArray(new CompletableFuture[0])).thenRun(() -> {
+            for (CompletableFuture<Genre> future : futuresG) {
+                try {
+                    Genre genre = future.get();
+                    if (gen.length() > 0) {
+                        gen.append(" & ");
+                    }
+                    gen.append(genre.getName());
+                } catch (ExecutionException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            BookGenreTxt.setText(gen.toString());
+        });
+
+       /* if (authors == null || genres == null) {
+            System.out.println("authors or genres are null");
+        } else {
+            System.out.println("these are not null");
+
+            StringBuilder aut = new StringBuilder();
+            StringBuilder gen = new StringBuilder();
+            CountDownLatch latch = new CountDownLatch(authors.size() + genres.size());
+
+            // Fetch authors
+            for (String id : authors) {
+                dbHelper.getAuthorById(id, author -> {
+                    if (author != null) {
+                        if (aut.length() > 0) {
+                            aut.append(" & ");
+                        }
+                        aut.append(author.getName());
+                    }
+                    System.out.println("we are inside authors");
+                    latch.countDown(); // Ensure count down even in case of null author
+                });
+            }
+
+            // Fetch genres
+            for (String id : genres) {
+                dbHelper.getGenreById(id, genre -> {
+                    if (genre != null) {
+                        if (gen.length() > 0) {
+                            gen.append(" & ");
+                        }
+                        gen.append(genre.getName());
+                    }
+                    System.out.println("we are inside genres");
+                    latch.countDown(); // Ensure count down even in case of null genre
+                });
+            }
+
+            // Update UI once all data is fetched
+            new Handler(Looper.getMainLooper()).post(() -> {
+                try {
+                    latch.await();
+                    // Update UI on the main thread
+                    BookAuthorTxt.setText(aut.toString());
+                    BookGenreTxt.setText(gen.toString());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+        }*/
+
+
+        // Fetch and update rating and review details
+        dbHelper.getRatingOfBook(book.getId()).addOnSuccessListener(f -> {
+            BigDecimal bd = new BigDecimal(f).setScale(2, RoundingMode.HALF_UP);
+            ratingNote.setText(String.valueOf(bd.floatValue()));
+        });
+        System.out.println("we set ratings");
+
+        dbHelper.getNumberOfRatings(book.getId()).addOnSuccessListener(l -> {
+            if (l.size() >= 6) {
+                ratingNumber.setText(l.get(0) + " Reviews");
+                rating1.setProgress(l.get(1));
+                rating2.setProgress(l.get(2));
+                rating3.setProgress(l.get(3));
+                rating4.setProgress(l.get(4));
+                rating5.setProgress(l.get(5));
+            }
+            System.out.println("we are inside of ratings");
+        });
+        System.out.println("we set ratings x2");
     }
+
+
 }

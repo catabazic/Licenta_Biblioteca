@@ -11,14 +11,13 @@ import android.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.library.Adapters.SearchBookAdapter;
 import com.example.library.Adapters.SearchUserAdapter;
-import com.example.library.Database.DatabaseHelper;
+
+import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Interfaces.OnItemClickListener;
-import com.example.library.Models.Book;
-import com.example.library.Models.User;
+import com.example.library.Models.DB.Book;
+import com.example.library.Models.DB.User;
 import com.example.library.R;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,7 @@ public class SearchUserActivity extends Activity implements OnItemClickListener 
     private ImageButton backButton;
     private SearchUserAdapter adapter;
     private List<User> userList;
-    private DatabaseHelper dbHelper;
+    private FirebaseDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +41,7 @@ public class SearchUserActivity extends Activity implements OnItemClickListener 
         searchView.clearFocus();
         listView = findViewById(R.id.SearchResults);
         listView.setLayoutManager(new LinearLayoutManager(this));
-        dbHelper = new DatabaseHelper(this);
+        dbHelper = new FirebaseDatabaseHelper();
 
         userList = new ArrayList<>();
         adapter = new SearchUserAdapter(userList, this);
@@ -51,15 +50,31 @@ public class SearchUserActivity extends Activity implements OnItemClickListener 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                userList = dbHelper.getUserSearch(query, MainActivity.sharedPreferences.getInt("user_id", -1));
-                adapter.updateData(userList);
+                dbHelper.getUsersSearch(query).addOnSuccessListener(l->{
+                    System.out.println("It s all right");
+                    System.out.println(l.size());
+                    for (User book : l) {
+                        System.out.println(book.getName());
+                    }
+                    adapter.updateData(l);
+                }).addOnFailureListener(e->{
+                    System.out.println(e);
+                });
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                userList = dbHelper.getUserSearch(newText, MainActivity.sharedPreferences.getInt("user_id", -1));
-                adapter.updateData(userList);
+                dbHelper.getUsersSearch(newText).addOnSuccessListener(l->{
+                    System.out.println("It s all right");
+                    System.out.println(l.size());
+                    for (User book : l) {
+                        System.out.println(book.getName());
+                    }
+                    adapter.updateData(l);
+                }).addOnFailureListener(e->{
+                    System.out.println(e);
+                });
                 return true;
             }
         });

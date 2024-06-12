@@ -1,4 +1,4 @@
-package com.example.library.Models;
+package com.example.library.Models.DB;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -6,19 +6,28 @@ import java.util.List;
 import java.util.Set;
 
 public class Book implements Serializable {
-    private int id;
+    private String ID;
     private String name;
     private String image;
     private String description;
     private int disponible;
-    private Set<Author> authors;
-    private Set<Genre> genres;
-    private String state;
-    private String retur;
+    private Set<String> authors;
+    private Set<String> genres;
+//    private String state;
+//    private String retur;
+    private String date;
 
     public Book() {
         authors = new HashSet<>();
         genres  = new HashSet<>();
+    }
+
+    public String getId() {
+        return ID;
+    }
+
+    public void setId(String ID) {
+        this.ID = ID;
     }
 
     public void resetAuthors(){
@@ -29,49 +38,49 @@ public class Book implements Serializable {
         this.genres.clear();
     }
 
-    public void setAuthors(List<Author> authors) {
-        for(Author author : authors){
+    public String getDateRelease() {
+        return date;
+    }
+
+    public void setDateRelease(String dateRelease) {
+        this.date = dateRelease;
+    }
+
+    public void setAuthors(List<String> authors) {
+        for(String author : authors){
             this.authors.add(author);
         }
     }
 
-    public void setGenres(List<Genre> genres) {
-        for(Genre genre : genres){
+    public void setGenres(List<String> genres) {
+        for(String genre : genres){
             this.genres.add(genre);
         }
     }
 
-    public Set<Author> getAuthors() {
+    public Set<String> getAuthors() {
         return authors;
     }
 
-    public Set<Genre> getGenres() {
+    public Set<String> getGenres() {
         return genres;
     }
 
-    public int getId() {
-        return id;
-    }
+//    public String getRetur() {
+//        return retur;
+//    }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getRetur() {
-        return retur;
-    }
-
-    public void setRetur(String retur) {
-        this.retur = retur;
-    }
+//    public void setRetur(String retur) {
+//        this.retur = retur;
+//    }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setState(String state) {
-        this.state = state;
-    }
+//    public void setState(String state) {
+//        this.state = state;
+//    }
     public void setDescription(String description) {
         this.description = description;
     }
@@ -99,8 +108,8 @@ public class Book implements Serializable {
         return image;
     }
 
-    public String getState() {
-        return state;
-    }
+//    public String getState() {
+//        return state;
+//    }
 }
 

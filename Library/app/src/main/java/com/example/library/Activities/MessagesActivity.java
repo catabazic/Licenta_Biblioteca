@@ -9,11 +9,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.library.Adapters.BookAdapter;
 import com.example.library.Adapters.ChatAdapter;
-import com.example.library.Database.DatabaseHelper;
+import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Interfaces.OnItemClickListener;
-import com.example.library.Models.Book;
 import com.example.library.Models.Chat;
 import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -32,11 +30,13 @@ public class MessagesActivity extends AppCompatActivity implements OnItemClickLi
     private ChatAdapter adapter;
     private List<Chat> chatList;
 
+    private FirebaseDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_messages);
+        dbHelper = new FirebaseDatabaseHelper();
 
         homeActionButton = findViewById(R.id.homeActionButton);
         searchActionButton = findViewById(R.id.searchActionButton);
@@ -104,10 +104,11 @@ public class MessagesActivity extends AppCompatActivity implements OnItemClickLi
     }
 
     private void loadChats() {
-        DatabaseHelper dbHelper = new DatabaseHelper(MessagesActivity.this);
-        chatList = dbHelper.getChats(MainActivity.sharedPreferences.getInt("user_id", -1));
-        adapter = new ChatAdapter(chatList, this);
-        recyclerView.setAdapter(adapter);
+        dbHelper.getChats(MainActivity.sharedPreferences.getString("user_id", null), chats -> {
+            chatList = chats;
+            adapter = new ChatAdapter(chatList, this);
+            recyclerView.setAdapter(adapter);
+        });
     }
 
     @Override

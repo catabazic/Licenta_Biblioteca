@@ -3,11 +3,10 @@ package com.example.library.Activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,9 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.Adapters.SearchBookAdapter;
-import com.example.library.Database.DatabaseHelper;
+import com.example.library.Database.FirebaseDatabaseHelper;
+import com.example.library.Database.FirestoreCallback;
 import com.example.library.Interfaces.OnItemClickListener;
-import com.example.library.Models.Book;
+import com.example.library.Models.DB.Author;
+import com.example.library.Models.DB.Book;
 import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -34,7 +35,7 @@ public class SearchActivity extends AppCompatActivity implements OnItemClickList
     private RecyclerView listView;
     private SearchBookAdapter adapter;
     private List<Book> bookList;
-    private DatabaseHelper dbHelper;
+    private FirebaseDatabaseHelper dbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +51,7 @@ public class SearchActivity extends AppCompatActivity implements OnItemClickList
         searchView.clearFocus();
         listView = findViewById(R.id.SearchResults);
         listView.setLayoutManager(new LinearLayoutManager(this));
-        dbHelper = new DatabaseHelper(this);
+        dbHelper = new FirebaseDatabaseHelper();
 
         bookList = new ArrayList<>();
         adapter = new SearchBookAdapter(bookList, this);
@@ -59,15 +60,31 @@ public class SearchActivity extends AppCompatActivity implements OnItemClickList
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                bookList = dbHelper.getBooksSearch(query);
-                adapter.updateData(bookList);
+                dbHelper.getBooksSearch(query).addOnSuccessListener( l ->{
+                    System.out.println("It s all right");
+                    for (Book book : l) {
+                        System.out.println(book.getName());
+                    }
+                    adapter.updateData(l);
+                }).addOnFailureListener(l->{
+                    System.out.println("there is something wrong");
+                });
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                bookList = dbHelper.getBooksSearch(newText);
-                adapter.updateData(bookList);
+                dbHelper.getBooksSearch(newText).addOnSuccessListener( l ->{
+                    System.out.println("It s all right");
+                    System.out.println(l.size());
+                    for (Book book : l) {
+                        System.out.println(book.getName());
+                    }
+                    adapter.updateData(l);
+                }).addOnFailureListener(l->{
+                    System.out.println("there is something wrong");
+                });
+                System.out.println("I am out");
                 return true;
             }
         });
@@ -140,5 +157,9 @@ public class SearchActivity extends AppCompatActivity implements OnItemClickList
             }
         }
         return super.dispatchTouchEvent(event);
+    }
+
+    private void searchBooks(String query) {
+
     }
 }

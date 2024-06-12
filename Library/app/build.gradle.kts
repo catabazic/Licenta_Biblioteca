@@ -10,6 +10,7 @@ val DependencyHandlerScope.annotationProcessor: Unit
 
 plugins {
     alias(libs.plugins.androidApplication)
+    id("com.google.gms.google-services")
 //    alias(libs.plugins.chaquopy)
 }
 
@@ -78,6 +79,10 @@ dependencies {
     implementation(libs.jakarta.mail)
     implementation(libs.jakarta.mail.activation)
     implementation("androidx.room:room-runtime:2.6.1")
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.database)
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     testImplementation(libs.junit);
     androidTestImplementation(libs.ext.junit);

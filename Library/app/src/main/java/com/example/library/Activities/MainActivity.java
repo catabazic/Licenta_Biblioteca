@@ -11,11 +11,9 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.library.Database.DatabaseHelper;
-import com.example.library.Models.User;
+import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.R;
 import com.example.library.Server.AlarmReceiver;
-import com.example.library.Server.MyBackgroundService;
 
 import java.util.Calendar;
 
@@ -23,14 +21,15 @@ public class MainActivity extends AppCompatActivity {
 
     private Button loginButton;
     private Button registerButton;
-    public static final String SHARED_PREFS="sharedPrefs";
+    public static final String SHARED_PREFS="com.example.library";
     public static SharedPreferences sharedPreferences;
+    private FirebaseDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        DatabaseHelper dbHelper = new DatabaseHelper(MainActivity.this);
+        dbHelper = new FirebaseDatabaseHelper();
 //        dbHelper.insertMockData();
 //        scheduleNotification(this);
 
@@ -38,18 +37,19 @@ public class MainActivity extends AppCompatActivity {
 //        startService(serviceIntent);
 
         sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        User user = dbHelper.getUserById(sharedPreferences.getInt("user_id",-1));
-        if(user==null){
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("isLoggedIn",false);
-            editor.putInt("user_id", -1);
-            editor.apply();
-        }
-        boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
-        if (isLoggedIn) {
-            startActivity(new Intent(MainActivity.this, HomeActivity.class));
-            finish();
-        }
+        dbHelper.getUserById(MainActivity.sharedPreferences.getString("user_id", null), user -> {
+            if(user==null){
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("isLoggedIn",false);
+                editor.putString("user_id", null);
+                editor.apply();
+            }
+            boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+            if (isLoggedIn) {
+                startActivity(new Intent(MainActivity.this, HomeActivity.class));
+                finish();
+            }
+        });
 
 
         loginButton = findViewById(R.id.loginButton);

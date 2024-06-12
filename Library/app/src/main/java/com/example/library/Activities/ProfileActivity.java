@@ -9,8 +9,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.library.Database.DatabaseHelper;
-import com.example.library.Models.User;
+import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -26,6 +25,7 @@ public class ProfileActivity extends AppCompatActivity {
     Button myRewievs;
     Button logout;
     TextView name;
+    private FirebaseDatabaseHelper dbHelper;
 
 
 
@@ -33,6 +33,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_profile);
+        dbHelper = new FirebaseDatabaseHelper();
 
         homeActionButton = findViewById(R.id.homeActionButton);
         searchActionButton = findViewById(R.id.searchActionButton);
@@ -134,8 +135,8 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void editProfile(){
-        DatabaseHelper dbHelper = new DatabaseHelper(ProfileActivity.this);
-        User user = dbHelper.getUserById(MainActivity.sharedPreferences.getInt("user_id",-1));
-        name.setText(user.getName());
+        dbHelper.getUserById(MainActivity.sharedPreferences.getString("user_id", null), user -> {
+            name.setText(user.getName());
+        });
     }
 }

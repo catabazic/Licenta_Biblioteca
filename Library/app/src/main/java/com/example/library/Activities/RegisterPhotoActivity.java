@@ -9,13 +9,14 @@ import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.library.Database.DatabaseHelper;
+
+import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.R;
 
 public class RegisterPhotoActivity  extends AppCompatActivity {
     private TextView changePhoto;
     private Button button;
-    private DatabaseHelper dbHelper;
+    private FirebaseDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +24,7 @@ public class RegisterPhotoActivity  extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register_photo);
 
-        dbHelper = new DatabaseHelper(RegisterPhotoActivity.this);
+        dbHelper = new FirebaseDatabaseHelper();
         changePhoto = findViewById(R.id.photoBtn);
         button = findViewById(R.id.RegisterBtn);
 

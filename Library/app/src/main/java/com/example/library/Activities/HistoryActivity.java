@@ -11,20 +11,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.Adapters.BookAdapter;
-import com.example.library.Database.DatabaseHelper;
+import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Interfaces.OnItemClickListener;
-import com.example.library.Models.Book;
+import com.example.library.Models.DB.Book;
 import com.example.library.R;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
 public class HistoryActivity extends AppCompatActivity implements OnItemClickListener {
     private RecyclerView recyclerView; //booksRecView
     private BookAdapter adapter;
-    private List<Book> bookList;
     private ImageButton backButton;
     private TextView text;
+    private FirebaseDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +47,31 @@ public class HistoryActivity extends AppCompatActivity implements OnItemClickLis
         bookList.add(new Book("Another Book", "Another Author", "Another State"));*/
 
 
-        DatabaseHelper dbHelper = new DatabaseHelper(HistoryActivity.this);
+        dbHelper = new FirebaseDatabaseHelper();
         if(type.equals("history")) {
-            bookList = dbHelper.getAllHistory(MainActivity.sharedPreferences.getInt("user_id", -1));
+            dbHelper.getAllHistory(MainActivity.sharedPreferences.getString("user_id", null)).addOnSuccessListener(l ->{
+                System.out.println("at leas i am here");
+                System.out.println(l.size());
+                for(Book book: l){
+                    System.out.println(book.getName());
+                }
+                adapter = new BookAdapter(l, this);
+                recyclerView.setAdapter(adapter);
+            }).addOnFailureListener(t->{
+                System.out.println(t);
+            });
         }else if (type.equals("my books")){
-            bookList = dbHelper.getBorrowedBooks(MainActivity.sharedPreferences.getInt("user_id",-1));
+            dbHelper.getBorrowedBooks(MainActivity.sharedPreferences.getString("user_id",null)).addOnSuccessListener(l ->{
+                System.out.println("at leas i am here");
+                System.out.println(l.size());
+                for(Book book: l){
+                    System.out.println(book.getName());
+                }
+                adapter = new BookAdapter(l, this);
+                recyclerView.setAdapter(adapter);
+            });
             text.setText("Your books");
         }
-        adapter = new BookAdapter(bookList, this);
-        recyclerView.setAdapter(adapter);
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,7 +84,6 @@ public class HistoryActivity extends AppCompatActivity implements OnItemClickLis
 
     @Override
     public void onItemClick(Object book) {
-        DatabaseHelper dbHelper = new DatabaseHelper(HistoryActivity.this);
         Book thisBook = (Book) book;
 //        dbHelper.getBookByNameAndAuthor(thisBook.getName(), thisBook.getAuthors());
         Intent intent = new Intent(HistoryActivity.this, SelectedBookActivity.class);

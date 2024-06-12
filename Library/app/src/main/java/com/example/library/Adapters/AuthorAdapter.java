@@ -9,7 +9,7 @@ import android.widget.TextView;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.library.Models.Author;
+import com.example.library.Models.DB.Author;
 import com.example.library.R;
 
 import java.util.HashSet;
@@ -23,7 +23,7 @@ public class AuthorAdapter extends RecyclerView.Adapter<AuthorAdapter.AuthorView
     }
 
     private List<Author> authors;
-    private Set<Integer> selectedAuthors;
+    private Set<String> selectedAuthors;
     private OnAuthorSelectedListener listener;
 
     public AuthorAdapter(List<Author> authors, OnAuthorSelectedListener listener) {

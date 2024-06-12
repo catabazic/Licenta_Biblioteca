@@ -7,23 +7,29 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Interfaces.OnItemClickListener;
-import com.example.library.Models.Author;
+import com.example.library.Models.DB.Author;
 import com.example.library.R;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
-import com.example.library.Models.Book;
+import com.example.library.Models.DB.Book;
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> {
     private List<Book> bookList;
     private OnItemClickListener listener;
+    private List<String> returns;
     private int[] colors = {0x5BFFFFFF,0xA6FFFFFF};
 
     public BookAdapter(List<Book> bookList, OnItemClickListener listener) {
         this.bookList = bookList;
         this.listener=listener;
+//        this.returns = returns;
     }
 
     public class BookViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -66,21 +72,40 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
         Book book = bookList.get(position);
         holder.bookName.setText(book.getName());
-        Set<Author> authors = book.getAuthors();
-        String aut= null;
-        for(Author author: authors){
-            if(aut == null){
-                aut = author.getName();
-            }else{
-                aut+= " & " + author.getName();
-            }
+        Set<String> authors = book.getAuthors();
+        FirebaseDatabaseHelper database = new FirebaseDatabaseHelper();
+
+        // Use StringBuilder for efficient string concatenation
+        StringBuilder autBuilder = new StringBuilder();
+        List<CompletableFuture<Author>> futures = new ArrayList<>();
+
+        // Collect all futures
+        for (String id : authors) {
+            CompletableFuture<Author> futureAuthor = new CompletableFuture<>();
+            database.getAuthorById(id, futureAuthor::complete);
+            futures.add(futureAuthor);
         }
-        holder.bookAuthor.setText(aut);
-        holder.bookState.setText(book.getState());
-        holder.bookRetur.setText(book.getRetur());
-        int colorIndex=position % colors.length;
+
+        // Combine all futures
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenRun(() -> {
+            for (CompletableFuture<Author> future : futures) {
+                try {
+                    Author author = future.get();
+                    if (autBuilder.length() > 0) {
+                        autBuilder.append(" & ");
+                    }
+                    autBuilder.append(author.getName());
+                } catch (ExecutionException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            holder.bookAuthor.setText(autBuilder.toString());
+        });
+
+        int colorIndex = position % colors.length;
         holder.layout.setBackgroundColor(colors[colorIndex]);
     }
+
 
     @Override
     public int getItemCount() {

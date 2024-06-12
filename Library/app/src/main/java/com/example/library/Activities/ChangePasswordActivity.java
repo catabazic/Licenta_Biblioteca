@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.library.Database.DatabaseHelper;
+import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.R;
 
 public class ChangePasswordActivity extends AppCompatActivity {
@@ -20,7 +20,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
     private EditText password;
     private EditText passwordRepeat;
     private Button changeBtn;
-    private DatabaseHelper dbHelper;
+    private FirebaseDatabaseHelper dbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,7 +31,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
         password = findViewById(R.id.password);
         passwordRepeat = findViewById(R.id.passwordRepeat);
         changeBtn = findViewById(R.id.button);
-        dbHelper = new DatabaseHelper(ChangePasswordActivity.this);
+        dbHelper = new FirebaseDatabaseHelper();
 
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,17 +43,17 @@ public class ChangePasswordActivity extends AppCompatActivity {
         changeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isPasswordOk(password.getText().toString(),passwordRepeat.getText().toString()) &&
-                    dbHelper.isPasswordOk(MainActivity.sharedPreferences.getInt("user_id",-1), oldPassword.getText().toString())){
-                        dbHelper.changePassword(MainActivity.sharedPreferences.getInt("user_id",-1), password.getText().toString());
+                dbHelper.isPasswordOk(MainActivity.sharedPreferences.getString("user_id",null), oldPassword.getText().toString()).addOnSuccessListener(b->{
+                    if(isPasswordOk(password.getText().toString(),passwordRepeat.getText().toString()) && b){
+                        dbHelper.changePassword(MainActivity.sharedPreferences.getString("user_id",null), password.getText().toString());
                         startActivity(new Intent(ChangePasswordActivity.this, ProfileEditActivity.class));
                         finish();
                         Toast.makeText(ChangePasswordActivity.this, "You changed password", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(ChangePasswordActivity.this, "You password is incorect!", Toast.LENGTH_SHORT).show();
 
-                }else{
-                    Toast.makeText(ChangePasswordActivity.this, "You password is incorect!", Toast.LENGTH_SHORT).show();
-
-                }
+                    }
+                });
             }
         });
 

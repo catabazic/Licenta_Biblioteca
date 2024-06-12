@@ -1,11 +1,8 @@
 package com.example.library.Adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -13,9 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.Interfaces.OnItemClickListener;
-import com.example.library.Models.Book;
-import com.example.library.Models.Chat;
-import com.example.library.Models.User;
+import com.example.library.Models.DB.User;
 import com.example.library.R;
 
 import java.util.List;
