@@ -71,6 +71,8 @@ public class ReviewBookActivity extends AppCompatActivity {
 
                 if(verifyData()){
                     dbHelper.addReviewForABook(review).addOnSuccessListener(d->{
+                        Intent resultIntent = new Intent();
+                        setResult(RESULT_OK, resultIntent);
                         finish();
                     });
                 }

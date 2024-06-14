@@ -54,31 +54,6 @@ public class ReviewsBookAllActivity  extends AppCompatActivity {
         }
         recyclerView = findViewById(R.id.reviewsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        dbHelper.getAllReviewsOfBook(book.getId()).addOnSuccessListener(reviewList -> {
-            List<String> names = new ArrayList<>();
-            AtomicInteger pendingTasks = new AtomicInteger(reviewList.size());
-
-            for (Review review : reviewList) {
-                dbHelper.getUserById(review.getId_user(), user -> {
-                    if (user != null) {
-                        names.add(user.getName());
-                    } else {
-                        names.add("Unknown User");
-                    }
-
-                    // Check if all tasks are completed
-                    if (pendingTasks.decrementAndGet() == 0) {
-                        // All users fetched, update the RecyclerView
-                        adapter = new ReviewBookAdapter(reviewList, names);
-                        recyclerView.setAdapter(adapter);
-                        System.out.println("Reviews are here");
-                    }
-                });
-            }
-
-        }).addOnFailureListener(e -> {
-            System.out.println("There was a problem fetching reviews");
-        });
 
 
         backButton=findViewById(R.id.backBtn);
@@ -106,6 +81,8 @@ public class ReviewsBookAllActivity  extends AppCompatActivity {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent resultIntent = new Intent();
+                setResult(RESULT_OK, resultIntent);
                 finish();
             }
         });
@@ -136,6 +113,32 @@ public class ReviewsBookAllActivity  extends AppCompatActivity {
             rating3.setProgress(list.get(3));
             rating4.setProgress(list.get(4));
             rating5.setProgress(list.get(5));
+        });
+
+        dbHelper.getAllReviewsOfBook(book.getId()).addOnSuccessListener(reviewList -> {
+            List<String> names = new ArrayList<>();
+            AtomicInteger pendingTasks = new AtomicInteger(reviewList.size());
+
+            for (Review review : reviewList) {
+                dbHelper.getUserById(review.getId_user(), user -> {
+                    if (user != null) {
+                        names.add(user.getName());
+                    } else {
+                        names.add("Unknown User");
+                    }
+
+                    // Check if all tasks are completed
+                    if (pendingTasks.decrementAndGet() == 0) {
+                        // All users fetched, update the RecyclerView
+                        adapter = new ReviewBookAdapter(reviewList, names);
+                        recyclerView.setAdapter(adapter);
+                        System.out.println("Reviews are here");
+                    }
+                });
+            }
+
+        }).addOnFailureListener(e -> {
+            System.out.println("There was a problem fetching reviews");
         });
 
     }
