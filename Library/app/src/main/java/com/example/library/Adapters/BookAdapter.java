@@ -2,6 +2,7 @@ package com.example.library.Adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Interfaces.OnItemClickListener;
 import com.example.library.Models.DB.Author;
+import com.example.library.Models.DB.Loan;
 import com.example.library.R;
 
 import java.util.ArrayList;
@@ -19,15 +21,17 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import com.example.library.Models.DB.Book;
+import com.squareup.picasso.Picasso;
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> {
-    private List<Book> bookList;
+    private List<Loan> loanList;
     private OnItemClickListener listener;
     private List<String> returns;
     private int[] colors = {0x5BFFFFFF,0xA6FFFFFF};
+    FirebaseDatabaseHelper db;
 
-    public BookAdapter(List<Book> bookList, OnItemClickListener listener) {
-        this.bookList = bookList;
+    public BookAdapter(List<Loan> loanList, OnItemClickListener listener) {
+        this.loanList = loanList;
         this.listener=listener;
 //        this.returns = returns;
     }
@@ -38,9 +42,11 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         TextView bookState;
         TextView bookRetur;
         LinearLayout layout;
+        ImageView imageView;
 
         public BookViewHolder(View itemView) {
             super(itemView);
+            imageView = itemView.findViewById(R.id.imageView3);
             bookName = itemView.findViewById(R.id.BooksBookName);
             bookAuthor = itemView.findViewById(R.id.BooksBookAuthor);
             bookState = itemView.findViewById(R.id.BooksBookState);
@@ -54,8 +60,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
             if (listener != null) {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
-                    Book clickedBook = bookList.get(position); // Retrieve the clicked book
-                    listener.onItemClick(clickedBook); // Pass the clicked book to the listener
+                    db.getBookById(loanList.get(position).getBookId()).addOnSuccessListener(clickedBook->{
+                        listener.onItemClick(clickedBook);
+                    });
                 }
             }
         }
@@ -70,36 +77,48 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
-        Book book = bookList.get(position);
-        holder.bookName.setText(book.getName());
-        Set<String> authors = book.getAuthors();
-        FirebaseDatabaseHelper database = new FirebaseDatabaseHelper();
+        setState(holder,position);
+        db = new FirebaseDatabaseHelper();
+        db.getBookById(loanList.get(position).getBookId()).addOnSuccessListener(book->{
+            holder.bookName.setText(book.getName());
+            Set<String> authors = book.getAuthors();
 
-        // Use StringBuilder for efficient string concatenation
-        StringBuilder autBuilder = new StringBuilder();
-        List<CompletableFuture<Author>> futures = new ArrayList<>();
-
-        // Collect all futures
-        for (String id : authors) {
-            CompletableFuture<Author> futureAuthor = new CompletableFuture<>();
-            database.getAuthorById(id, futureAuthor::complete);
-            futures.add(futureAuthor);
-        }
-
-        // Combine all futures
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenRun(() -> {
-            for (CompletableFuture<Author> future : futures) {
-                try {
-                    Author author = future.get();
-                    if (autBuilder.length() > 0) {
-                        autBuilder.append(" & ");
-                    }
-                    autBuilder.append(author.getName());
-                } catch (ExecutionException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+            String imageUrl = book.getImage();
+            if(imageUrl!=null) {
+                System.out.println(imageUrl);
+                Picasso.get()
+                        .load(imageUrl)
+                        .into(holder.imageView);
+            }else{
+                System.out.println("no photo");
             }
-            holder.bookAuthor.setText(autBuilder.toString());
+
+            StringBuilder autBuilder = new StringBuilder();
+            List<CompletableFuture<Author>> futures = new ArrayList<>();
+
+            // Collect all futures
+            for (String id : authors) {
+                CompletableFuture<Author> futureAuthor = new CompletableFuture<>();
+                db.getAuthorById(id, futureAuthor::complete);
+                futures.add(futureAuthor);
+            }
+
+            // Combine all futures
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenRun(() -> {
+                for (CompletableFuture<Author> future : futures) {
+                    try {
+                        Author author = future.get();
+                        if (autBuilder.length() > 0) {
+                            autBuilder.append(" & ");
+                        }
+                        autBuilder.append(author.getName());
+                    } catch (ExecutionException | InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                holder.bookAuthor.setText(autBuilder.toString());
+            });
+
         });
 
         int colorIndex = position % colors.length;
@@ -109,6 +128,19 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
 
     @Override
     public int getItemCount() {
-        return bookList.size();
+        return loanList.size();
+    }
+
+    private void setState(@NonNull BookViewHolder holder,int index){
+        if(loanList.get(index).getDataRetur()!=null){
+            String state = "Was available until " + loanList.get(index).getDataRetur();
+            holder.bookState.setText(state);
+        }else if(loanList.get(index).getDataInceput()!=null){
+            String state = "Is available from " + loanList.get(index).getDataInceput();
+            holder.bookState.setText(state);
+        }else if(loanList.get(index).getDataCerere()!=null){
+            String state = "Reserved from " + loanList.get(index).getDataCerere();
+            holder.bookState.setText(state);
+        }
     }
 }

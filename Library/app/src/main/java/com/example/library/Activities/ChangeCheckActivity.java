@@ -9,10 +9,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Models.DB.User;
 import com.example.library.R;
+import com.example.library.Server.SharedViewModel;
 
 public class ChangeCheckActivity extends AppCompatActivity {
 
@@ -21,7 +23,7 @@ public class ChangeCheckActivity extends AppCompatActivity {
     private Button button;
     private TextView text;
     private FirebaseDatabaseHelper dbHelper;
-    private User user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,7 @@ public class ChangeCheckActivity extends AppCompatActivity {
         number = findViewById(R.id.numberCheck);
         button = findViewById(R.id.buttonCheck);
         text = findViewById(R.id.ReviewTitleTxt);
+
 
         String email;
         Intent intent = getIntent();
@@ -57,13 +60,13 @@ public class ChangeCheckActivity extends AppCompatActivity {
                     if(Integer.parseInt(number.getText().toString()) == storedRandomNumber){
                         if(((String) intent.getSerializableExtra("page")).equals("change")) {
                             dbHelper.changeEmail(MainActivity.sharedPreferences.getString("user_id", null), finalEmail).addOnSuccessListener(a->{
-                                startActivity(new Intent(ChangeCheckActivity.this, ProfileEditActivity.class));
+                                Intent resultIntent = new Intent();
+                                setResult(RESULT_OK, resultIntent);
                             });
                         }else if(((String) intent.getSerializableExtra("page")).equals("register")){
                             String name = (String) intent.getSerializableExtra("name");
                             String number = (String) intent.getSerializableExtra("number");
                             String password = (String) intent.getSerializableExtra("password");
-//                            int id = dbHelper.addNewUser(name, number, email, password);
                             Intent intent = new Intent(ChangeCheckActivity.this, RegisterSelectActivity.class);
                             intent.putExtra("email", email);
                             intent.putExtra("name", name);
@@ -73,13 +76,14 @@ public class ChangeCheckActivity extends AppCompatActivity {
                             startActivity(intent);
                         }
                         finish();
+                    }else{
+                        Toast.makeText(ChangeCheckActivity.this, "Email is not set!", Toast.LENGTH_SHORT).show();
                     }
                 }
 //                    SharedPreferences.Editor removeEditor = MainActivity.sharedPreferences.edit();
 //                    removeEditor.remove("mailChange");
 //                    removeEditor.remove("mailChangeTimestamp");
 //                    removeEditor.apply();
-                Toast.makeText(ChangeCheckActivity.this, "Email is not set!", Toast.LENGTH_SHORT).show();
             }
         });
 

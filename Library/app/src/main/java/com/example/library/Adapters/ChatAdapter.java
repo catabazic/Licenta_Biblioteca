@@ -3,15 +3,18 @@ package com.example.library.Adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Interfaces.OnItemClickListener;
 import com.example.library.Models.Chat;
 import com.example.library.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -30,6 +33,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         private TextView name;
         private TextView message;
         private TextView date;
+        private ImageView profilePhoto;
         private LinearLayout layout;
 
         ViewHolder(View itemView) {
@@ -39,6 +43,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             message = itemView.findViewById(R.id.bookAuthor);
             date = itemView.findViewById(R.id.dateChatTxt);
             layout = itemView.findViewById(R.id.chatLayout);
+            profilePhoto = itemView.findViewById(R.id.user_img3);
         }
 
 
@@ -66,6 +71,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ChatAdapter.ViewHolder holder, int position) {
         Chat chat = chatList.get(position);
+        FirebaseDatabaseHelper db = new FirebaseDatabaseHelper();
+        db.getUserById(chat.getIdUser(), user ->{
+            String imageUrl = user.getPhoto();
+            if(imageUrl!=null) {
+                System.out.println(imageUrl);
+                Picasso.get()
+                        .load(imageUrl)
+                        .into(holder.profilePhoto);
+            }else{
+                System.out.println("no photo");
+            }
+        });
         holder.date.setText(chat.getDate());
         holder.name.setText(chat.getName());
         String mess = new String();

@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ import com.example.library.Models.DB.Book;
 import com.example.library.Models.DB.Genre;
 import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.squareup.picasso.Picasso;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -55,6 +57,7 @@ public class SelectedBookActivity extends AppCompatActivity {
     private ProgressBar rating3;
     private ProgressBar rating2;
     private ProgressBar rating1;
+    private ImageView imageView;
 
     private RatingBar ratingBar;
     private FirebaseDatabaseHelper dbHelper;
@@ -74,6 +77,7 @@ public class SelectedBookActivity extends AppCompatActivity {
         booksActionButton = findViewById(R.id.booksActionButton);
         messagesActionButton = findViewById(R.id.messagesActionButton);
         userActionButton = findViewById(R.id.userActionButton);
+        imageView = findViewById(R.id.imageView2);
 
         backButton=findViewById(R.id.backBtn);
 
@@ -111,7 +115,7 @@ public class SelectedBookActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(SelectedBookActivity.this, ReviewsBookAllActivity.class);
                 intent.putExtra("book",book);
-                startActivity(intent);
+                startActivityForResult(intent,1);
             }
         });
 
@@ -120,7 +124,7 @@ public class SelectedBookActivity extends AppCompatActivity {
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 Intent intent = new Intent(SelectedBookActivity.this, ReviewBookActivity.class);
                 intent.putExtra("book",book);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
             }
         });
 
@@ -191,12 +195,30 @@ public class SelectedBookActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            this.updateUI(book);
+        }
+    }
+
     private void updateUI(Book book) {
         // Update text views immediately if possible
         chatNameTxt.setText(book.getName());
         BookNameTxt.setText(book.getName());
         BookAvailabilityTxt.setText("Disponibilitate: " + book.getDisponible());
         BookDescriptionTxt.setText(book.getDescription());
+
+        String imageUrl = book.getImage();
+        if(imageUrl!=null) {
+            System.out.println(imageUrl);
+            Picasso.get()
+                    .load(imageUrl)
+                    .into(imageView);
+        }else{
+            System.out.println("no photo");
+        }
 
         Set<String> authors = book.getAuthors();
         Set<String> genres = book.getGenres();
@@ -252,57 +274,6 @@ public class SelectedBookActivity extends AppCompatActivity {
             }
             BookGenreTxt.setText(gen.toString());
         });
-
-       /* if (authors == null || genres == null) {
-            System.out.println("authors or genres are null");
-        } else {
-            System.out.println("these are not null");
-
-            StringBuilder aut = new StringBuilder();
-            StringBuilder gen = new StringBuilder();
-            CountDownLatch latch = new CountDownLatch(authors.size() + genres.size());
-
-            // Fetch authors
-            for (String id : authors) {
-                dbHelper.getAuthorById(id, author -> {
-                    if (author != null) {
-                        if (aut.length() > 0) {
-                            aut.append(" & ");
-                        }
-                        aut.append(author.getName());
-                    }
-                    System.out.println("we are inside authors");
-                    latch.countDown(); // Ensure count down even in case of null author
-                });
-            }
-
-            // Fetch genres
-            for (String id : genres) {
-                dbHelper.getGenreById(id, genre -> {
-                    if (genre != null) {
-                        if (gen.length() > 0) {
-                            gen.append(" & ");
-                        }
-                        gen.append(genre.getName());
-                    }
-                    System.out.println("we are inside genres");
-                    latch.countDown(); // Ensure count down even in case of null genre
-                });
-            }
-
-            // Update UI once all data is fetched
-            new Handler(Looper.getMainLooper()).post(() -> {
-                try {
-                    latch.await();
-                    // Update UI on the main thread
-                    BookAuthorTxt.setText(aut.toString());
-                    BookGenreTxt.setText(gen.toString());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            });
-        }*/
-
 
         // Fetch and update rating and review details
         dbHelper.getRatingOfBook(book.getId()).addOnSuccessListener(f -> {

@@ -19,6 +19,7 @@ import com.example.library.R;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
 
 public class SearchBookAdapter extends RecyclerView.Adapter<SearchBookAdapter.ViewHolder> {
     List<Book> bookList;
@@ -69,33 +70,38 @@ public class SearchBookAdapter extends RecyclerView.Adapter<SearchBookAdapter.Vi
     public void onBindViewHolder(@NonNull SearchBookAdapter.ViewHolder holder, int position) {
         Book book = bookList.get(position);
         holder.name.setText(book.getName());
-//        FirebaseDatabaseHelper database = new FirebaseDatabaseHelper();
-//        Set<String> authors = book.getAuthors();
-//        StringBuilder aut = new StringBuilder();
-//        CountDownLatch latch = new CountDownLatch(authors.size());
-//        for (String id : authors) {
-//            database.getAuthorById(id, author -> {
-//                synchronized (aut) {
-//                    if (aut.length() == 0) {
-//                        aut.append(author.getName());
-//                    } else {
-//                        aut.append(" & ").append(author.getName());
-//                    }
-//                    latch.countDown(); // Move latch countdown here to ensure it's only decremented after aut is updated
-//                }
-//            });
-//        }
-//
-//        // Handler to update UI on the main thread
-//        Handler mainHandler = new Handler(Looper.getMainLooper());
-//        mainHandler.post(() -> {
-//            try {
-//                latch.await(); // Wait for all tasks to complete
-//                holder.author.setText(aut.toString());
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        });
+        FirebaseDatabaseHelper database = new FirebaseDatabaseHelper();
+        Set<String> authors = book.getAuthors();
+        StringBuilder aut = new StringBuilder();
+        CountDownLatch latch = new CountDownLatch(authors.size());
+
+        // Run database operations in a background thread
+        Executors.newSingleThreadExecutor().execute(() -> {
+            for (String id : authors) {
+                database.getAuthorById(id, author -> {
+                    synchronized (aut) {
+                        if (author != null) {
+                            if (aut.length() == 0) {
+                                aut.append(author.getName());
+                            } else {
+                                aut.append(" & ").append(author.getName());
+                            }
+                        }
+                        latch.countDown();
+                    }
+                });
+            }
+
+            try {
+                latch.await();
+                // Post the result back to the main thread
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    holder.author.setText(aut.toString());
+                });
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override

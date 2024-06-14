@@ -130,11 +130,12 @@
         app:cardCornerRadius="150dp">
 
         <ImageView
-            android:id="@+id/profilePhotoImage"
+            android:id="@+id/user_img3"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            tools:srcCompat="@tools:sample/avatars" />
+            android:src="@drawable/img"
+            tools:srcCompat="@drawable/img"
+            android:scaleType="centerCrop" />
     </androidx.cardview.widget.CardView>
 
     <TextView

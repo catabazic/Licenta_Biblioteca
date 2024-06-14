@@ -98,7 +98,7 @@ public class ReviewsBookAllActivity  extends AppCompatActivity {
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 Intent intent = new Intent(ReviewsBookAllActivity.this, ReviewBookActivity.class);
                 intent.putExtra("book",book);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
             }
         });
 
@@ -111,6 +111,14 @@ public class ReviewsBookAllActivity  extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            this.updateUI(book);
+        }
     }
 
     private void updateUI(Book book) {

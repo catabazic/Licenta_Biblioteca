@@ -5,13 +5,18 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.R;
+import com.example.library.Server.SharedViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.squareup.picasso.Picasso;
 
 public class ProfileActivity extends AppCompatActivity {
     FloatingActionButton homeActionButton;
@@ -19,6 +24,7 @@ public class ProfileActivity extends AppCompatActivity {
     FloatingActionButton booksActionButton;
     FloatingActionButton messagesActionButton;
     FloatingActionButton userActionButton;
+    private ImageView profilePhoto;
     Button editProfile;
     Button history;
     Button myBooks;
@@ -26,8 +32,7 @@ public class ProfileActivity extends AppCompatActivity {
     Button logout;
     TextView name;
     private FirebaseDatabaseHelper dbHelper;
-
-
+    private SharedViewModel sharedViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,16 +51,16 @@ public class ProfileActivity extends AppCompatActivity {
         myBooks = findViewById(R.id.profileMyBooksBtn);
         myRewievs = findViewById(R.id.profileMyRewiewsBtn);
         logout = findViewById(R.id.LogoutBtn);
+        profilePhoto = findViewById(R.id.user_img3);
 
         name = findViewById(R.id.photoBtn);
 
         editProfile();
 
-
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ProfileActivity.this, ProfileEditActivity.class));
+                startActivityForResult(new Intent(ProfileActivity.this, ProfileEditActivity.class), 1);
             }
         });
         myRewievs.setOnClickListener(new View.OnClickListener() {
@@ -137,6 +142,23 @@ public class ProfileActivity extends AppCompatActivity {
     private void editProfile(){
         dbHelper.getUserById(MainActivity.sharedPreferences.getString("user_id", null), user -> {
             name.setText(user.getName());
+            String imageUrl = user.getPhoto();
+            if(imageUrl!=null) {
+                System.out.println(imageUrl);
+                Picasso.get()
+                        .load(imageUrl)
+                        .into(profilePhoto);
+            }else{
+                System.out.println("no photo");
+            }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            this.editProfile();
+        }
     }
 }

@@ -9,8 +9,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Models.DB.Review;
 import com.example.library.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -33,6 +35,7 @@ public class ReviewBookAdapter extends RecyclerView.Adapter<ReviewBookAdapter.Vi
         ImageView star3;
         ImageView star2;
         ImageView star1;
+        ImageView profilePhoto;
 
 
 
@@ -47,6 +50,7 @@ public class ReviewBookAdapter extends RecyclerView.Adapter<ReviewBookAdapter.Vi
             star3 = itemView.findViewById(R.id.star3);
             star2 = itemView.findViewById(R.id.star2);
             star1 = itemView.findViewById(R.id.star1);
+            profilePhoto= itemView.findViewById(R.id.user_img3);
         }
     }
 
@@ -60,6 +64,18 @@ public class ReviewBookAdapter extends RecyclerView.Adapter<ReviewBookAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Review review = list.get(position);
+        FirebaseDatabaseHelper db = new FirebaseDatabaseHelper();
+        db.getUserById(review.getId_user(), user ->{
+            String imageUrl = user.getPhoto();
+            if(imageUrl!=null) {
+                System.out.println(imageUrl);
+                Picasso.get()
+                        .load(imageUrl)
+                        .into(holder.profilePhoto);
+            }else{
+                System.out.println("no photo");
+            }
+        });
         holder.date.setText(review.getDate());
         holder.titleReview.setText(review.getReviewTitle());
         holder.commentReview.setText(review.getReviewText());

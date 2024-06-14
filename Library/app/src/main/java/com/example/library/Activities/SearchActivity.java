@@ -3,7 +3,6 @@ package com.example.library.Activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -15,9 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.Adapters.SearchBookAdapter;
 import com.example.library.Database.FirebaseDatabaseHelper;
-import com.example.library.Database.FirestoreCallback;
 import com.example.library.Interfaces.OnItemClickListener;
-import com.example.library.Models.DB.Author;
 import com.example.library.Models.DB.Book;
 import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;

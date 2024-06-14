@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Models.DB.User;
 import com.example.library.R;
+import com.squareup.picasso.Picasso;
 
 public class SelectedUserActivity extends AppCompatActivity {
     private ImageButton backButton;
@@ -22,6 +24,7 @@ public class SelectedUserActivity extends AppCompatActivity {
     private TextView authors;
     private Button addConv;
     private FirebaseDatabaseHelper dbHelper;
+    private ImageView profilePhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,7 @@ public class SelectedUserActivity extends AppCompatActivity {
         authors = findViewById(R.id.preferedAuthorsTxt);
         addConv = findViewById(R.id.addBtn);
         dbHelper = new FirebaseDatabaseHelper();
+        profilePhoto = findViewById(R.id.user_img3);
 
         updateData();
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -65,6 +69,15 @@ public class SelectedUserActivity extends AppCompatActivity {
     }
 
     private void updateData(){
+        String imageUrl = user.getPhoto();
+        if(imageUrl!=null) {
+            System.out.println(imageUrl);
+            Picasso.get()
+                    .load(imageUrl)
+                    .into(profilePhoto);
+        }else{
+            System.out.println("no photo");
+        }
         name.setText(user.getName());
         email.setText(user.getEmail());
         dbHelper.getPreferencesAuthors(user.getId(),authorList ->{

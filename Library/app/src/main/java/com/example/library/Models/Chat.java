@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Chat implements Serializable {
     private String id;
     private String Name;
+    private String idUser;
     private String message;
     private String date;
     private boolean lastMessageMine;
@@ -18,6 +19,14 @@ public class Chat implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getIdUser() {
+        return idUser;
+    }
+
+    public void setIdUser(String idUser) {
+        this.idUser = idUser;
     }
 
     public void setName(String name) {

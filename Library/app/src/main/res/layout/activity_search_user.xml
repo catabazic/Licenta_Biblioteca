@@ -8,40 +8,73 @@
     android:background="#D8CBD2"
     tools:context=".Activities.SearchUserActivity">
 
-
-    <ImageButton
-        android:id="@+id/backBtn"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:background="#D7CAD1"
-        android:contentDescription="back"
-        android:minWidth="48dp"
-        android:minHeight="48dp"
-        app:layout_constraintBottom_toBottomOf="@+id/searchBar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/searchBar"
-        app:srcCompat="?attr/homeAsUpIndicator" />
-
-
-    <SearchView
-        android:id="@+id/searchBar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/frame"
-        android:backgroundTint="#6AFFFFFF"
-        android:iconifiedByDefault="false"
-        android:paddingLeft="10dp"
-        android:paddingTop="2dp"
-        android:paddingRight="10dp"
-        android:paddingBottom="2dp"
-        android:queryHint="Search here"
+        android:background="#D7CAD1"
+        android:backgroundTint="#D7CAD1"
+        android:maxHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/backBtn"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/backBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="?attr/homeAsUpIndicator"
+            android:contentDescription="back"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <SearchView
+            android:id="@+id/searchBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/frame"
+            android:backgroundTint="#6AFFFFFF"
+            android:iconifiedByDefault="false"
+            android:paddingLeft="10dp"
+            android:paddingTop="2dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="2dp"
+            android:queryHint="Search here"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/backBtn"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+<!--    <ImageButton-->
+<!--        android:id="@+id/backBtn"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="10dp"-->
+<!--        android:minHeight="48dp"-->
+<!--        android:minWidth="48dp"-->
+<!--        android:backgroundTint="#D7CAD1"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/searchBar"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/searchBar"-->
+<!--        android:contentDescription="back"-->
+<!--        app:srcCompat="?attr/homeAsUpIndicator"-->
+<!--        />-->
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/SearchResults"
@@ -52,6 +85,6 @@
         android:layout_marginEnd="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchBar" />
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

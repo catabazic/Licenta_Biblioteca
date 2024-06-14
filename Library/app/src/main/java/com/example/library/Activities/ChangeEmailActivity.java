@@ -12,8 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 import com.example.library.Database.FirebaseDatabaseHelper;
-import com.example.library.Database.FirestoreCallback;
-import com.example.library.Models.DB.User;
+import com.example.library.Interfaces.FirestoreCallback;
 import com.example.library.R;
 import com.example.library.Helper.MailHelper;
 
@@ -23,8 +22,6 @@ public class ChangeEmailActivity extends AppCompatActivity {
     private Button button;
     private TextView text;
     private FirebaseDatabaseHelper dbHelper;
-    private User user;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -53,9 +50,9 @@ public class ChangeEmailActivity extends AppCompatActivity {
         dbHelper.uniqueEmailRegister(email).addOnSuccessListener(b->{
             if(!b){
                 Toast.makeText(ChangeEmailActivity.this, "This email is already used", Toast.LENGTH_SHORT).show();
-                callback.onComplete(true);
-            }else{
                 callback.onComplete(false);
+            }else{
+                callback.onComplete(true);
             }
         });
     }

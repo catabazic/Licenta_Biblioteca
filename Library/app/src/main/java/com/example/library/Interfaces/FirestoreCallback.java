@@ -1,4 +1,4 @@
-package com.example.library.Database;
+package com.example.library.Interfaces;
 
 public interface FirestoreCallback<T> {
     void onComplete(T result);

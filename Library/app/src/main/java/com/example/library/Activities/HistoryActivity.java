@@ -50,11 +50,6 @@ public class HistoryActivity extends AppCompatActivity implements OnItemClickLis
         dbHelper = new FirebaseDatabaseHelper();
         if(type.equals("history")) {
             dbHelper.getAllHistory(MainActivity.sharedPreferences.getString("user_id", null)).addOnSuccessListener(l ->{
-                System.out.println("at leas i am here");
-                System.out.println(l.size());
-                for(Book book: l){
-                    System.out.println(book.getName());
-                }
                 adapter = new BookAdapter(l, this);
                 recyclerView.setAdapter(adapter);
             }).addOnFailureListener(t->{
@@ -62,11 +57,6 @@ public class HistoryActivity extends AppCompatActivity implements OnItemClickLis
             });
         }else if (type.equals("my books")){
             dbHelper.getBorrowedBooks(MainActivity.sharedPreferences.getString("user_id",null)).addOnSuccessListener(l ->{
-                System.out.println("at leas i am here");
-                System.out.println(l.size());
-                for(Book book: l){
-                    System.out.println(book.getName());
-                }
                 adapter = new BookAdapter(l, this);
                 recyclerView.setAdapter(adapter);
             });

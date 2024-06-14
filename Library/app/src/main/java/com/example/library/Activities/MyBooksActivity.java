@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Interfaces.OnItemClickListener;
+import com.example.library.Models.DB.Loan;
 import com.example.library.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -27,7 +28,6 @@ public class MyBooksActivity extends AppCompatActivity implements OnItemClickLis
 
     private RecyclerView recyclerView;
     private BookAdapter adapter;
-    private List<Book> bookList;
     private FirebaseDatabaseHelper dbHelper;
 
     @Override
@@ -51,8 +51,11 @@ public class MyBooksActivity extends AppCompatActivity implements OnItemClickLis
 
         dbHelper = new FirebaseDatabaseHelper();
         dbHelper.getBorrowedBooks(MainActivity.sharedPreferences.getString("user_id",null)).addOnSuccessListener( l->{
-            bookList = l;
-            adapter = new BookAdapter(bookList, this);
+            System.out.println(l.size());
+            for(Loan loan : l){
+                System.out.println(loan.getBookId());
+            }
+            adapter = new BookAdapter(l, this);
             recyclerView.setAdapter(adapter);
         });
 

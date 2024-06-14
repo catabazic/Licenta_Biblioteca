@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -19,6 +20,7 @@ import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Models.DB.Author;
 import com.example.library.Models.DB.Genre;
 import com.example.library.R;
+import com.example.library.Server.SharedViewModel;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -37,6 +39,7 @@ public class RegisterSelectActivity  extends AppCompatActivity implements GenreA
     private Set<String> selectedGenres;
     private Set<String> selectedAuthors;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +48,7 @@ public class RegisterSelectActivity  extends AppCompatActivity implements GenreA
         Intent intent = getIntent();
         selectedGenres = new HashSet<>();
         selectedAuthors = new HashSet<>();
+
 
         dbHelper = new FirebaseDatabaseHelper();
         button = findViewById(R.id.RegisterBtn);
@@ -118,7 +122,7 @@ public class RegisterSelectActivity  extends AppCompatActivity implements GenreA
             @Override
             public void onClick(View v) {
 
-                if(selectedGenres.size()>=5) {
+                if(selectedGenres.size()>=4) {
                     if(!page.equals("register")){
                         String userId= MainActivity.sharedPreferences.getString("user_id", null);
                         dbHelper.deletePreferences(userId);
@@ -129,6 +133,8 @@ public class RegisterSelectActivity  extends AppCompatActivity implements GenreA
                         for (String authorId : selectedAuthors) {
                             dbHelper.addPreferencesAuthor(userId, authorId);
                         }
+                        Intent resultIntent = new Intent();
+                        setResult(RESULT_OK, resultIntent);
                         finish();
                     }else {
                         String name = (String) intent.getSerializableExtra("name");

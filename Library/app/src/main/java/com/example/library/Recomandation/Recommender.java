@@ -2,7 +2,7 @@ package com.example.library.Recomandation;
 
 
 import com.example.library.Database.FirebaseDatabaseHelper;
-import com.example.library.Database.FirestoreCallback;
+import com.example.library.Interfaces.FirestoreCallback;
 import com.example.library.Models.DB.Author;
 import com.example.library.Models.DB.Book;
 import com.example.library.Models.DB.Genre;

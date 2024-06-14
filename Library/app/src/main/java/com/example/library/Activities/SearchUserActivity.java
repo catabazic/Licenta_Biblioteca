@@ -21,6 +21,7 @@ import com.example.library.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SearchUserActivity extends Activity implements OnItemClickListener {
     private SearchView searchView;
@@ -50,11 +51,11 @@ public class SearchUserActivity extends Activity implements OnItemClickListener 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                dbHelper.getUsersSearch(query).addOnSuccessListener(l->{
+                dbHelper.getUsersSearch(query, MainActivity.sharedPreferences.getString("user_id", null)).addOnSuccessListener(l->{
                     System.out.println("It s all right");
                     System.out.println(l.size());
-                    for (User book : l) {
-                        System.out.println(book.getName());
+                    for (User user : l) {
+                        System.out.println(user.getName());
                     }
                     adapter.updateData(l);
                 }).addOnFailureListener(e->{
@@ -65,7 +66,7 @@ public class SearchUserActivity extends Activity implements OnItemClickListener 
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                dbHelper.getUsersSearch(newText).addOnSuccessListener(l->{
+                dbHelper.getUsersSearch(newText, MainActivity.sharedPreferences.getString("user_id", null)).addOnSuccessListener(l->{
                     System.out.println("It s all right");
                     System.out.println(l.size());
                     for (User book : l) {

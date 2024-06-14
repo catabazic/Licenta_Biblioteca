@@ -11,7 +11,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.library.Database.FirebaseDatabaseHelper;
-import com.example.library.Database.FirestoreCallback;
+import com.example.library.Interfaces.FirestoreCallback;
 import com.example.library.R;
 
 public class LoginActivity extends AppCompatActivity {

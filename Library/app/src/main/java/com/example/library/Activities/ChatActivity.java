@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,7 @@ import com.example.library.Models.DB.Message;
 import com.example.library.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -33,6 +35,7 @@ public class ChatActivity extends AppCompatActivity {
     private RecyclerView messages;
     private List<Message> messageList;
     private MessagesAdapter adapter;
+    private ImageView profilePhoto;
     private Chat chat;
     private FirebaseDatabaseHelper dbHelper;
 
@@ -48,6 +51,7 @@ public class ChatActivity extends AppCompatActivity {
         backButton = findViewById(R.id.chatBackBtn);
         sentBtn = findViewById(R.id.chatSentBtn);
         myMessage = findViewById(R.id.chatMassagetxt);
+        profilePhoto = findViewById(R.id.user_img3);
 
         name = findViewById(R.id.nameTxt);
         name.setText(chat.getName());
@@ -57,6 +61,18 @@ public class ChatActivity extends AppCompatActivity {
 
 
         dbHelper = new FirebaseDatabaseHelper();
+
+        dbHelper.getUserById(chat.getIdUser(), user ->{
+            String imageUrl = user.getPhoto();
+            if(imageUrl!=null) {
+                System.out.println(imageUrl);
+                Picasso.get()
+                        .load(imageUrl)
+                        .into(profilePhoto);
+            }else{
+                System.out.println("no photo");
+            }
+        });
         dbHelper.getAllMessages(chat.getId()).addOnCompleteListener(new OnCompleteListener<List<Message>>() {
             @Override
             public void onComplete(@NonNull Task<List<Message>> task) {

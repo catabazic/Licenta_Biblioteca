@@ -1,6 +1,7 @@
 package com.example.library.Models.DB;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -28,7 +29,10 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public User(){}
+    public User(){
+        preferredGenres = new HashSet<>();
+        preferredAuthors = new HashSet<>();
+    }
 
     public String getId() {
         return ID;

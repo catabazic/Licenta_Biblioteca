@@ -8,10 +8,12 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+import com.example.library.Interfaces.FirestoreCallback;
 import com.example.library.Models.Chat;
 import com.example.library.Models.DB.Author;
 import com.example.library.Models.DB.Book;
 import com.example.library.Models.DB.Genre;
+import com.example.library.Models.DB.Loan;
 import com.example.library.Models.DB.Message;
 import com.example.library.Models.DB.Review;
 import com.example.library.Models.DB.User;
@@ -19,13 +21,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.Query;
 //import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -41,15 +38,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FirebaseDatabaseHelper {
     private FirebaseFirestore db;
 
-    public FirebaseDatabaseHelper(){
+    public FirebaseDatabaseHelper() {
         db = FirebaseFirestore.getInstance();
     }
 
@@ -109,19 +107,25 @@ public class FirebaseDatabaseHelper {
                 .update("password", password);
     }
 
+    public Task<Void> changePhoto(String id, String uri) {
+        return db.collection("users")
+                .document(id)
+                .update("photo", uri);
+    }
+
     public Task<Void> changeEmail(String id, String email) {
         return db.collection("users")
                 .document(id)
                 .update("email", email);
     }
 
-    public Task<Void> changePhoneNumber(String id, String phone){
+    public Task<Void> changePhoneNumber(String id, String phone) {
         return db.collection("users")
                 .document(id)
                 .update("number", phone);
     }
 
-    public Task<Void> changeName(String id, String name){
+    public Task<Void> changeName(String id, String name) {
         return db.collection("users")
                 .document(id)
                 .update("name", name);
@@ -153,12 +157,12 @@ public class FirebaseDatabaseHelper {
 
     public Task<Void> addPreferencesGenre(String userId, String genre) {
         DocumentReference userRef = db.collection("users").document(userId);
-        return userRef.update("preferredGenres", FieldValue.arrayUnion(genre));
+        return userRef.update("genres", FieldValue.arrayUnion(genre));
     }
 
     public Task<Void> addPreferencesAuthor(String userId, String author) {
         DocumentReference userRef = db.collection("users").document(userId);
-        return userRef.update("preferredAuthors", FieldValue.arrayUnion(author));
+        return userRef.update("authors", FieldValue.arrayUnion(author));
     }
 
     public Task<List<Book>> getNewBooks() {
@@ -189,6 +193,7 @@ public class FirebaseDatabaseHelper {
                         }
                         book.setDescription(document.getString("description"));
                         book.setDateRelease(document.getString("dateRelease"));
+                        book.setImage(document.getString("photo"));
                         booksList.add(book);
                     }
                     return Tasks.forResult(booksList);
@@ -228,9 +233,6 @@ public class FirebaseDatabaseHelper {
     }
 
 
-
-
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void borrowBook(String idBook, String idUser) {
         LocalDate currentDate = LocalDate.now();
@@ -243,7 +245,6 @@ public class FirebaseDatabaseHelper {
             if (bookSnapshot.exists()) {
                 int availableBooks = bookSnapshot.getLong("available").intValue();
                 if (availableBooks > 0) {
-                    // Update book availability
                     transaction.update(bookRef, "available", availableBooks - 1);
 
                     Map<String, Object> loanData = new HashMap<>();
@@ -255,8 +256,6 @@ public class FirebaseDatabaseHelper {
 
                     transaction.set(loanRef, loanData);
                 } else {
-                    transaction.update(bookRef, "available", availableBooks - 1);
-
                     Map<String, Object> loanData = new HashMap<>();
                     loanData.put("userId", idUser);
                     loanData.put("bookId", idBook);
@@ -280,7 +279,7 @@ public class FirebaseDatabaseHelper {
         });
     }
 
-    public Task<List<Book>> getBorrowedBooks(String idUser) {
+    /*public Task<List<Book>> getBorrowedBooks(String idUser) {
         return db.collection("loans")
                 .whereEqualTo("userId", idUser)
                 .whereEqualTo("returnDate", null)
@@ -300,9 +299,39 @@ public class FirebaseDatabaseHelper {
 
                     return Tasks.whenAllSuccess(bookTasks);
                 });
+    }*/
+
+    public Task<List<Loan>> getBorrowedBooks(String idUser) {
+        return db.collection("loans")
+                .whereEqualTo("userId", idUser)
+                .whereEqualTo("returnDate", null)
+                .get()
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful() || task.getResult() == null) {
+                        throw task.getException();
+                    }
+
+                    List<Task<Loan>> loanTasks = new ArrayList<>();
+
+                    for (DocumentSnapshot loanDoc : task.getResult().getDocuments()) {
+                        Loan loan = new Loan();
+                        loan.setBookId(loanDoc.getString("bookId"));
+                        loan.setUserId(loanDoc.getString("userId"));
+                        loan.setId(loanDoc.getId());
+                        loan.setDataCerere(loanDoc.getString("requestDate"));
+                        loan.setDataInceput(loanDoc.getString("startDate"));
+                        loan.setDataRetur(loanDoc.getString("returnDate"));
+
+                        Task<Loan> loanTask = Tasks.forResult(loan); // Simulate a completed Task
+                        loanTasks.add(loanTask);
+                    }
+
+                    return Tasks.whenAllSuccess(loanTasks);
+                });
     }
 
-    public Task<List<Book>> getAllHistory(String idUser) {
+
+    public Task<List<Loan>> getAllHistory(String idUser) {
         return db.collection("loans")
                 .whereEqualTo("userId", idUser)
                 .get()
@@ -311,15 +340,22 @@ public class FirebaseDatabaseHelper {
                         throw task.getException();
                     }
 
-                    List<Task<Book>> bookTasks = new ArrayList<>();
+                    List<Task<Loan>> loanTasks = new ArrayList<>();
 
                     for (DocumentSnapshot loanDoc : task.getResult().getDocuments()) {
-                        String bookId = loanDoc.getString("bookId");
-                        Task<Book> bookTask = this.getBookById(bookId);
-                        bookTasks.add(bookTask);
+                        Loan loan = new Loan();
+                        loan.setBookId(loanDoc.getString("bookId"));
+                        loan.setUserId(loanDoc.getString("userId"));
+                        loan.setId(loanDoc.getId());
+                        loan.setDataCerere(loanDoc.getString("requestDate"));
+                        loan.setDataInceput(loanDoc.getString("startDate"));
+                        loan.setDataRetur(loanDoc.getString("returnDate"));
+
+                        Task<Loan> loanTask = Tasks.forResult(loan); // Simulate a completed Task
+                        loanTasks.add(loanTask);
                     }
 
-                    return Tasks.whenAllSuccess(bookTasks);
+                    return Tasks.whenAllSuccess(loanTasks);
                 });
     }
 
@@ -334,10 +370,13 @@ public class FirebaseDatabaseHelper {
                 DocumentSnapshot document = task.getResult();
                 User user = new User();
                 user.setId(document.getId());
-                user.setName(document.getString("name"));
+                if (document.contains("photo")) {
+                    String photoUrl = document.getString("photo");
+                    user.setPhoto(photoUrl);
+                }
                 user.setEmail(document.getString("email"));
+                user.setName(document.getString("name"));
                 user.setNumber(document.getString("number"));
-                user.setPhoto(document.getString("photo"));
                 callback.onComplete(user);
             } else {
                 callback.onComplete(null); // Handle the error or null case
@@ -527,6 +566,7 @@ public class FirebaseDatabaseHelper {
                         }
                         book.setDescription(document.getString("description"));
                         book.setDateRelease(document.getString("dateRelease"));
+                        book.setImage(document.getString("photo"));
                         return book;
                     } else {
                         throw task.getException() != null ? task.getException() : new Exception("Error retrieving book");
@@ -567,7 +607,6 @@ public class FirebaseDatabaseHelper {
     }
 
 
-
     public void getChats(String idUser, final FirestoreCallback<List<Chat>> callback) {
         List<Chat> chatList = new ArrayList<>();
 
@@ -585,6 +624,7 @@ public class FirebaseDatabaseHelper {
                             String otherUserId = user1Id.equals(idUser) ? user2Id : user1Id;
                             getUserById(otherUserId, user -> {
                                 if (user != null) {
+                                    chat.setIdUser(user.getId());
                                     chat.setName(user.getName());
                                     getLastMessageForConversation(chat.getId(), idUser, message -> {
                                         if (message != null) {
@@ -617,6 +657,7 @@ public class FirebaseDatabaseHelper {
                             String otherUserId = user1Id.equals(idUser) ? user2Id : user1Id;
                             getUserById(otherUserId, user -> {
                                 if (user != null) {
+                                    chat.setIdUser(user.getId());
                                     chat.setName(user.getName());
                                     getLastMessageForConversation(chat.getId(), idUser, message -> {
                                         if (message != null) {
@@ -651,7 +692,7 @@ public class FirebaseDatabaseHelper {
                             message.setId(document.getString("chatId"));
                             message.setId_user(document.getString("userId"));
                             Date date = document.getDate("date");
-                            if(date!=null) {
+                            if (date != null) {
                                 message.setDate(date.toString());
                             }
                             messages.add(message);
@@ -724,6 +765,7 @@ public class FirebaseDatabaseHelper {
                         }
                         book.setDescription(document.getString("description"));
                         book.setDateRelease(document.getString("dateRelease"));
+                        book.setImage(document.getString("photo"));
                         booksList.add(book);
                     }
                     return Tasks.forResult(booksList);
@@ -765,6 +807,7 @@ public class FirebaseDatabaseHelper {
                             }
                             book.setDescription(document.getString("description"));
                             book.setDateRelease(document.getString("dateRelease"));
+                            book.setImage(document.getString("photo"));
                             list.add(book);
                         }
                     }
@@ -775,47 +818,77 @@ public class FirebaseDatabaseHelper {
         });
     }
 
-    public Task<List<User>> getUsersSearch(String query) {
+    public Task<List<User>> getUsersSearch(String query, String idUser) {
         String[] keywords = query.toLowerCase().split("\\s+");
         List<User> list = new ArrayList<>();
+        Set<String> userIds = new HashSet<>();
 
         Task<QuerySnapshot> queryTask = db.collection("users").get();
 
-        return queryTask.continueWith(task -> {
+        return queryTask.continueWithTask(task -> {
             QuerySnapshot queryDocumentSnapshots = task.getResult();
             if (queryDocumentSnapshots != null) {
+                List<Task<Void>> futures = new ArrayList<>();
                 for (DocumentSnapshot document : queryDocumentSnapshots) {
-                    for (String keyword : keywords) {
-                        String name = document.getString("name");
-                        String email = document.getString("email");
-                        if ((name != null && name.toLowerCase().contains(keyword)) || (email !=null && email.toLowerCase().contains(keyword))) {
-                            System.out.println(name);
-                            User user= new User();
-                            user.setId(document.getId());
-                            user.setEmail(email);
-                            user.setName(name);
-                            user.setNumber(document.getString("phone"));
-                            List<String> genres = (List<String>) document.get("genres");
-                            if (genres != null) {
-                                user.setGenres(genres);
-                            } else {
-                                user.setGenres(Collections.emptyList());
+                    String id = document.getId();
+                    String name = document.getString("name");
+                    String email = document.getString("email");
+                    if (!idUser.equals(id) && matchesKeywords(keywords, name, email)) {
+                        TaskCompletionSource<Void> completionSource = new TaskCompletionSource<>();
+                        this.getChats(idUser, chats -> {
+                            boolean ok = true;
+                            for (Chat chat : chats) {
+                                if (id.equals(chat.getIdUser())) {
+                                    System.out.println("it is false");
+                                    ok = false;
+                                }
                             }
-                            List<String> authors = (List<String>) document.get("authors");
-                            if (authors != null) {
-                                user.setAuthors(authors);
-                            } else {
-                                user.setAuthors(Collections.emptyList());
+                            if (ok && userIds.add(id)) {
+                                User user = new User();
+                                user.setId(id);
+                                user.setEmail(email);
+                                user.setName(name);
+                                if (document.contains("photo")) {
+                                    String photoUrl = document.getString("photo");
+                                    user.setPhoto(photoUrl);
+                                }
+                                System.out.println("The name that was is " + name);
+                                user.setNumber(document.getString("phone"));
+                                List<String> genres = (List<String>) document.get("genres");
+                                user.setGenres(genres != null ? genres : Collections.emptyList());
+                                List<String> authors = (List<String>) document.get("authors");
+                                user.setAuthors(authors != null ? authors : Collections.emptyList());
+                                list.add(user);
                             }
-                            list.add(user);
-                        }
+                            if (!completionSource.getTask().isComplete()) {
+                                completionSource.setResult(null);
+                            }
+                        });
+                        futures.add(completionSource.getTask());
                     }
                 }
-                return list;
+                return Tasks.whenAllComplete(futures);
             }
-            return list;
+            return Tasks.forResult(null);
+        }).continueWith(task -> {
+            if (task.isSuccessful()) {
+                return list;
+            } else {
+                return null;
+            }
         });
     }
+
+    private boolean matchesKeywords(String[] keywords, String name, String email) {
+        for (String keyword : keywords) {
+            if ((name != null && name.toLowerCase().contains(keyword)) ||
+                    (email != null && email.toLowerCase().contains(keyword))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public void getAuthorById(String authorId, final FirestoreCallback<Author> callback) {
         if (authorId == null) {
@@ -847,7 +920,7 @@ public class FirebaseDatabaseHelper {
     }
 
     public void getGenreById(String genreId, final FirestoreCallback<Genre> callback) {
-        if(genreId==null){
+        if (genreId == null) {
             callback.onComplete(null);
             return;
         }
@@ -871,7 +944,6 @@ public class FirebaseDatabaseHelper {
                 });
     }
 
-
     public void getPreferencesGenre(String userId, final FirestoreCallback<List<Genre>> callback) {
         db.collection("users")
                 .document(userId)
@@ -880,10 +952,11 @@ public class FirebaseDatabaseHelper {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            List<String> genreIds = (List<String>) document.get("preferredGenres");                            for(String d: genreIds){
-                                System.out.println(d);
-                            }
+                            List<String> genreIds = (List<String>) document.get("genres");
                             if (genreIds != null && !genreIds.isEmpty()) {
+                                for (String d : genreIds) {
+                                    System.out.println(d);
+                                }
                                 getGenresByIds(genreIds, callback);
                             } else {
                                 callback.onComplete(new ArrayList<>()); // No preference genres
@@ -896,6 +969,7 @@ public class FirebaseDatabaseHelper {
                     }
                 });
     }
+
 
     private void getGenresByIds(List<String> genreIds, final FirestoreCallback<List<Genre>> callback) {
         List<Genre> genres = new ArrayList<>();
@@ -925,7 +999,7 @@ public class FirebaseDatabaseHelper {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            List<String> authorsIds = (List<String>) document.get("preferredAuthors");
+                            List<String> authorsIds = (List<String>) document.get("authors");
                             if (authorsIds != null && !authorsIds.isEmpty()) {
                                 getAuthorsByIds(authorsIds, callback);
                             } else {
@@ -963,10 +1037,10 @@ public class FirebaseDatabaseHelper {
     public void deletePreferences(String id) {
         db.collection("users")
                 .document(id)
-                .update("preferredGenres", null);
+                .update("genres", null);
         db.collection("users")
                 .document(id)
-                .update("preferredAuthors", null);
+                .update("authors", null);
     }
 
     public Task<List<Author>> getAllAuthors() {
@@ -988,6 +1062,7 @@ public class FirebaseDatabaseHelper {
                 });
         return tcs.getTask();
     }
+
     public Task<List<Genre>> getAllGenres() {
 //        TaskCompletionSource<List<Genre>> tcs = new TaskCompletionSource<>();
         return db.collection("genres")

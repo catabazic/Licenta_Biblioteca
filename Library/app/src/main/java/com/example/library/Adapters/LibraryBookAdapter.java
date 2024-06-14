@@ -27,6 +27,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 
 import com.example.library.Models.DB.Book;
+import com.squareup.picasso.Picasso;
 
 public class LibraryBookAdapter  extends RecyclerView.Adapter<LibraryBookAdapter.ViewHolder> {
     private List<Book> mBooks;
@@ -80,13 +81,13 @@ public class LibraryBookAdapter  extends RecyclerView.Adapter<LibraryBookAdapter
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Book book = mBooks.get(position);
         String imageUrl = book.getImage();
-
-        Bitmap bitmap = null;
-        try {
-            bitmap = BitmapFactory.decodeStream((InputStream) new URL(imageUrl).getContent());
-            holder.imageView.setImageBitmap(bitmap);
-        } catch (IOException e) {
-            System.out.println("upsi, no photo");
+        if(imageUrl!=null) {
+            System.out.println(imageUrl);
+            Picasso.get()
+                    .load(imageUrl)
+                    .into(holder.imageView);
+        }else{
+            System.out.println("no photo");
         }
 
         holder.bookNameTextView.setText(book.getName());
