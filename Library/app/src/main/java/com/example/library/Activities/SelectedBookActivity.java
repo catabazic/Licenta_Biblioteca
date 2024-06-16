@@ -34,11 +34,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 
 public class SelectedBookActivity extends AppCompatActivity {
-    FloatingActionButton homeActionButton;
-    FloatingActionButton searchActionButton;
-    FloatingActionButton booksActionButton;
-    FloatingActionButton messagesActionButton;
-    FloatingActionButton userActionButton;
     ImageButton backButton;
     private Book book;
     private TextView chatNameTxt;
@@ -71,12 +66,6 @@ public class SelectedBookActivity extends AppCompatActivity {
             book = (Book) intent.getSerializableExtra("book");
             System.out.println("we are here : " + book.getName());
         }
-
-        homeActionButton = findViewById(R.id.homeActionButton);
-        searchActionButton = findViewById(R.id.searchActionButton);
-        booksActionButton = findViewById(R.id.booksActionButton);
-        messagesActionButton = findViewById(R.id.messagesActionButton);
-        userActionButton = findViewById(R.id.userActionButton);
         imageView = findViewById(R.id.imageView2);
 
         backButton=findViewById(R.id.backBtn);
@@ -152,44 +141,7 @@ public class SelectedBookActivity extends AppCompatActivity {
             }
         });
 
-        homeActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(SelectedBookActivity.this, HomeActivity.class));
-                finish();
-            }
-        });
 
-        searchActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(SelectedBookActivity.this, SearchActivity.class));
-                finish();            }
-        });
-
-        booksActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(SelectedBookActivity.this, MyBooksActivity.class));
-                finish();
-            }
-        });
-
-        messagesActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(SelectedBookActivity.this, MessagesActivity.class));
-                finish();
-            }
-        });
-
-        userActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(SelectedBookActivity.this, ProfileActivity.class));
-                finish();
-            }
-        });
 
         System.out.println("we are at the end");
 

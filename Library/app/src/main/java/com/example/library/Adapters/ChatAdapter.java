@@ -1,5 +1,6 @@
 package com.example.library.Adapters;
 
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,14 +9,23 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Interfaces.OnItemClickListener;
 import com.example.library.Models.Chat;
 import com.example.library.R;
+import com.google.firebase.Timestamp;
 import com.squareup.picasso.Picasso;
 
+import java.sql.Time;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
@@ -68,6 +78,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         return new ChatAdapter.ViewHolder(view);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(@NonNull ChatAdapter.ViewHolder holder, int position) {
         Chat chat = chatList.get(position);
@@ -83,7 +94,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                 System.out.println("no photo");
             }
         });
-        holder.date.setText(chat.getDate());
+        String d = getFormattedDate(chat.getTimestapt());
+        holder.date.setText(d);
         holder.name.setText(chat.getName());
         String mess = new String();
         if (chat.isLastMessageMine()) {
@@ -99,6 +111,23 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     @Override
     public int getItemCount() {
         return chatList.size();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public String getFormattedDate(Date date) {
+        LocalDateTime messageDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        LocalDateTime now = LocalDateTime.now();
+
+        if (messageDate.toLocalDate().isEqual(now.toLocalDate())) {
+            // Same day
+            return messageDate.format(DateTimeFormatter.ofPattern("HH:mm"));
+        } else if (ChronoUnit.DAYS.between(messageDate.toLocalDate(), now.toLocalDate()) < 7) {
+            return messageDate.format(DateTimeFormatter.ofPattern("EEE"));
+        } else if (messageDate.getYear() == now.getYear()) {
+            return messageDate.format(DateTimeFormatter.ofPattern("dd MMM"));
+        } else {
+            return messageDate.format(DateTimeFormatter.ofPattern("yyyy"));
+        }
     }
 
 

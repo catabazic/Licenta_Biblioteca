@@ -54,12 +54,11 @@
         android:id="@+id/Messages"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/Coordination"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
 
         <ImageView
@@ -128,7 +127,7 @@
             android:id="@+id/BookReservationBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="30dp"
             android:text="Rezervare"
             app:layout_constraintEnd_toEndOf="parent"
@@ -139,12 +138,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginBottom="20dp"
             android:text="Tap to rate"
             android:textSize="24sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout3" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <RatingBar
             android:id="@+id/ratingBar"
@@ -160,10 +159,10 @@
             android:id="@+id/constraintLayout3"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginBottom="30dp"
+            app:layout_constraintBottom_toTopOf="@+id/TapToRateTxt"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/BookReservationBtn">
+            app:layout_constraintStart_toStartOf="parent">
 
             <ImageView
                 android:id="@+id/imageView37"
@@ -443,6 +442,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginEnd="15dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/BookRating"
@@ -454,6 +454,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginEnd="15dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/BookRating"
@@ -465,6 +466,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginEnd="15dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/BookRating"
@@ -476,6 +478,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="100dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginEnd="15dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/BookRating"
@@ -484,115 +487,5 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/Coordination"
-        android:layout_width="0dp"
-        android:layout_height="80dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-
-            android:gravity="center"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="@id/Coordination"
-            app:layout_constraintEnd_toEndOf="@id/Coordination">
-
-            <LinearLayout
-                android:id="@+id/home_l"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/homeActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:contentDescription="home"
-                    app:srcCompat="@android:drawable/ic_menu_gallery" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/search_l"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/searchActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.2"
-                    android:clickable="true"
-                    android:contentDescription="Search"
-                    app:srcCompat="@android:drawable/ic_menu_search" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/books_l"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/booksActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:contentDescription="books"
-                    app:srcCompat="?attr/actionModeSelectAllDrawable" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/messages_l"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/messagesActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:contentDescription="messages"
-                    app:srcCompat="@android:drawable/stat_notify_chat" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/user_l"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0.2"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/userActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:contentDescription="user"
-                    app:srcCompat="@android:drawable/ic_menu_myplaces" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

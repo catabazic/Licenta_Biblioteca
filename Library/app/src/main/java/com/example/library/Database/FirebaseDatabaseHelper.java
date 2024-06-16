@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Query;
 //import com.google.firebase.database.Query;
 import com.google.firebase.firestore.DocumentReference;
@@ -575,6 +576,7 @@ public class FirebaseDatabaseHelper {
     }
 
 
+
     private void getLastMessageForConversation(String conversationId, String userId, final FirestoreCallback<Message> callback) {
         db.collection("messages")
                 .whereEqualTo("chatId", conversationId)
@@ -593,6 +595,7 @@ public class FirebaseDatabaseHelper {
                             message.setId(queryDocument.getString("chatId"));
                             message.setId_user(queryDocument.getString("userId"));
                             Date date = queryDocument.getDate("date");
+                            System.out.println(date.toString());
                             if (date != null) {
                                 message.setDate(date.toString());
                             }
