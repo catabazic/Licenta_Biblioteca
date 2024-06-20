@@ -80,7 +80,6 @@
         </activity>
         <activity android:name=".Activities.RegisterSelectActivity">
         </activity>
-        <service android:name=".Server.MyBackgroundService" />
     </application>
 
 </manifest>

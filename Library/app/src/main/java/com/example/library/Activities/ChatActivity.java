@@ -20,6 +20,7 @@ import com.example.library.Adapters.MessagesAdapter;
 import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Models.Chat;
 import com.example.library.Models.DB.Message;
+import com.example.library.Models.DB.User;
 import com.example.library.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -38,6 +39,7 @@ public class ChatActivity extends AppCompatActivity {
     private ImageView profilePhoto;
     private Chat chat;
     private FirebaseDatabaseHelper dbHelper;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,7 @@ public class ChatActivity extends AppCompatActivity {
         dbHelper = new FirebaseDatabaseHelper();
 
         dbHelper.getUserById(chat.getIdUser(), user ->{
+            this.user = user;
             String imageUrl = user.getPhoto();
             if(imageUrl!=null) {
                 System.out.println(imageUrl);
@@ -86,6 +89,16 @@ public class ChatActivity extends AppCompatActivity {
                 } else {
                     Log.d(TAG, "Error getting messages: ", task.getException());
                 }
+            }
+        });
+
+        profilePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ChatActivity.this, SelectedUserActivity.class);
+                intent.putExtra("user", user);
+                intent.putExtra("page", "chat");
+                startActivity(intent);
             }
         });
 

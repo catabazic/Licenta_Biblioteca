@@ -14,7 +14,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Models.DB.User;
 import com.example.library.R;
-import com.example.library.Server.SharedViewModel;
 
 public class ChangeCheckActivity extends AppCompatActivity {
 

@@ -47,11 +47,9 @@ public class SearchBookAdapter extends RecyclerView.Adapter<SearchBookAdapter.Vi
 
         @Override
         public void onClick(View v) {
-            System.out.println("i am here");
             if (listener != null) {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
-                    System.out.println("i guess i should be here");
                     Book clickedChat = bookList.get(position);
                     listener.onItemClick(clickedChat);
                 }

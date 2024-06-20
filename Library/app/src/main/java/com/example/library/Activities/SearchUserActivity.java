@@ -92,6 +92,7 @@ public class SearchUserActivity extends Activity implements OnItemClickListener 
         User thisUser = (User) object;
         Intent intent = new Intent(SearchUserActivity.this, SelectedUserActivity.class);
         intent.putExtra("user", thisUser);
+        intent.putExtra("page", "search");
         startActivity(intent);
         finish();
     }

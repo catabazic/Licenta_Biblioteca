@@ -123,22 +123,13 @@ public class RegisterActivity extends AppCompatActivity {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        // Închidem activitatea după întârziere
                         finish();
                     }
                 }, 500);
-
-//                int id = dbHelper.addNewUser(name,number,email,password1);
-//                SharedPreferences.Editor editor = MainActivity.sharedPreferences.edit();
-//                editor.putBoolean("isLoggedIn",true);
-//                editor.putInt("user_id", id);
-//                editor.apply();
             }
-
-
             @Override
             public void onFailure(Exception e) {
-
+                System.out.println(e);
             }
         });
     }
@@ -189,7 +180,6 @@ public class RegisterActivity extends AppCompatActivity {
             } else if(Character.isLowerCase(c)){
                 hasLower = true;
             }
-
             if (hasUpper && hasNumber && hasLower) {
                 return true;
             }

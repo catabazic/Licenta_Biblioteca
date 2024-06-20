@@ -156,7 +156,4 @@ public class SearchActivity extends AppCompatActivity implements OnItemClickList
         return super.dispatchTouchEvent(event);
     }
 
-    private void searchBooks(String query) {
-
-    }
 }

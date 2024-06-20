@@ -14,7 +14,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.R;
-import com.example.library.Server.SharedViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
@@ -32,7 +31,6 @@ public class ProfileActivity extends AppCompatActivity {
     Button logout;
     TextView name;
     private FirebaseDatabaseHelper dbHelper;
-    private SharedViewModel sharedViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

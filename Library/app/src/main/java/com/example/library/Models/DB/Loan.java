@@ -1,5 +1,15 @@
 package com.example.library.Models.DB;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+
 public class Loan {
     String ID;
     private String userId;
@@ -51,6 +61,22 @@ public class Loan {
 
     public String getDataRetur() {
         return dataRetur;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public Date getTimestapt(int what){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E MMM dd HH:mm:ss z yyyy");
+        ZonedDateTime zonedDateTime;
+        if(what == 0 ) {
+            zonedDateTime = ZonedDateTime.parse(dataCerere, formatter);
+        }else if(what == 1){
+            zonedDateTime = ZonedDateTime.parse(dataInceput, formatter);
+        }else{
+            zonedDateTime = ZonedDateTime.parse(dataRetur, formatter);
+        }
+
+        Instant instant = zonedDateTime.toInstant();
+        return Timestamp.from(instant);
     }
 
     public void setDataRetur(String dataRetur) {

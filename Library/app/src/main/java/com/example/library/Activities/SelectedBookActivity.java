@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Models.DB.Author;
@@ -43,6 +45,7 @@ public class SelectedBookActivity extends AppCompatActivity {
     private TextView BookAvailabilityTxt;
     private TextView BookDescriptionTxt;
     private Button reservButton;
+    private Button readBook;
 
     private TextView ratingNote;
     private TextView ratingNumber;
@@ -56,6 +59,11 @@ public class SelectedBookActivity extends AppCompatActivity {
 
     private RatingBar ratingBar;
     private FirebaseDatabaseHelper dbHelper;
+    private Button removedButton;
+    private ViewGroup.LayoutParams removedButtonLayoutParams;
+    private ConstraintLayout parentLayout;
+    private boolean isIt;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,12 +96,37 @@ public class SelectedBookActivity extends AppCompatActivity {
         BookAvailabilityTxt = findViewById(R.id.BookAvailabilityTxt);
         BookDescriptionTxt = findViewById(R.id.BookDescriptionTxt);
         reservButton = findViewById(R.id.BookReservationBtn);
+        readBook = findViewById(R.id.accesCarte);
 
         dbHelper = new FirebaseDatabaseHelper();
         updateUI(book);
         dbHelper.isBookBorrowed(MainActivity.sharedPreferences.getString("user_id",null),book.getId()).addOnSuccessListener(b->{
             if(b){
-                reservButton.setText("Read Book");
+                dbHelper.isBookMine(MainActivity.sharedPreferences.getString("user_id",null),book.getId())
+                        .addOnSuccessListener(isIt->{
+                            reservButton.setText("Restituie");
+                            this.isIt = isIt;
+                            if(!isIt){
+                                parentLayout = (ConstraintLayout) readBook.getParent();
+                                if (parentLayout != null) {
+                                    ViewGroup.LayoutParams layoutParams = readBook.getLayoutParams();
+                                    parentLayout.removeView(readBook);
+
+                                    this.removedButton = readBook;
+                                    this.removedButtonLayoutParams = layoutParams;
+                                }
+
+                            }
+                        });
+            }else{
+                parentLayout = (ConstraintLayout) readBook.getParent();
+                if (parentLayout != null) {
+                    ViewGroup.LayoutParams layoutParams = readBook.getLayoutParams();
+                    parentLayout.removeView(readBook);
+
+                    this.removedButton = readBook;
+                    this.removedButtonLayoutParams = layoutParams;
+                }
             }
         });
         System.out.println("we know if book is borrowed");
@@ -123,14 +156,44 @@ public class SelectedBookActivity extends AppCompatActivity {
             public void onClick(View v) {
                 dbHelper.isBookBorrowed(MainActivity.sharedPreferences.getString("user_id",null),book.getId()).addOnSuccessListener(b->{
                     if(b) {
+                        dbHelper.returnBook(book.getId(), MainActivity.sharedPreferences.getString("user_id", null));
+                        reservButton.setText("Rezerveaza");
+                        if(isIt){
+                            book.setDisponible(book.getDisponible() + 1);
+                            String disp = "Disponibilitate: " + String.valueOf(book.getDisponible());
+                            BookAvailabilityTxt.setText(disp);
+                            parentLayout = (ConstraintLayout) readBook.getParent();
+                            if (parentLayout != null) {
+                                ViewGroup.LayoutParams layoutParams = readBook.getLayoutParams();
+                                parentLayout.removeView(readBook);
 
+                                removedButton = readBook;
+                                removedButtonLayoutParams = layoutParams;
+                            }
+                        }
                     }else{
-                        dbHelper.borrowBook(book.getId(), MainActivity.sharedPreferences.getString("user_id",null));
-                        reservButton.setText("Read Book");
-                        String disp = "Disponibilitate: " + String.valueOf(book.getDisponible()-1);
-                        BookAvailabilityTxt.setText(disp);
+                        dbHelper.borrowBook(book.getId(), MainActivity.sharedPreferences.getString("user_id", null));
+                        reservButton.setText("Restituie");
+                        if(isIt) {
+                            book.setDisponible(book.getDisponible() - 1);
+                            String disp = "Disponibilitate: " + String.valueOf(book.getDisponible());
+                            BookAvailabilityTxt.setText(disp);
+                            if (removedButton != null && removedButtonLayoutParams != null) {
+                                parentLayout.addView(removedButton, removedButtonLayoutParams);
+
+                                removedButton = null;
+                                removedButtonLayoutParams = null;
+                            }
+                        }
                     }
                 });
+            }
+        });
+
+        readBook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
 

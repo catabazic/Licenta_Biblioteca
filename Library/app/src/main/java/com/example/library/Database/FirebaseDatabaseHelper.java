@@ -21,7 +21,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Query;
 //import com.google.firebase.database.Query;
 import com.google.firebase.firestore.DocumentReference;
@@ -34,7 +33,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
 
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -236,34 +234,29 @@ public class FirebaseDatabaseHelper {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void borrowBook(String idBook, String idUser) {
-        LocalDate currentDate = LocalDate.now();
         DocumentReference bookRef = db.collection("books").document(idBook);
         DocumentReference loanRef = db.collection("loans").document();
 
         db.runTransaction((Transaction.Function<Void>) transaction -> {
-            // Get book document
             DocumentSnapshot bookSnapshot = transaction.get(bookRef);
             if (bookSnapshot.exists()) {
                 int availableBooks = bookSnapshot.getLong("available").intValue();
                 if (availableBooks > 0) {
                     transaction.update(bookRef, "available", availableBooks - 1);
-
                     Map<String, Object> loanData = new HashMap<>();
                     loanData.put("userId", idUser);
                     loanData.put("bookId", idBook);
-                    loanData.put("requestDate", currentDate.toString());
-                    loanData.put("startDate", currentDate.toString());
+                    loanData.put("requestDate", FieldValue.serverTimestamp());
+                    loanData.put("startDate", FieldValue.serverTimestamp());
                     loanData.put("returnDate", null);
-
                     transaction.set(loanRef, loanData);
                 } else {
                     Map<String, Object> loanData = new HashMap<>();
                     loanData.put("userId", idUser);
                     loanData.put("bookId", idBook);
-                    loanData.put("requestDate", currentDate.toString());
+                    loanData.put("requestDate", FieldValue.serverTimestamp());
                     loanData.put("startDate", null);
                     loanData.put("returnDate", null);
-
                     transaction.set(loanRef, loanData);
                 }
             } else {
@@ -272,40 +265,18 @@ public class FirebaseDatabaseHelper {
             }
             return null;
         }).addOnSuccessListener(aVoid -> {
-            // Transaction success
             System.out.println("Book borrowed successfully");
         }).addOnFailureListener(e -> {
-            // Transaction failure
             e.printStackTrace();
         });
     }
 
-    /*public Task<List<Book>> getBorrowedBooks(String idUser) {
+    public Task<List<Loan>> getMyBooks(String idUser) {
         return db.collection("loans")
                 .whereEqualTo("userId", idUser)
                 .whereEqualTo("returnDate", null)
-                .get()
-                .continueWithTask(task -> {
-                    if (!task.isSuccessful() || task.getResult() == null) {
-                        throw task.getException();
-                    }
-
-                    List<Task<Book>> bookTasks = new ArrayList<>();
-
-                    for (DocumentSnapshot loanDoc : task.getResult().getDocuments()) {
-                        String bookId = loanDoc.getString("bookId");
-                        Task<Book> bookTask = this.getBookById(bookId);
-                        bookTasks.add(bookTask);
-                    }
-
-                    return Tasks.whenAllSuccess(bookTasks);
-                });
-    }*/
-
-    public Task<List<Loan>> getBorrowedBooks(String idUser) {
-        return db.collection("loans")
-                .whereEqualTo("userId", idUser)
-                .whereEqualTo("returnDate", null)
+                .whereNotEqualTo("startDate", null)
+                .orderBy("requestDate")
                 .get()
                 .continueWithTask(task -> {
                     if (!task.isSuccessful() || task.getResult() == null) {
@@ -319,11 +290,59 @@ public class FirebaseDatabaseHelper {
                         loan.setBookId(loanDoc.getString("bookId"));
                         loan.setUserId(loanDoc.getString("userId"));
                         loan.setId(loanDoc.getId());
-                        loan.setDataCerere(loanDoc.getString("requestDate"));
-                        loan.setDataInceput(loanDoc.getString("startDate"));
-                        loan.setDataRetur(loanDoc.getString("returnDate"));
+                        Date date = loanDoc.getDate("requestDate");
+                        if (date != null) {
+                            loan.setDataCerere(date.toString());
+                        }
+                        Date date1 = loanDoc.getDate("startDate");
+                        if (date1 != null) {
+                            loan.setDataInceput(date1.toString());
+                        }
+                        Date date2 = loanDoc.getDate("returnDate");
+                        if (date2 != null) {
+                            loan.setDataRetur(date2.toString());
+                        }
 
                         Task<Loan> loanTask = Tasks.forResult(loan); // Simulate a completed Task
+                        loanTasks.add(loanTask);
+                    }
+
+                    return Tasks.whenAllSuccess(loanTasks);
+                });
+    }
+
+    public Task<List<Loan>> getBorrowedBooks(String idUser) {
+        return db.collection("loans")
+                .whereEqualTo("userId", idUser)
+                .whereEqualTo("returnDate", null)
+                .orderBy("requestDate")
+                .get()
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful() || task.getResult() == null) {
+                        throw task.getException();
+                    }
+
+                    List<Task<Loan>> loanTasks = new ArrayList<>();
+
+                    for (DocumentSnapshot loanDoc : task.getResult().getDocuments()) {
+                        Loan loan = new Loan();
+                        loan.setBookId(loanDoc.getString("bookId"));
+                        loan.setUserId(loanDoc.getString("userId"));
+                        loan.setId(loanDoc.getId());
+                        Date date = loanDoc.getDate("requestDate");
+                        if (date != null) {
+                            loan.setDataCerere(date.toString());
+                        }
+                        Date date1 = loanDoc.getDate("startDate");
+                        if (date1 != null) {
+                            loan.setDataInceput(date1.toString());
+                        }
+                        Date date2 = loanDoc.getDate("returnDate");
+                        if (date2 != null) {
+                            loan.setDataRetur(date2.toString());
+                        }
+
+                        Task<Loan> loanTask = Tasks.forResult(loan);
                         loanTasks.add(loanTask);
                     }
 
@@ -335,6 +354,7 @@ public class FirebaseDatabaseHelper {
     public Task<List<Loan>> getAllHistory(String idUser) {
         return db.collection("loans")
                 .whereEqualTo("userId", idUser)
+                .orderBy("requestDate", Query.Direction.DESCENDING)
                 .get()
                 .continueWithTask(task -> {
                     if (!task.isSuccessful() || task.getResult() == null) {
@@ -348,9 +368,18 @@ public class FirebaseDatabaseHelper {
                         loan.setBookId(loanDoc.getString("bookId"));
                         loan.setUserId(loanDoc.getString("userId"));
                         loan.setId(loanDoc.getId());
-                        loan.setDataCerere(loanDoc.getString("requestDate"));
-                        loan.setDataInceput(loanDoc.getString("startDate"));
-                        loan.setDataRetur(loanDoc.getString("returnDate"));
+                        Date date = loanDoc.getDate("requestDate");
+                        if (date != null) {
+                            loan.setDataCerere(date.toString());
+                        }
+                        Date date1 = loanDoc.getDate("startDate");
+                        if (date1 != null) {
+                            loan.setDataInceput(date1.toString());
+                        }
+                        Date date2 = loanDoc.getDate("returnDate");
+                        if (date2 != null) {
+                            loan.setDataRetur(date2.toString());
+                        }
 
                         Task<Loan> loanTask = Tasks.forResult(loan); // Simulate a completed Task
                         loanTasks.add(loanTask);
@@ -362,7 +391,6 @@ public class FirebaseDatabaseHelper {
 
     public void getUserById(String userId, final FirestoreCallback<User> callback) {
         if (userId == null) {
-            // Handle the case where userId is null
             callback.onComplete(null);
             return;
         }
@@ -394,9 +422,25 @@ public class FirebaseDatabaseHelper {
                 .continueWith(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
                         QuerySnapshot querySnapshot = task.getResult();
-                        return !querySnapshot.isEmpty(); // Book is borrowed if query result is not empty
+                        return !querySnapshot.isEmpty();
                     }
-                    return false; // Error occurred or no result found
+                    return false;
+                });
+    }
+
+    public Task<Boolean> isBookMine(String idUser, String idBook) {
+        return db.collection("loans")
+                .whereEqualTo("userId", idUser)
+                .whereEqualTo("bookId", idBook)
+                .whereEqualTo("returnDate", null)
+                .whereNotEqualTo("startDate", null)
+                .get()
+                .continueWith(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        return !querySnapshot.isEmpty();
+                    }
+                    return false;
                 });
     }
 
@@ -474,8 +518,8 @@ public class FirebaseDatabaseHelper {
                         for (DocumentSnapshot doc : task.getResult().getDocuments()) {
                             Review review = new Review();
                             review.setId_book(doc.getString("bookId"));
-                            review.setId_user(doc.getString("userId")); // Assuming the field name is "userId"
-                            review.setReviewTitle(doc.getString("title")); // Assuming the field name is "reviewTitle"
+                            review.setId_user(doc.getString("userId"));
+                            review.setReviewTitle(doc.getString("title"));
                             review.setDate(doc.getString("date"));
                             review.setRating(doc.getDouble("rating"));
                             review.setID(doc.getId());
@@ -485,11 +529,9 @@ public class FirebaseDatabaseHelper {
                         }
                         return reviews;
                     } else {
-                        // Log the error if the task was not successful
                         if (task.getException() != null) {
                             Log.e("getAllReviewsOfBook", "Error getting documents: ", task.getException());
                         }
-                        // Return an empty list instead of null
                         return new ArrayList<>();
                     }
                 });
@@ -534,7 +576,6 @@ public class FirebaseDatabaseHelper {
                     System.out.println("Review added successfully: " + documentReference.getId());
                 })
                 .addOnFailureListener(e -> {
-                    // Handle failure
                     e.printStackTrace();
                 });
     }
@@ -595,7 +636,6 @@ public class FirebaseDatabaseHelper {
                             message.setId(queryDocument.getString("chatId"));
                             message.setId_user(queryDocument.getString("userId"));
                             Date date = queryDocument.getDate("date");
-                            System.out.println(date.toString());
                             if (date != null) {
                                 message.setDate(date.toString());
                             }
@@ -610,75 +650,67 @@ public class FirebaseDatabaseHelper {
     }
 
 
-    public void getChats(String idUser, final FirestoreCallback<List<Chat>> callback) {
+    public Task<List<QuerySnapshot>> getChats(String idUser, final FirestoreCallback<List<Chat>> callback) {
         List<Chat> chatList = new ArrayList<>();
 
-        db.collection("chats")
+        // First query task
+        Task<QuerySnapshot> task1 = db.collection("chats")
                 .whereEqualTo("user1Id", idUser)
-                .get()
-                .addOnCompleteListener(task1 -> {
-                    if (task1.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task1.getResult()) {
-                            Chat chat = new Chat();
-                            chat.setId(document.getId());
-                            String user1Id = document.getString("user1Id");
-                            String user2Id = document.getString("user2Id");
+                .get();
 
-                            String otherUserId = user1Id.equals(idUser) ? user2Id : user1Id;
-                            getUserById(otherUserId, user -> {
-                                if (user != null) {
-                                    chat.setIdUser(user.getId());
-                                    chat.setName(user.getName());
-                                    getLastMessageForConversation(chat.getId(), idUser, message -> {
-                                        if (message != null) {
-                                            chat.setMessage(message.getMessage());
-                                            chat.setDate(message.getDate());
-                                            chat.setLastMessageMine(message.getId_user().equals(idUser));
-                                        }
-                                        chatList.add(chat);
-                                        callback.onComplete(chatList);
-                                    });
-                                }
-                            });
-                        }
-                    } else {
-                        callback.onComplete(chatList); // or handle the error
-                    }
-                });
-
-        db.collection("chats")
+        // Second query task
+        Task<QuerySnapshot> task2 = db.collection("chats")
                 .whereEqualTo("user2Id", idUser)
-                .get()
-                .addOnCompleteListener(task2 -> {
-                    if (task2.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task2.getResult()) {
-                            Chat chat = new Chat();
-                            chat.setId(document.getId());
-                            String user1Id = document.getString("user1Id");
-                            String user2Id = document.getString("user2Id");
+                .get();
 
-                            String otherUserId = user1Id.equals(idUser) ? user2Id : user1Id;
-                            getUserById(otherUserId, user -> {
-                                if (user != null) {
-                                    chat.setIdUser(user.getId());
-                                    chat.setName(user.getName());
-                                    getLastMessageForConversation(chat.getId(), idUser, message -> {
-                                        if (message != null) {
-                                            chat.setMessage(message.getMessage());
-                                            chat.setDate(message.getDate());
-                                            chat.setLastMessageMine(message.getId_user().equals(idUser));
-                                        }
-                                        chatList.add(chat);
-                                        callback.onComplete(chatList);
-                                    });
-                                }
-                            });
+        // Combine both tasks using Tasks.whenAll()
+        return Tasks.whenAll(task1, task2)
+                .continueWithTask(task -> {
+                    // Process results of both queries
+                    List<QuerySnapshot> querySnapshots = new ArrayList<>();
+                    querySnapshots.add(task1.getResult());
+                    querySnapshots.add(task2.getResult());
+                    return Tasks.forResult(querySnapshots);
+                })
+                .addOnCompleteListener(allTasks -> {
+                    if (allTasks.isSuccessful()) {
+                        List<QuerySnapshot> querySnapshots = allTasks.getResult();
+                        for (QuerySnapshot querySnapshot : querySnapshots) {
+                            for (QueryDocumentSnapshot document : querySnapshot) {
+                                Chat chat = new Chat();
+                                chat.setId(document.getId());
+                                String user1Id = document.getString("user1Id");
+                                String user2Id = document.getString("user2Id");
+
+                                String otherUserId = user1Id.equals(idUser) ? user2Id : user1Id;
+                                getUserById(otherUserId, user -> {
+                                    if (user != null) {
+                                        chat.setIdUser(user.getId());
+                                        chat.setName(user.getName());
+                                        getLastMessageForConversation(chat.getId(), idUser, message -> {
+                                            if (message != null) {
+                                                chat.setMessage(message.getMessage());
+                                                chat.setDate(message.getDate());
+                                                chat.setLastMessageMine(message.getId_user().equals(idUser));
+                                            }
+                                            chatList.add(chat);
+
+                                            // Check if both tasks are complete before triggering callback
+                                            if (chatList.size() == querySnapshots.get(0).size() + querySnapshots.get(1).size()) {
+                                                callback.onComplete(chatList);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
                         }
                     } else {
+                        // Handle errors if any of the tasks fail
                         callback.onComplete(chatList); // or handle the error
                     }
                 });
     }
+
 
 
     public Task<List<Message>> getAllMessages(String chatId) {
@@ -778,7 +810,6 @@ public class FirebaseDatabaseHelper {
     public Task<List<Book>> getBooksSearch(String query) {
         String[] keywords = query.toLowerCase().split("\\s+");
         List<Book> list = new ArrayList<>();
-
         Task<QuerySnapshot> queryTask = db.collection("books").get();
 
         return queryTask.continueWith(task -> {
@@ -788,7 +819,6 @@ public class FirebaseDatabaseHelper {
                     for (String keyword : keywords) {
                         String name = document.getString("name");
                         if (name != null && name.toLowerCase().contains(keyword)) {
-//                            System.out.println(name);
                             Book book = new Book();
                             book.setId(document.getId());
                             book.setName(document.getString("name"));
@@ -825,7 +855,6 @@ public class FirebaseDatabaseHelper {
         String[] keywords = query.toLowerCase().split("\\s+");
         List<User> list = new ArrayList<>();
         Set<String> userIds = new HashSet<>();
-
         Task<QuerySnapshot> queryTask = db.collection("users").get();
 
         return queryTask.continueWithTask(task -> {
@@ -842,8 +871,8 @@ public class FirebaseDatabaseHelper {
                             boolean ok = true;
                             for (Chat chat : chats) {
                                 if (id.equals(chat.getIdUser())) {
-                                    System.out.println("it is false");
                                     ok = false;
+                                    break;
                                 }
                             }
                             if (ok && userIds.add(id)) {
@@ -855,7 +884,6 @@ public class FirebaseDatabaseHelper {
                                     String photoUrl = document.getString("photo");
                                     user.setPhoto(photoUrl);
                                 }
-                                System.out.println("The name that was is " + name);
                                 user.setNumber(document.getString("phone"));
                                 List<String> genres = (List<String>) document.get("genres");
                                 user.setGenres(genres != null ? genres : Collections.emptyList());
@@ -867,7 +895,7 @@ public class FirebaseDatabaseHelper {
                                 completionSource.setResult(null);
                             }
                         });
-                        futures.add(completionSource.getTask());
+                            futures.add(completionSource.getTask());
                     }
                 }
                 return Tasks.whenAllComplete(futures);
@@ -877,7 +905,7 @@ public class FirebaseDatabaseHelper {
             if (task.isSuccessful()) {
                 return list;
             } else {
-                return null;
+                return Collections.emptyList();
             }
         });
     }
@@ -1089,4 +1117,36 @@ public class FirebaseDatabaseHelper {
     }
 
 
+    public Task<QuerySnapshot> returnBook(String bookId, String userId) {
+        return db.collection("loans")
+                .whereEqualTo("bookId", bookId)
+                .whereEqualTo("userId", userId)
+                .whereEqualTo("returnDate", null)
+                .get()
+                .addOnCompleteListener(query -> {
+                    if (query.isSuccessful() && !query.getResult().isEmpty()) {
+                        for (QueryDocumentSnapshot document : query.getResult()) {
+                            if(document.getDate("startDate")!=null){
+                                addBook(bookId);
+                            }
+                            db.collection("loans").document(document.getId())
+                                    .update("returnDate", FieldValue.serverTimestamp())
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.d("Firestore", "DocumentSnapshot successfully updated!");
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.w("Firestore", "Error updating document", e);
+                                    });
+                        }
+                    } else {
+                        Log.d("Firestore", "No matching loan records found.");
+                    }
+                });
+    }
+
+    public Task<Void> addBook(String bookId){
+        return db.collection("books")
+                .document(bookId)
+                .update("available", FieldValue.increment(1));
+    }
 }

@@ -6,9 +6,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.library.Database.FirebaseDatabaseHelper;
 import com.example.library.Models.DB.User;
@@ -53,18 +55,26 @@ public class SelectedUserActivity extends AppCompatActivity {
             }
         });
 
-        addConv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dbHelper.addChat(user.getId(), MainActivity.sharedPreferences.getString("user_id", null)).addOnSuccessListener(chat ->{
-                    chat.setName(user.getName());
-                    Intent intent = new Intent(SelectedUserActivity.this, ChatActivity.class);
-                    intent.putExtra("chat",chat);
-                    startActivity(intent);
-                    finish();
-                });
+        if(intent.getSerializableExtra("page").equals("search")) {
+            addConv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dbHelper.addChat(user.getId(), MainActivity.sharedPreferences.getString("user_id", null)).addOnSuccessListener(chat -> {
+                        chat.setName(user.getName());
+                        Intent intent = new Intent(SelectedUserActivity.this, ChatActivity.class);
+                        intent.putExtra("chat", chat);
+                        startActivity(intent);
+                        finish();
+                    });
+                }
+            });
+        }else{
+            ConstraintLayout parentLayout = (ConstraintLayout) addConv.getParent();
+            if (parentLayout != null) {
+                // Remove the Button from the parent layout
+                parentLayout.removeView(addConv);
             }
-        });
+        }
 
     }
 

@@ -51,12 +51,14 @@ public class MyBooksActivity extends AppCompatActivity implements OnItemClickLis
 
         dbHelper = new FirebaseDatabaseHelper();
         dbHelper.getBorrowedBooks(MainActivity.sharedPreferences.getString("user_id",null)).addOnSuccessListener( l->{
-            System.out.println(l.size());
+            System.out.println("The size is... "+l.size());
             for(Loan loan : l){
                 System.out.println(loan.getBookId());
             }
             adapter = new BookAdapter(l, this);
             recyclerView.setAdapter(adapter);
+        }).addOnFailureListener(e->{
+            System.out.println("error... " + e);
         });
 
 

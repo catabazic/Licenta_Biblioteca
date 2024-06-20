@@ -85,6 +85,7 @@ dependencies {
     implementation ("com.squareup.picasso:picasso:2.71828")
     implementation(libs.firebase.storage)
     implementation ("com.github.dhaval2404:imagepicker:2.1")
+    implementation(libs.firebase.messaging)
     annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     testImplementation(libs.junit);
