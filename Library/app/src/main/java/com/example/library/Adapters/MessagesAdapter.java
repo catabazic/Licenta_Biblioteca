@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -66,13 +67,17 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
 
 
         if (message.getId_user().equals(idUser)) {
+            params.setMarginStart(100);
             params.gravity = Gravity.END;
             holder.textMessage.setLayoutParams(params);
             DrawableCompat.setTint(backgroundDrawable, 0x3C6750A3);
+            holder.textMessage.setPadding(20,20,20,20);
         } else {
+            params.setMarginEnd(100);
             params.gravity = Gravity.START;
             holder.textMessage.setLayoutParams(params);
             DrawableCompat.setTint(backgroundDrawable, 0x856750A3);
+            holder.textMessage.setPadding(20,20,20,20);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             holder.textMessage.setBackground(backgroundDrawable);
